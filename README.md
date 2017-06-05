@@ -1,4 +1,5 @@
-# RestServer Readme (will update1)
+# RestServer Readme (will update)
+
 
 __NOTE: Following is the manual steps to quick setup the rest server dev environment, the readme will be update to get the Jersey jars with Maven in build scripts__
 
