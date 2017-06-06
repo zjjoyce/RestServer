@@ -1,5 +1,4 @@
-# RestServer Readme (will update)
-
+# RestServer Readme
 
 __NOTE: Following is the manual steps to quick setup the rest server dev environment, the readme will be update to get the Jersey jars with Maven in build scripts__
 
@@ -24,6 +23,8 @@ mkdir <TOMCAT_HOME>/webapps/ocmanager/WEB-INF/lib
 5. Go the the web https://jersey.github.io/download.html
 to download the Jersey jars, then copy the them into the __<TOMCAT_HOME>/webapps/ocmanager/WEB-INF/lib__ folder
 
-6. Then restart the tomcat server
+6. Copy the __web.xml__ into the __<TOMCAT_HOME>/webapps/ocmanager/WEB-INF__ folder
 
-7. Access the __http://<your tomcat server>:<port>/ocmanager/v1/api/tenant__ with __POST__ request, you will get the __Hello World!__
+7. Then restart the tomcat server
+
+8. Access the __http://<your tomcat server>:<port>/ocmanager/v1/api/tenant__ with __POST__ request, you will get the __Hello World!__
