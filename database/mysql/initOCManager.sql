@@ -75,14 +75,16 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `ocmanager`.`tenants_users_assignment`
+-- Table `ocmanager`.`tenants_users_roles_assignment`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `ocmanager`.`tenants_users_assignment` (
+CREATE TABLE IF NOT EXISTS `ocmanager`.`tenants_users_roles_assignment` (
   `tenant_id` INT NOT NULL,
   `user_id` INT NOT NULL,
+  `role_id` INT NOT NULL,
   PRIMARY KEY (`tenant_id`, `user_id`),
   INDEX `fk_tenants_users_assignment_users1_idx` (`user_id` ASC),
   INDEX `fk_tenants_users_assignment_tenants1_idx` (`tenant_id` ASC),
+  INDEX `fk_tenants_users_assignment_roles1_idx` (`role_id` ASC),
   CONSTRAINT `fk_tenants_users_assignment_tenants1`
     FOREIGN KEY (`tenant_id`)
     REFERENCES `ocmanager`.`tenants` (`id`)
@@ -92,25 +94,8 @@ CREATE TABLE IF NOT EXISTS `ocmanager`.`tenants_users_assignment` (
     FOREIGN KEY (`user_id`)
     REFERENCES `ocmanager`.`users` (`id`)
     ON DELETE RESTRICT
-    ON UPDATE RESTRICT)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `ocmanager`.`users_roles_assignment`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `ocmanager`.`users_roles_assignment` (
-  `user_id` INT NOT NULL,
-  `role_id` INT NOT NULL,
-  PRIMARY KEY (`user_id`, `role_id`),
-  INDEX `fk_users_roles_assignment_roles1_idx` (`role_id` ASC),
-  INDEX `fk_users_roles_assignment_users1_idx` (`user_id` ASC),
-  CONSTRAINT `fk_users_roles_assignment_users1`
-    FOREIGN KEY (`user_id`)
-    REFERENCES `ocmanager`.`users` (`id`)
-    ON DELETE RESTRICT
     ON UPDATE RESTRICT,
-  CONSTRAINT `fk_users_roles_assignment_roles1`
+  CONSTRAINT `fk_tenants_users_assignment_roles1`
     FOREIGN KEY (`role_id`)
     REFERENCES `ocmanager`.`roles` (`id`)
     ON DELETE RESTRICT
