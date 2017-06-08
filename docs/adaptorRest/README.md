@@ -292,6 +292,7 @@ __request body:__
     "bindingUsers": 
         [
             {
+                "operation": "add",   //Only have 3 values ["add", "update", "delete"]
                 "id": "1",
                 "username": "user1",
                 "email": "xxx@123.com",
@@ -303,6 +304,7 @@ __request body:__
     "serviceInstances":
         [
             {
+                "operation": "add",   //Only have 3 values ["add", "update", "delete"]
                 "id": "1",
                 "serviceTypeId": "2",
                 "quota": 
