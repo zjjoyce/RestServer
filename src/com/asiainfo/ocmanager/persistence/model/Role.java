@@ -6,15 +6,15 @@ package com.asiainfo.ocmanager.persistence.model;
  *
  */
 public class Role {
-	private int id;
+	private String id;
 	private String rolename;
-	private int description;
+	private String description;
 
-	public int getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
@@ -26,11 +26,11 @@ public class Role {
 		this.rolename = rolename;
 	}
 
-	public int getDescription() {
+	public String getDescription() {
 		return description;
 	}
 
-	public void setDescription(int description) {
+	public void setDescription(String description) {
 		this.description = description;
 	}
 

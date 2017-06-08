@@ -6,16 +6,29 @@ package com.asiainfo.ocmanager.persistence.model;
  *
  */
 public class User {
-	private int id;
+	private String id;
 	private String username;
 	private String password;
-	private int description;
+	private String email;
+	private String description;
 
-	public int getId() {
+	public User() {
+
+	}
+
+	public User(String id, String username, String password, String email, String description) {
+		this.id = id;
+		this.username = username;
+		this.password = password;
+		this.email = email;
+		this.description = description;
+	}
+
+	public String getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
@@ -31,15 +44,23 @@ public class User {
 		return password;
 	}
 
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
 	public void setPassword(String password) {
 		this.password = password;
 	}
 
-	public int getDescription() {
+	public String getDescription() {
 		return description;
 	}
 
-	public void setDescription(int description) {
+	public void setDescription(String description) {
 		this.description = description;
 	}
 
