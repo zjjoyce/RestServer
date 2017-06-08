@@ -8,10 +8,10 @@ USE `ocmanager` ;
 -- Table `ocmanager`.`tenants`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `ocmanager`.`tenants` (
-  `id` INT NOT NULL AUTO_INCREMENT,
+  `id` VARCHAR(64) NOT NULL,
   `name` VARCHAR(64) NOT NULL,
   `description` MEDIUMTEXT NULL,
-  `parent_id` INT NULL,
+  `parent_id` VARCHAR(64) NULL,
   PRIMARY KEY (`id`))
 ENGINE = InnoDB;
 
@@ -20,9 +20,10 @@ ENGINE = InnoDB;
 -- Table `ocmanager`.`users`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `ocmanager`.`users` (
-  `id` INT NOT NULL AUTO_INCREMENT,
+  `id` VARCHAR(64) NOT NULL,
   `username` VARCHAR(45) NOT NULL,
-  `password` VARCHAR(45) NOT NULL,
+  `password` VARCHAR(45) NULL,
+  `email` VARCHAR(45) NULL,
   `description` MEDIUMTEXT NULL,
   PRIMARY KEY (`id`))
 ENGINE = InnoDB;
@@ -32,7 +33,7 @@ ENGINE = InnoDB;
 -- Table `ocmanager`.`services`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `ocmanager`.`services` (
-  `id` INT NOT NULL,
+  `id` VARCHAR(64) NOT NULL,
   `servicename` VARCHAR(45) NOT NULL,
   `description` MEDIUMTEXT NULL,
   PRIMARY KEY (`id`))
@@ -43,7 +44,7 @@ ENGINE = InnoDB;
 -- Table `ocmanager`.`roles`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `ocmanager`.`roles` (
-  `id` INT NOT NULL,
+  `id` VARCHAR(64) NOT NULL,
   `rolename` VARCHAR(45) NOT NULL,
   `description` VARCHAR(45) NULL,
   PRIMARY KEY (`id`))
@@ -54,9 +55,9 @@ ENGINE = InnoDB;
 -- Table `ocmanager`.`service_instances`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `ocmanager`.`service_instances` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `tenant_id` INT NOT NULL,
-  `service_type` INT NOT NULL,
+  `id` VARCHAR(64) NOT NULL,
+  `tenant_id` VARCHAR(64) NOT NULL,
+  `service_type` VARCHAR(64) NOT NULL,
   `quota` MEDIUMTEXT NOT NULL,
   PRIMARY KEY (`id`),
   INDEX `fk_service_instances_tenants1_idx` (`tenant_id` ASC),
@@ -78,9 +79,9 @@ ENGINE = InnoDB;
 -- Table `ocmanager`.`tenants_users_roles_assignment`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `ocmanager`.`tenants_users_roles_assignment` (
-  `tenant_id` INT NOT NULL,
-  `user_id` INT NOT NULL,
-  `role_id` INT NOT NULL,
+  `tenant_id` VARCHAR(64) NOT NULL,
+  `user_id` VARCHAR(64) NOT NULL,
+  `role_id` VARCHAR(64) NOT NULL,
   PRIMARY KEY (`tenant_id`, `user_id`),
   INDEX `fk_tenants_users_assignment_users1_idx` (`user_id` ASC),
   INDEX `fk_tenants_users_assignment_tenants1_idx` (`tenant_id` ASC),
@@ -107,11 +108,9 @@ ENGINE = InnoDB;
 -- Table `ocmanager`.`services_roles_permission`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `ocmanager`.`services_roles_permission` (
-  `service_id` INT NOT NULL,
-  `role_id` INT NOT NULL,
-  `read` TINYINT NOT NULL,
-  `write` TINYINT NOT NULL,
-  `excute` TINYINT NOT NULL,
+  `service_id` VARCHAR(64) NOT NULL,
+  `role_id` VARCHAR(64) NOT NULL,
+  `permission` TEXT NULL,
   PRIMARY KEY (`service_id`, `role_id`),
   INDEX `fk_services_roles_permission_roles1_idx` (`role_id` ASC),
   INDEX `fk_services_roles_permission_services1_idx` (`service_id` ASC),

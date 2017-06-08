@@ -6,7 +6,11 @@ import java.util.List;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
+import org.apache.ibatis.session.SqlSession;
+
+import com.asiainfo.ocmanager.persistence.mapper.UserMapper;
 import com.asiainfo.ocmanager.persistence.model.User;
+import com.asiainfo.ocmanager.persistence.test.DBConnectorFactory;
 
 /**
  * 
@@ -25,7 +29,20 @@ public class UserResource {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<User> getUsers() {
-		List<User> users = new ArrayList();
+		SqlSession session = DBConnectorFactory.getSession();
+		List<User> users = new ArrayList<User>();
+		try {
+			UserMapper mapper = session.getMapper(UserMapper.class);
+			users = mapper.selectAllUsers();
+
+			session.commit();
+
+		} catch (Exception e) {
+			session.rollback();
+		} finally {
+			session.close();
+		}
+
 		return users;
 	}
 
@@ -39,9 +56,22 @@ public class UserResource {
 	@GET
 	@Path("{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public User getUserById(@PathParam("id") int userId) {
-		User user = new User();
-		return user;
+	public User getUserById(@PathParam("id") String userId) {
+		SqlSession session = DBConnectorFactory.getSession();
+		User user = null;
+		try {
+			UserMapper mapper = session.getMapper(UserMapper.class);
+			user = mapper.selectUserById(userId);
+
+			session.commit();
+
+		} catch (Exception e) {
+			session.rollback();
+		} finally {
+			session.close();
+		}
+
+		return user == null ? new User() : user;
 	}
 
 	/**
