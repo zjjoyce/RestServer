@@ -1,4 +1,4 @@
-package com.asiainfo.ocmanager.rest;
+package com.asiainfo.ocmanager.rest.resource;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,6 +8,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.apache.ibatis.session.SqlSession;
 
@@ -30,7 +31,7 @@ public class ServiceResource {
 	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<Service> getServices() {
+	public Response getServices() {
 		SqlSession session = DBConnectorFactory.getSession();
 		List<Service> services = new ArrayList<Service>();
 		try {
@@ -45,7 +46,7 @@ public class ServiceResource {
 			session.close();
 		}
 
-		return services;
+		return Response.ok().entity(services).build();
 	}
 
 	/**
@@ -56,7 +57,7 @@ public class ServiceResource {
 	@GET
 	@Path("{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Service getServiceById(@PathParam("id") String serviceId) {
+	public Response getServiceById(@PathParam("id") String serviceId) {
 		SqlSession session = DBConnectorFactory.getSession();
 		Service service = null;
 		try {
@@ -71,7 +72,7 @@ public class ServiceResource {
 			session.close();
 		}
 
-		return service == null ? new Service() : service;
+		return Response.ok().entity(service == null ? new Service() : service).build();
 	}
 
 }

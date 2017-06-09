@@ -18,7 +18,11 @@ public class TestUser {
 		try {
 			UserMapper mapper = session.getMapper(UserMapper.class);
 
+			System.out.println("=== Insert user ===");
 			mapper.insertUser(new User("id3", "username", "password", "email", "description"));
+
+			System.out.println("=== Update user ===");
+			mapper.updateUser(new User("id3", "username4", "password4", "email4", "description4"));
 
 			List<User> users = mapper.selectAllUsers();
 
@@ -29,12 +33,26 @@ public class TestUser {
 				System.out.println(u.getEmail());
 				System.out.println(u.getDescription());
 			}
+
 			System.out.println("=== User by id ===");
 			User user = mapper.selectUserById("1");
 			System.out.println(user.getId());
 			System.out.println(user.getUsername());
 			System.out.println(user.getEmail());
 			System.out.println(user.getDescription());
+
+			System.out.println("=== Delete user ===");
+			mapper.deleteUser("id3");
+
+			List<User> usersAfterD = mapper.selectAllUsers();
+
+			System.out.println("=== All users after delete ===");
+			for (User u : usersAfterD) {
+				System.out.println(u.getId());
+				System.out.println(u.getUsername());
+				System.out.println(u.getEmail());
+				System.out.println(u.getDescription());
+			}
 
 			session.commit();
 

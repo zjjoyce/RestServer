@@ -1,4 +1,4 @@
-package com.asiainfo.ocmanager.rest;
+package com.asiainfo.ocmanager.rest.resource;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,6 +7,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.apache.ibatis.session.SqlSession;
 
@@ -30,7 +31,7 @@ public class RoleResource {
 	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<Role> getRoles() {
+	public Response getRoles() {
 		SqlSession session = DBConnectorFactory.getSession();
 		List<Role> roles = new ArrayList<Role>();
 		try {
@@ -44,7 +45,7 @@ public class RoleResource {
 			session.close();
 		}
 
-		return roles;
+		return Response.ok().entity(roles).build();
 	}
 
 }

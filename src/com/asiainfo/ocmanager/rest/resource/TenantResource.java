@@ -1,4 +1,4 @@
-package com.asiainfo.ocmanager.rest;
+package com.asiainfo.ocmanager.rest.resource;
 
 import java.util.ArrayList;
 import java.util.List;
