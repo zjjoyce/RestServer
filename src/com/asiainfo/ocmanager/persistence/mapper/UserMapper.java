@@ -24,13 +24,24 @@ public interface UserMapper {
 	 * @return
 	 */
 	public User selectUserById(String userId);
-	
-	
+
 	/**
 	 * 
 	 * @param user
 	 * @return
 	 */
 	public void insertUser(User user);
+
+	/**
+	 * 
+	 * @param user
+	 */
+	public void updateUser(User user);
+
+	/**
+	 * 
+	 * @param userId
+	 */
+	public void deleteUser(String userId);
 
 }

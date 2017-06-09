@@ -8,10 +8,6 @@ import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 
-import com.asiainfo.ocmanager.persistence.mapper.TenantMapper;
-import com.asiainfo.ocmanager.persistence.model.Tenant;
-
-
 /**
  * 
  * @author zhaoyim
@@ -21,8 +17,8 @@ import com.asiainfo.ocmanager.persistence.model.Tenant;
 public class DBConnectorFactory {
 
 	public static SqlSessionFactory sessionFactory;
-	
-	static{
+
+	static {
 
 		try {
 			String resource = "com/asiainfo/ocmanager/persistence/configuration.xml";
@@ -31,28 +27,11 @@ public class DBConnectorFactory {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
-	}
-	
-	public static SqlSession getSession(){
-		return sessionFactory.openSession();
-	}
-	
-	
-	public static void main(String[] args) {
-		SqlSession session = DBConnectorFactory.getSession();
-		try {
-			TenantMapper mapper = session.getMapper(TenantMapper.class);
-			Tenant tenant = mapper.selectTenantById(1);
-			System.out.println(tenant);
-			System.out.println(tenant.getId());
-			System.out.println(tenant.getName());
-			session.commit();
-		} catch (Exception e) {
-			session.rollback();
-		} finally {
-			session.close();
-		}
 
 	}
+
+	public static SqlSession getSession() {
+		return sessionFactory.openSession();
+	}
+
 }
