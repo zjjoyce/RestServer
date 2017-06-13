@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS `ocmanager`.`tenants` (
   `id` VARCHAR(64) NOT NULL,
   `name` VARCHAR(64) NOT NULL,
   `description` MEDIUMTEXT NULL,
-  `parent_id` VARCHAR(64) NULL,
+  `parentId` VARCHAR(64) NULL,
   PRIMARY KEY (`id`))
 ENGINE = InnoDB;
 

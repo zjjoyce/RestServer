@@ -1,6 +1,5 @@
 package com.asiainfo.ocmanager.persistence.model;
 
-
 /**
  * 
  * @author zhaoyim
@@ -8,16 +7,27 @@ package com.asiainfo.ocmanager.persistence.model;
  */
 public class Tenant {
 
-	private int id;
+	private String id;
 	private String name;
 	private String description;
-	private int parent_id;
+	private String parentId;
 
-	public int getId() {
+	public Tenant() {
+
+	}
+
+	public Tenant(String id, String name, String description, String parentId) {
+		this.id = id;
+		this.name = name;
+		this.description = description;
+		this.parentId = parentId;
+	}
+
+	public String getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
@@ -37,12 +47,12 @@ public class Tenant {
 		this.description = description;
 	}
 
-	public int getParent_id() {
-		return parent_id;
+	public String getParentId() {
+		return parentId;
 	}
 
-	public void setParent_id(int parent_id) {
-		this.parent_id = parent_id;
+	public void setParentId(String parentId) {
+		this.parentId = parentId;
 	}
 
 }
