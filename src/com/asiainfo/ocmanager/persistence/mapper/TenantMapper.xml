@@ -3,7 +3,24 @@
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.asiainfo.ocmanager.persistence.mapper.TenantMapper">
-	<select id="selectTenantById" parameterType="int" resultType="com.asiainfo.ocmanager.persistence.model.Tenant">
+	<!-- get all tenants -->
+	<select id="selectAllTenants" resultType="com.asiainfo.ocmanager.persistence.model.Tenant">
+		select * from tenants
+	</select>
+	<!-- get tenant by id -->
+	<select id="selectTenantById" parameterType="java.lang.String"
+		resultType="com.asiainfo.ocmanager.persistence.model.Tenant">
 		select * from tenants where id=#{id}
 	</select>
+	<!-- get tenant children -->
+	<select id="selectChildrenTenants" parameterType="java.lang.String"
+		resultType="com.asiainfo.ocmanager.persistence.model.Tenant">
+		select * from tenants where parentId=#{parentId}
+	</select>
+	<!-- create tenant -->
+	<insert id="insertTenant" keyProperty="id"
+		parameterType="com.asiainfo.ocmanager.persistence.model.Tenant">
+		insert into tenants (id, name, description, parentId)
+		values (#{id}, #{name}, #{description}, #{parentId})
+	</insert>
 </mapper>
