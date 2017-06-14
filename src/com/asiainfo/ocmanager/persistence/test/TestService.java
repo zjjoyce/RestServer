@@ -2,8 +2,6 @@ package com.asiainfo.ocmanager.persistence.test;
 
 import java.util.List;
 
-import javax.json.Json;
-
 import org.apache.ibatis.session.SqlSession;
 
 import com.asiainfo.ocmanager.persistence.mapper.ServiceMapper;
