@@ -34,9 +34,10 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `ocmanager`.`services` (
   `id` VARCHAR(64) NOT NULL,
-  `servicename` VARCHAR(45) NOT NULL,
+  `servicename` VARCHAR(64) NOT NULL,
   `description` MEDIUMTEXT NULL,
-  PRIMARY KEY (`id`))
+  PRIMARY KEY (`servicename`),
+  UNIQUE INDEX `id_UNIQUE` (`id` ASC))
 ENGINE = InnoDB;
 
 
@@ -56,20 +57,22 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `ocmanager`.`service_instances` (
   `id` VARCHAR(64) NOT NULL,
-  `tenant_id` VARCHAR(64) NOT NULL,
-  `service_type` VARCHAR(64) NOT NULL,
-  `quota` MEDIUMTEXT NOT NULL,
+  `instanceName` VARCHAR(64) NOT NULL,
+  `tenantId` VARCHAR(64) NOT NULL,
+  `serviceTypeId` VARCHAR(64) NULL,
+  `serviceTypeName` VARCHAR(64) NOT NULL,
+  `quota` MEDIUMTEXT NULL,
   PRIMARY KEY (`id`),
-  INDEX `fk_service_instances_tenants1_idx` (`tenant_id` ASC),
-  INDEX `fk_service_instances_services1_idx` (`service_type` ASC),
+  INDEX `fk_service_instances_tenants1_idx` (`tenantId` ASC),
+  INDEX `fk_service_instances_services1_idx` (`serviceTypeName` ASC),
   CONSTRAINT `fk_service_instances_tenants1`
-    FOREIGN KEY (`tenant_id`)
+    FOREIGN KEY (`tenantId`)
     REFERENCES `ocmanager`.`tenants` (`id`)
     ON DELETE RESTRICT
     ON UPDATE RESTRICT,
   CONSTRAINT `fk_service_instances_services1`
-    FOREIGN KEY (`service_type`)
-    REFERENCES `ocmanager`.`services` (`id`)
+    FOREIGN KEY (`serviceTypeName`)
+    REFERENCES `ocmanager`.`services` (`servicename`)
     ON DELETE RESTRICT
     ON UPDATE RESTRICT)
 ENGINE = InnoDB;

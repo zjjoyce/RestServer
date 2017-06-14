@@ -1,48 +1,37 @@
 package com.asiainfo.ocmanager.rest.resource;
 
-import java.io.File;
-import java.io.IOException;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
-import javax.net.ssl.SSLContext;
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.ssl.SSLContexts;
-import org.apache.http.ssl.TrustStrategy;
 import org.apache.http.util.EntityUtils;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
 
-import org.apache.ibatis.session.SqlSession;
-
-import com.asiainfo.ocmanager.persistence.mapper.TenantMapper;
 import com.asiainfo.ocmanager.persistence.model.ServiceInstance;
 import com.asiainfo.ocmanager.persistence.model.Tenant;
-import com.asiainfo.ocmanager.persistence.model.User;
-import com.asiainfo.ocmanager.persistence.test.DBConnectorFactory;
+import com.asiainfo.ocmanager.persistence.model.UserRoleView;
+import com.asiainfo.ocmanager.rest.resource.utils.ServiceInstancePersistenceWrapper;
 import com.asiainfo.ocmanager.rest.resource.utils.TenantPersistenceWrapper;
+import com.asiainfo.ocmanager.rest.resource.utils.UserRoleViewPersistenceWrapper;
 import com.asiainfo.ocmanager.rest.utils.SSLSocketIgnoreCA;
 import com.asiainfo.ocmanager.rest.utils.UUIDFactory;
-import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -62,9 +51,9 @@ public class TenantResource {
 	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<Tenant> getAllTenants() {
+	public Response getAllTenants() {
 		List<Tenant> tenants = TenantPersistenceWrapper.getAllTenants();
-		return tenants;
+		return Response.ok().entity(tenants).build();
 	}
 
 	/**
@@ -77,8 +66,9 @@ public class TenantResource {
 	@GET
 	@Path("{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Tenant getTenantById(@PathParam("id") String tenantId) {
-		return TenantPersistenceWrapper.getTenantById(tenantId);
+	public Response getTenantById(@PathParam("id") String tenantId) {
+		Tenant tenant = TenantPersistenceWrapper.getTenantById(tenantId);
+		return Response.ok().entity(tenant).build();
 	}
 
 	/**
@@ -91,9 +81,70 @@ public class TenantResource {
 	@GET
 	@Path("{id}/children")
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<Tenant> getChildrenTeants(@PathParam("id") String parentTenantId) {
-		return TenantPersistenceWrapper.getChildrenTenants(parentTenantId);
+	public Response getChildrenTeants(@PathParam("id") String parentTenantId) {
+		List<Tenant> tenants = TenantPersistenceWrapper.getChildrenTenants(parentTenantId);
+		return Response.ok().entity(tenants).build(); 
 	}
+	
+	
+	/**
+	 * Get the users list in the specific tenant
+	 * 
+	 * @param tenantId
+	 *            tenant id
+	 * @return user list
+	 */
+	@GET
+	@Path("{id}/users")
+	public Response getTenantUsers(@PathParam("id") String tenantId) {
+		List<UserRoleView> usersRoles = UserRoleViewPersistenceWrapper.getUsersInTenant(tenantId);
+		return Response.ok().entity(usersRoles).build(); 
+	}
+	
+	
+	
+	/**
+	 * Get the service instance list in the specific tenant
+	 * 
+	 * @param tenantId
+	 *            tenant id
+	 * @return service instance list
+	 */
+	@GET
+	@Path("{id}/service/instances")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getTenantServiceInstances(@PathParam("id") String tenantId) {
+		
+		String dfRestUrl = "https://10.1.130.134:8443/oapi/v1/namespaces/"+ tenantId + "/backingserviceinstances";
+		try {
+		SSLConnectionSocketFactory sslsf = SSLSocketIgnoreCA.createSSLSocketFactory();
+
+		CloseableHttpClient httpclient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
+		try {
+			HttpGet httpGet = new HttpGet(dfRestUrl);
+			httpGet.addHeader("Content-type", "application/json");
+			httpGet.addHeader("Authorization", "bearer "
+					+ "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJkZWZhdWx0Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6Im9jbS10b2tlbi12NzZtNyIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50Lm5hbWUiOiJvY20iLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC51aWQiOiI1ZTg1MGY0Yi00YzM3LTExZTctYWE0OS1mYTE2M2VmZGJlYTgiLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6ZGVmYXVsdDpvY20ifQ.t1SrAN167RVL4slBo2botWDzjNtXG8J4tRlnlNJJL85HOHMYNEi-FvGJ5Nt37mKVVVPaZFjUoU5pGLBCzcE79pzrRJyBMXe_duCsCX23z9M-cEllX9Srn7Kex2N5D596M8S8mnSwtLSvXjYuX2ftW7eCWw1738hUtTg1UxXWO-HYW8yPYGTusZJFErtkdl7pV6wAcDl__ltSI62IjoeIjKT5ZGM5GLmInWDu9Dkk6i0pBy2kTWbLQqRD94QZKXMK9Zp4uAjCFaYaumT_DWhRh9DvHYK6dXvmxVXKvqXe9uVHYwT2AbNVZq-ix1Tev3xzaNw8ju9XZq4xHFLNi4LzFQ");
+
+			 CloseableHttpResponse response1 = httpclient.execute(httpGet);
+
+			try {
+//				int statusCode = response1.getStatusLine().getStatusCode();
+
+				String bodyStr = EntityUtils.toString(response1.getEntity());
+
+				return Response.ok().entity(bodyStr).build();
+			} finally {
+				response1.close();
+			}
+		} finally {
+			httpclient.close();
+		}
+		} catch (Exception e) {
+			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+		}
+	}
+	
 	
 	
 	/**
@@ -164,6 +215,87 @@ public class TenantResource {
 		}
 	}
 
+	
+	
+	
+	
+	/**
+	 * Create a service instance in specific tenant
+	 * 
+	 * @param 
+	 * @return
+	 */
+	@POST
+	@Path("{id}/service/instance")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response createServiceInstanceInTenant(@PathParam("id") String tenantId, String reqBodyStr) {
+
+		String dfRestUrl = "https://10.1.130.134:8443/oapi/v1/namespaces/"+ tenantId + "/backingserviceinstances";
+		try {
+			// parse the req body make sure it is json
+			JsonElement reqBodyJson = new JsonParser().parse(reqBodyStr);
+			SSLConnectionSocketFactory sslsf = SSLSocketIgnoreCA.createSSLSocketFactory();
+
+			CloseableHttpClient httpclient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
+			try {
+				HttpPost httpPost = new HttpPost(dfRestUrl);
+				httpPost.addHeader("Content-type", "application/json");
+				httpPost.addHeader("Authorization", "bearer "
+						+ "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJkZWZhdWx0Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6Im9jbS10b2tlbi12NzZtNyIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50Lm5hbWUiOiJvY20iLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC51aWQiOiI1ZTg1MGY0Yi00YzM3LTExZTctYWE0OS1mYTE2M2VmZGJlYTgiLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6ZGVmYXVsdDpvY20ifQ.t1SrAN167RVL4slBo2botWDzjNtXG8J4tRlnlNJJL85HOHMYNEi-FvGJ5Nt37mKVVVPaZFjUoU5pGLBCzcE79pzrRJyBMXe_duCsCX23z9M-cEllX9Srn7Kex2N5D596M8S8mnSwtLSvXjYuX2ftW7eCWw1738hUtTg1UxXWO-HYW8yPYGTusZJFErtkdl7pV6wAcDl__ltSI62IjoeIjKT5ZGM5GLmInWDu9Dkk6i0pBy2kTWbLQqRD94QZKXMK9Zp4uAjCFaYaumT_DWhRh9DvHYK6dXvmxVXKvqXe9uVHYwT2AbNVZq-ix1Tev3xzaNw8ju9XZq4xHFLNi4LzFQ");
+
+				StringEntity se = new StringEntity(reqBodyJson.toString());
+				se.setContentType("application/json");
+				httpPost.setEntity(se);
+
+				CloseableHttpResponse response2 = httpclient.execute(httpPost);
+
+				try {
+					int statusCode = response2.getStatusLine().getStatusCode();
+					String bodyStr = EntityUtils.toString(response2.getEntity());
+					if (statusCode == 201) {
+						JsonElement resBodyJson = new JsonParser().parse(bodyStr);
+						JsonObject resBodyJsonObj = resBodyJson.getAsJsonObject();
+						ServiceInstance serviceInstance= new ServiceInstance();
+						
+						serviceInstance.setId(resBodyJsonObj.getAsJsonObject("metadata").get("uid").getAsString());
+						serviceInstance.setInstanceName(resBodyJsonObj.getAsJsonObject("metadata").get("name").getAsString());
+						serviceInstance.setTenantId(tenantId);
+						serviceInstance.setServiceTypeId(resBodyJsonObj.getAsJsonObject("spec").getAsJsonObject("provisioning").get("backingservice_spec_id").getAsString());
+						serviceInstance.setServiceTypeName(resBodyJsonObj.getAsJsonObject("spec").getAsJsonObject("provisioning").get("backingservice_name").getAsString());
+						
+						if((resBodyJsonObj.getAsJsonObject("spec").getAsJsonObject("provisioning").get("parameters").isJsonNull())){
+							// should get df service quota
+						} else {
+							// parameters are a json format should use to string
+							serviceInstance.setQuota(resBodyJsonObj.getAsJsonObject("spec").getAsJsonObject("provisioning").get("parameters").toString());
+						}
+						
+					
+						ServiceInstancePersistenceWrapper.createServiceInstance(serviceInstance);
+					}
+
+					return Response.ok().entity(bodyStr).build();
+				} finally {
+					response2.close();
+				}
+			} finally {
+				httpclient.close();
+			}
+		} catch (Exception e) {
+			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+		}
+		
+		
+
+	}
+	
+	
+	
+	
+	
+	
+	
 	/**
 	 * Update the existing tenant info
 	 * 
@@ -191,32 +323,7 @@ public class TenantResource {
 
 	}
 
-	/**
-	 * Get the users list in the specific tenant
-	 * 
-	 * @param tenantId
-	 *            tenant id
-	 * @return user list
-	 */
-	@GET
-	@Path("{id}/user")
-	public List<User> getTenantUsers(@PathParam("id") int tenantId) {
-		List<User> tenantUsers = new ArrayList();
-		return tenantUsers;
-	}
 
-	/**
-	 * Get the service instance list in the specific tenant
-	 * 
-	 * @param tenantId
-	 *            tenant id
-	 * @return service instance list
-	 */
-	@GET
-	@Path("{id}/service/instances")
-	public List<ServiceInstance> getTenantServiceInstances(@PathParam("id") int tenantId) {
-		List<ServiceInstance> serviceInstances = new ArrayList();
-		return serviceInstances;
-	}
+
 
 }

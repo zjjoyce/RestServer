@@ -6,7 +6,6 @@ import org.apache.ibatis.session.SqlSession;
 
 import com.asiainfo.ocmanager.persistence.mapper.TenantMapper;
 import com.asiainfo.ocmanager.persistence.model.Tenant;
-import com.asiainfo.ocmanager.persistence.model.User;
 
 /**
  * 

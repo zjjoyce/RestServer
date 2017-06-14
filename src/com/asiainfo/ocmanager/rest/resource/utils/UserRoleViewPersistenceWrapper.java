@@ -1,0 +1,38 @@
+package com.asiainfo.ocmanager.rest.resource.utils;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.ibatis.session.SqlSession;
+
+import com.asiainfo.ocmanager.persistence.mapper.UserRoleMapper;
+import com.asiainfo.ocmanager.persistence.model.UserRoleView;
+import com.asiainfo.ocmanager.persistence.test.DBConnectorFactory;
+
+/**
+ * 
+ * @author zhaoyim
+ *
+ */
+public class UserRoleViewPersistenceWrapper {
+	
+	/**
+	 * 
+	 * @param tenantId
+	 * @return
+	 */
+	public static List<UserRoleView> getUsersInTenant(String tenantId) {
+		SqlSession session = DBConnectorFactory.getSession();
+		List<UserRoleView> usersWithRoles = new ArrayList<UserRoleView>();
+		try {
+			UserRoleMapper mapper = session.getMapper(UserRoleMapper.class);
+			usersWithRoles = mapper.selectUsersRolesInTenant(tenantId);
+			session.commit();
+		} catch (Exception e) {
+			session.rollback();
+		} finally {
+			session.close();
+		}
+		return usersWithRoles;
+	}
+}
