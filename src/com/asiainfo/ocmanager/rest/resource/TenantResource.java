@@ -15,6 +15,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
@@ -81,12 +82,11 @@ public class TenantResource {
 	@GET
 	@Path("{id}/children")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getChildrenTeants(@PathParam("id") String parentTenantId) {
+	public Response getChildrenTenants(@PathParam("id") String parentTenantId) {
 		List<Tenant> tenants = TenantPersistenceWrapper.getChildrenTenants(parentTenantId);
-		return Response.ok().entity(tenants).build(); 
+		return Response.ok().entity(tenants).build();
 	}
-	
-	
+
 	/**
 	 * Get the users list in the specific tenant
 	 * 
@@ -98,11 +98,9 @@ public class TenantResource {
 	@Path("{id}/users")
 	public Response getTenantUsers(@PathParam("id") String tenantId) {
 		List<UserRoleView> usersRoles = UserRoleViewPersistenceWrapper.getUsersInTenant(tenantId);
-		return Response.ok().entity(usersRoles).build(); 
+		return Response.ok().entity(usersRoles).build();
 	}
-	
-	
-	
+
 	/**
 	 * Get the service instance list in the specific tenant
 	 * 
@@ -114,39 +112,42 @@ public class TenantResource {
 	@Path("{id}/service/instances")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getTenantServiceInstances(@PathParam("id") String tenantId) {
+
+		List<ServiceInstance> serviceInstances = ServiceInstancePersistenceWrapper.getServiceInstancesInTenant(tenantId);
+		return Response.ok().entity(serviceInstances).build();
 		
-		String dfRestUrl = "https://10.1.130.134:8443/oapi/v1/namespaces/"+ tenantId + "/backingserviceinstances";
-		try {
-		SSLConnectionSocketFactory sslsf = SSLSocketIgnoreCA.createSSLSocketFactory();
-
-		CloseableHttpClient httpclient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
-		try {
-			HttpGet httpGet = new HttpGet(dfRestUrl);
-			httpGet.addHeader("Content-type", "application/json");
-			httpGet.addHeader("Authorization", "bearer "
-					+ "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJkZWZhdWx0Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6Im9jbS10b2tlbi12NzZtNyIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50Lm5hbWUiOiJvY20iLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC51aWQiOiI1ZTg1MGY0Yi00YzM3LTExZTctYWE0OS1mYTE2M2VmZGJlYTgiLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6ZGVmYXVsdDpvY20ifQ.t1SrAN167RVL4slBo2botWDzjNtXG8J4tRlnlNJJL85HOHMYNEi-FvGJ5Nt37mKVVVPaZFjUoU5pGLBCzcE79pzrRJyBMXe_duCsCX23z9M-cEllX9Srn7Kex2N5D596M8S8mnSwtLSvXjYuX2ftW7eCWw1738hUtTg1UxXWO-HYW8yPYGTusZJFErtkdl7pV6wAcDl__ltSI62IjoeIjKT5ZGM5GLmInWDu9Dkk6i0pBy2kTWbLQqRD94QZKXMK9Zp4uAjCFaYaumT_DWhRh9DvHYK6dXvmxVXKvqXe9uVHYwT2AbNVZq-ix1Tev3xzaNw8ju9XZq4xHFLNi4LzFQ");
-
-			 CloseableHttpResponse response1 = httpclient.execute(httpGet);
-
-			try {
-//				int statusCode = response1.getStatusLine().getStatusCode();
-
-				String bodyStr = EntityUtils.toString(response1.getEntity());
-
-				return Response.ok().entity(bodyStr).build();
-			} finally {
-				response1.close();
-			}
-		} finally {
-			httpclient.close();
-		}
-		} catch (Exception e) {
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
-		}
+		// TODO following is call df api directly, just comment here FYI, will delete in future
+//		String dfRestUrl = "https://10.1.130.134:8443/oapi/v1/namespaces/" + tenantId + "/backingserviceinstances";
+//		try {
+//			SSLConnectionSocketFactory sslsf = SSLSocketIgnoreCA.createSSLSocketFactory();
+//
+//			CloseableHttpClient httpclient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
+//			try {
+//				HttpGet httpGet = new HttpGet(dfRestUrl);
+//				httpGet.addHeader("Content-type", "application/json");
+//				httpGet.addHeader("Authorization", "bearer "
+//						+ "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJkZWZhdWx0Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6Im9jbS10b2tlbi12NzZtNyIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50Lm5hbWUiOiJvY20iLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC51aWQiOiI1ZTg1MGY0Yi00YzM3LTExZTctYWE0OS1mYTE2M2VmZGJlYTgiLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6ZGVmYXVsdDpvY20ifQ.t1SrAN167RVL4slBo2botWDzjNtXG8J4tRlnlNJJL85HOHMYNEi-FvGJ5Nt37mKVVVPaZFjUoU5pGLBCzcE79pzrRJyBMXe_duCsCX23z9M-cEllX9Srn7Kex2N5D596M8S8mnSwtLSvXjYuX2ftW7eCWw1738hUtTg1UxXWO-HYW8yPYGTusZJFErtkdl7pV6wAcDl__ltSI62IjoeIjKT5ZGM5GLmInWDu9Dkk6i0pBy2kTWbLQqRD94QZKXMK9Zp4uAjCFaYaumT_DWhRh9DvHYK6dXvmxVXKvqXe9uVHYwT2AbNVZq-ix1Tev3xzaNw8ju9XZq4xHFLNi4LzFQ");
+//
+//				CloseableHttpResponse response1 = httpclient.execute(httpGet);
+//
+//				try {
+//					// int statusCode =
+//					// response1.getStatusLine().getStatusCode();
+//
+//					String bodyStr = EntityUtils.toString(response1.getEntity());
+//
+//					return Response.ok().entity(bodyStr).build();
+//				} finally {
+//					response1.close();
+//				}
+//			} finally {
+//				httpclient.close();
+//			}
+//		} catch (Exception e) {
+//			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+//		}
 	}
-	
-	
-	
+
 	/**
 	 * Create a new tenant
 	 * 
@@ -197,7 +198,7 @@ public class TenantResource {
 
 				try {
 					int statusCode = response2.getStatusLine().getStatusCode();
-					
+
 					if (statusCode == 201) {
 						TenantPersistenceWrapper.createTenant(tenant);
 					}
@@ -215,14 +216,10 @@ public class TenantResource {
 		}
 	}
 
-	
-	
-	
-	
 	/**
 	 * Create a service instance in specific tenant
 	 * 
-	 * @param 
+	 * @param
 	 * @return
 	 */
 	@POST
@@ -231,7 +228,7 @@ public class TenantResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response createServiceInstanceInTenant(@PathParam("id") String tenantId, String reqBodyStr) {
 
-		String dfRestUrl = "https://10.1.130.134:8443/oapi/v1/namespaces/"+ tenantId + "/backingserviceinstances";
+		String dfRestUrl = "https://10.1.130.134:8443/oapi/v1/namespaces/" + tenantId + "/backingserviceinstances";
 		try {
 			// parse the req body make sure it is json
 			JsonElement reqBodyJson = new JsonParser().parse(reqBodyStr);
@@ -256,22 +253,26 @@ public class TenantResource {
 					if (statusCode == 201) {
 						JsonElement resBodyJson = new JsonParser().parse(bodyStr);
 						JsonObject resBodyJsonObj = resBodyJson.getAsJsonObject();
-						ServiceInstance serviceInstance= new ServiceInstance();
-						
+						ServiceInstance serviceInstance = new ServiceInstance();
+
 						serviceInstance.setId(resBodyJsonObj.getAsJsonObject("metadata").get("uid").getAsString());
-						serviceInstance.setInstanceName(resBodyJsonObj.getAsJsonObject("metadata").get("name").getAsString());
+						serviceInstance
+								.setInstanceName(resBodyJsonObj.getAsJsonObject("metadata").get("name").getAsString());
 						serviceInstance.setTenantId(tenantId);
-						serviceInstance.setServiceTypeId(resBodyJsonObj.getAsJsonObject("spec").getAsJsonObject("provisioning").get("backingservice_spec_id").getAsString());
-						serviceInstance.setServiceTypeName(resBodyJsonObj.getAsJsonObject("spec").getAsJsonObject("provisioning").get("backingservice_name").getAsString());
-						
-						if((resBodyJsonObj.getAsJsonObject("spec").getAsJsonObject("provisioning").get("parameters").isJsonNull())){
-							// should get df service quota
+						serviceInstance.setServiceTypeId(resBodyJsonObj.getAsJsonObject("spec")
+								.getAsJsonObject("provisioning").get("backingservice_spec_id").getAsString());
+						serviceInstance.setServiceTypeName(resBodyJsonObj.getAsJsonObject("spec")
+								.getAsJsonObject("provisioning").get("backingservice_name").getAsString());
+
+						if ((resBodyJsonObj.getAsJsonObject("spec").getAsJsonObject("provisioning").get("parameters")
+								.isJsonNull())) {
+							// TODO should get df service quota
 						} else {
 							// parameters are a json format should use to string
-							serviceInstance.setQuota(resBodyJsonObj.getAsJsonObject("spec").getAsJsonObject("provisioning").get("parameters").toString());
+							serviceInstance.setQuota(resBodyJsonObj.getAsJsonObject("spec")
+									.getAsJsonObject("provisioning").get("parameters").toString());
 						}
-						
-					
+
 						ServiceInstancePersistenceWrapper.createServiceInstance(serviceInstance);
 					}
 
@@ -285,17 +286,56 @@ public class TenantResource {
 		} catch (Exception e) {
 			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
 		}
-		
-		
 
 	}
-	
-	
-	
-	
-	
-	
-	
+
+	/**
+	 * Delete a service instance in specific tenant
+	 * 
+	 * @param tenantId
+	 * @param instanceName
+	 * @return
+	 */
+	@DELETE
+	@Path("{id}/service/instance/{instanceName}")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response deleteServiceInstanceInTenant(@PathParam("id") String tenantId,
+			@PathParam("instanceName") String instanceName) {
+		String dfRestUrl = "https://10.1.130.134:8443/oapi/v1/namespaces/" + tenantId + "/backingserviceinstances/"
+				+ instanceName;
+		try {
+			SSLConnectionSocketFactory sslsf = SSLSocketIgnoreCA.createSSLSocketFactory();
+
+			CloseableHttpClient httpclient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
+			try {
+				HttpDelete httpDelete = new HttpDelete(dfRestUrl);
+				httpDelete.addHeader("Content-type", "application/json");
+				httpDelete.addHeader("Authorization", "bearer "
+						+ "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJkZWZhdWx0Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6Im9jbS10b2tlbi12NzZtNyIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50Lm5hbWUiOiJvY20iLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC51aWQiOiI1ZTg1MGY0Yi00YzM3LTExZTctYWE0OS1mYTE2M2VmZGJlYTgiLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6ZGVmYXVsdDpvY20ifQ.t1SrAN167RVL4slBo2botWDzjNtXG8J4tRlnlNJJL85HOHMYNEi-FvGJ5Nt37mKVVVPaZFjUoU5pGLBCzcE79pzrRJyBMXe_duCsCX23z9M-cEllX9Srn7Kex2N5D596M8S8mnSwtLSvXjYuX2ftW7eCWw1738hUtTg1UxXWO-HYW8yPYGTusZJFErtkdl7pV6wAcDl__ltSI62IjoeIjKT5ZGM5GLmInWDu9Dkk6i0pBy2kTWbLQqRD94QZKXMK9Zp4uAjCFaYaumT_DWhRh9DvHYK6dXvmxVXKvqXe9uVHYwT2AbNVZq-ix1Tev3xzaNw8ju9XZq4xHFLNi4LzFQ");
+
+				CloseableHttpResponse response1 = httpclient.execute(httpDelete);
+
+				try {
+					int statusCode = response1.getStatusLine().getStatusCode();
+					if (statusCode == 200) {
+						ServiceInstancePersistenceWrapper.deleteServiceInstance(tenantId, instanceName);
+					}
+					String bodyStr = EntityUtils.toString(response1.getEntity());
+
+					return Response.ok().entity(bodyStr).build();
+				} finally {
+					response1.close();
+				}
+			} finally {
+				httpclient.close();
+			}
+		} catch (Exception e) {
+			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+		}
+
+	}
+
 	/**
 	 * Update the existing tenant info
 	 * 
@@ -320,10 +360,7 @@ public class TenantResource {
 	@Path("{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public void deleteTenant(@PathParam("id") int tenantId) {
-
+		// TODO not consider in this stage 2
 	}
-
-
-
 
 }

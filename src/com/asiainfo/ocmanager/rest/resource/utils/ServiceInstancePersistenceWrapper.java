@@ -1,5 +1,8 @@
 package com.asiainfo.ocmanager.rest.resource.utils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.ibatis.session.SqlSession;
 
 import com.asiainfo.ocmanager.persistence.mapper.ServiceInstanceMapper;
@@ -12,6 +15,31 @@ import com.asiainfo.ocmanager.persistence.test.DBConnectorFactory;
  *
  */
 public class ServiceInstancePersistenceWrapper {
+
+	/**
+	 * 
+	 * @param tenantId
+	 * @return
+	 */
+	public static List<ServiceInstance> getServiceInstancesInTenant(String tenantId){
+		SqlSession session = DBConnectorFactory.getSession();
+		List<ServiceInstance> serviceInstances = new ArrayList<ServiceInstance>();
+		try {
+			ServiceInstanceMapper mapper = session.getMapper(ServiceInstanceMapper.class);
+
+			serviceInstances = mapper.selectServiceInstancesByTenant(tenantId);
+
+			session.commit();
+		} catch (Exception e) {
+			session.rollback();
+		} finally {
+			session.close();
+		}
+		
+		return serviceInstances;
+	}
+	
+	
 	/**
 	 * 
 	 * @param tenant
@@ -30,4 +58,25 @@ public class ServiceInstancePersistenceWrapper {
 			session.close();
 		}
 	}
+
+	/**
+	 * 
+	 * @param tenantId
+	 * @param instanceName
+	 */
+	public static void deleteServiceInstance(String tenantId, String instanceName) {
+		SqlSession session = DBConnectorFactory.getSession();
+		try {
+			ServiceInstanceMapper mapper = session.getMapper(ServiceInstanceMapper.class);
+
+			mapper.deleteServiceInstance(tenantId, instanceName);
+
+			session.commit();
+		} catch (Exception e) {
+			session.rollback();
+		} finally {
+			session.close();
+		}
+	}
+
 }
