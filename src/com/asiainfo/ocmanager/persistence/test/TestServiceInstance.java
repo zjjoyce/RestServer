@@ -5,7 +5,6 @@ import java.util.List;
 import org.apache.ibatis.session.SqlSession;
 
 import com.asiainfo.ocmanager.persistence.mapper.ServiceInstanceMapper;
-import com.asiainfo.ocmanager.persistence.model.Role;
 import com.asiainfo.ocmanager.persistence.model.ServiceInstance;
 
 public class TestServiceInstance {

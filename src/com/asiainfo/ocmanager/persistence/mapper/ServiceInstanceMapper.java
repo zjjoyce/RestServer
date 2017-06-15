@@ -12,18 +12,22 @@ import com.asiainfo.ocmanager.persistence.model.ServiceInstance;
  *
  */
 public interface ServiceInstanceMapper {
-	
-	
-	public List<ServiceInstance> selectServiceInstancesByTenant(@Param("tenantId") String tenantId);
-	
+
 	/**
-	 * 
+	 *
+	 * @param tenantId
+	 * @return
+	 */
+	public List<ServiceInstance> selectServiceInstancesByTenant(@Param("tenantId") String tenantId);
+
+	/**
+	 *
 	 * @param serviceInstance
 	 */
 	public void insertServiceInstance(ServiceInstance serviceInstance);
 
 	/**
-	 * 
+	 *
 	 * @param tenantId
 	 * @param instanceName
 	 */

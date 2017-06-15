@@ -1,6 +1,5 @@
 package com.asiainfo.ocmanager.rest.resource;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.GET;
@@ -9,11 +8,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.apache.ibatis.session.SqlSession;
-
-import com.asiainfo.ocmanager.persistence.mapper.RoleMapper;
 import com.asiainfo.ocmanager.persistence.model.Role;
-import com.asiainfo.ocmanager.persistence.test.DBConnectorFactory;
+import com.asiainfo.ocmanager.rest.resource.utils.RolePersistenceWrapper;
 
 /**
  * 
@@ -32,18 +28,7 @@ public class RoleResource {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getRoles() {
-		SqlSession session = DBConnectorFactory.getSession();
-		List<Role> roles = new ArrayList<Role>();
-		try {
-			RoleMapper mapper = session.getMapper(RoleMapper.class);
-			roles = mapper.selectAllRoles();
-
-			session.commit();
-		} catch (Exception e) {
-			session.rollback();
-		} finally {
-			session.close();
-		}
+		List<Role> roles = RolePersistenceWrapper.getRoles();
 
 		return Response.ok().entity(roles).build();
 	}

@@ -15,6 +15,7 @@ import org.apache.ibatis.session.SqlSession;
 import com.asiainfo.ocmanager.persistence.mapper.ServiceMapper;
 import com.asiainfo.ocmanager.persistence.model.Service;
 import com.asiainfo.ocmanager.persistence.test.DBConnectorFactory;
+import com.asiainfo.ocmanager.rest.resource.utils.ServicePersistenceWrapper;
 
 /**
  * 
@@ -32,19 +33,8 @@ public class ServiceResource {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getServices() {
-		SqlSession session = DBConnectorFactory.getSession();
-		List<Service> services = new ArrayList<Service>();
-		try {
-			ServiceMapper mapper = session.getMapper(ServiceMapper.class);
-			services = mapper.selectAllServices();
-			System.out.println(services);
 
-			session.commit();
-		} catch (Exception e) {
-			session.rollback();
-		} finally {
-			session.close();
-		}
+		List<Service> services = ServicePersistenceWrapper.getAllServices();
 
 		return Response.ok().entity(services).build();
 	}
@@ -58,19 +48,8 @@ public class ServiceResource {
 	@Path("{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getServiceById(@PathParam("id") String serviceId) {
-		SqlSession session = DBConnectorFactory.getSession();
-		Service service = null;
-		try {
-			ServiceMapper mapper = session.getMapper(ServiceMapper.class);
-			service = mapper.selectServiceById(serviceId);
-			System.out.println(service);
 
-			session.commit();
-		} catch (Exception e) {
-			session.rollback();
-		} finally {
-			session.close();
-		}
+		Service service = ServicePersistenceWrapper.getServiceById(serviceId);
 
 		return Response.ok().entity(service == null ? new Service() : service).build();
 	}
