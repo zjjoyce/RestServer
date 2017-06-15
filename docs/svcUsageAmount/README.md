@@ -97,7 +97,7 @@ GET /sapi/v1/namespaces/san/serviceisntances/hbase-instance
 
 ## agent / route
 
-agent当前由三个单独模块来实现，分别对应rds，hadoop，container三个类型的服务用量。
+agent 当前由三个单独模块来实现，分别对应rds，hadoop，container三个类型的服务用量。
 
 ## rds
 
