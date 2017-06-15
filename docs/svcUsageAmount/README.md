@@ -113,7 +113,7 @@ GET /svc/v1/rds/:name/db/:dbname
     </tr>
     <tr>
         <td>name</td>
-        <td>rds提供的。当前仅有mongo，gp。</td>
+        <td>rds提供的服务。当前仅有mongo，gp。</td>
     </tr>
     <tr>
         <td>dbname</td>
