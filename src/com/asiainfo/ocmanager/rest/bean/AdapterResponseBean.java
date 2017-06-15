@@ -5,16 +5,18 @@ package com.asiainfo.ocmanager.rest.bean;
  * @author zhaoyim
  *
  */
-public class DeleteResponseBean {
+public class AdapterResponseBean {
 	private String status;
+	private String message;
 	private int resCode;
 
-	public DeleteResponseBean() {
+	public AdapterResponseBean() {
 
 	}
 
-	public DeleteResponseBean(String status, int resCode) {
+	public AdapterResponseBean(String status, String message, int resCode) {
 		this.status = status;
+		this.message = message;
 		this.resCode = resCode;
 	}
 
@@ -24,6 +26,14 @@ public class DeleteResponseBean {
 
 	public void setStatus(String status) {
 		this.status = status;
+	}
+
+	public String getMessage() {
+		return message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
 	}
 
 	public int getResCodel() {

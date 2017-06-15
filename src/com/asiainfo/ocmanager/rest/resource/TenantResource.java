@@ -26,8 +26,11 @@ import org.apache.http.util.EntityUtils;
 
 import com.asiainfo.ocmanager.persistence.model.ServiceInstance;
 import com.asiainfo.ocmanager.persistence.model.Tenant;
+import com.asiainfo.ocmanager.persistence.model.TenantUserRoleAssignment;
 import com.asiainfo.ocmanager.persistence.model.UserRoleView;
+import com.asiainfo.ocmanager.rest.bean.AdapterResponseBean;
 import com.asiainfo.ocmanager.rest.resource.utils.ServiceInstancePersistenceWrapper;
+import com.asiainfo.ocmanager.rest.resource.utils.TURAssignmentPersistenceWrapper;
 import com.asiainfo.ocmanager.rest.resource.utils.TenantPersistenceWrapper;
 import com.asiainfo.ocmanager.rest.resource.utils.UserRoleViewPersistenceWrapper;
 import com.asiainfo.ocmanager.rest.utils.SSLSocketIgnoreCA;
@@ -359,8 +362,58 @@ public class TenantResource {
 	@DELETE
 	@Path("{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public void deleteTenant(@PathParam("id") int tenantId) {
+	public void deleteTenant(@PathParam("id") String tenantId) {
 		// TODO not consider in this stage 2
 	}
 
+	/**
+	 * Assign role to user in tenant
+	 * 
+	 * @param tenantId
+	 * @param assignment
+	 * @return
+	 */
+	@POST
+	@Path("{id}/user/role/assignment")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response assignRoleToUserInTenant(@PathParam("id") String tenantId, TenantUserRoleAssignment assignment) {
+		assignment.setTenantId(tenantId);
+		assignment = TURAssignmentPersistenceWrapper.assignRoleToUserInTenant(assignment);
+		return Response.ok().entity(assignment).build();
+	}
+
+	/**
+	 * Update user role in tenant
+	 * 
+	 * @param tenantId
+	 * @param assignment
+	 * @return
+	 */
+	@PUT
+	@Path("{id}/user/role/assignment")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response updateRoleToUserInTenant(@PathParam("id") String tenantId, TenantUserRoleAssignment assignment) {
+		assignment.setTenantId(tenantId);
+		assignment = TURAssignmentPersistenceWrapper.updateRoleToUserInTenant(assignment);
+		return Response.ok().entity(assignment).build();
+	}
+
+	/**
+	 * Unassign role to user in tenant
+	 * 
+	 * @param tenantId
+	 * @param userId
+	 * @return
+	 */
+	@DELETE
+	@Path("{id}/user/{userId}/role/assignment")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response unassignRoleFromUserInTenant(@PathParam("id") String tenantId, @PathParam("userId") String userId) {
+		TURAssignmentPersistenceWrapper.unassignRoleFromUserInTenant(tenantId, userId);
+		return Response.ok().entity(new AdapterResponseBean("delete success", userId, 200)).build();
+	}
+	
 }
