@@ -13,16 +13,18 @@ public class TestService {
 		SqlSession session = DBConnectorFactory.getSession();
 		try {
 			ServiceMapper mapper = session.getMapper(ServiceMapper.class);
+			mapper.insertService(new Service("100", "hdfs1", "hdfs description"));
+			session.commit();
 			List<Service> services = mapper.selectAllServices();
-
 			System.out.println("=== All services ===");
 			for (Service s : services) {
 				System.out.println(s.getId());
 				System.out.println(s.getServicename());
 				System.out.println(s.getDescription());
 			}
+			session.commit();
 			System.out.println("=== Service by id ===");
-			Service service = mapper.selectServiceById("200");
+			Service service = mapper.selectServiceById("100");
 			System.out.println(service.getId());
 			System.out.println(service.getServicename());
 			System.out.println(service.getDescription());

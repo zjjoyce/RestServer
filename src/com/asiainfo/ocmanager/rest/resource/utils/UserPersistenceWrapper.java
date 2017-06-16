@@ -2,7 +2,6 @@ package com.asiainfo.ocmanager.rest.resource.utils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import javax.ws.rs.PathParam;
 

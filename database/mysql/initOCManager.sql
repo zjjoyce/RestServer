@@ -21,9 +21,9 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `ocmanager`.`users` (
   `id` VARCHAR(64) NOT NULL,
-  `username` VARCHAR(45) NOT NULL,
-  `password` VARCHAR(45) NULL,
-  `email` VARCHAR(45) NULL,
+  `username` VARCHAR(64) NOT NULL,
+  `password` VARCHAR(64) NULL,
+  `email` VARCHAR(64) NULL,
   `description` MEDIUMTEXT NULL,
   PRIMARY KEY (`id`))
 ENGINE = InnoDB;
@@ -46,8 +46,8 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `ocmanager`.`roles` (
   `id` VARCHAR(64) NOT NULL,
-  `rolename` VARCHAR(45) NOT NULL,
-  `description` VARCHAR(45) NULL,
+  `rolename` VARCHAR(64) NOT NULL,
+  `description` MEDIUMTEXT NULL,
   PRIMARY KEY (`id`))
 ENGINE = InnoDB;
 
@@ -128,3 +128,27 @@ CREATE TABLE IF NOT EXISTS `ocmanager`.`services_roles_permission` (
     ON DELETE RESTRICT
     ON UPDATE RESTRICT)
 ENGINE = InnoDB;
+
+
+
+-- -----------------------------------------------------
+-- Init the 4 roles into the table `ocmanager`.`roles`
+-- -----------------------------------------------------
+INSERT INTO `ocmanager`.`roles`(id, rolename, description) VALUES("a10170cb-524a-11e7-9dbb-fa163ed7d0ae", "system.admin", "system admin is super user, it can create subsidiary and add users, assign role to user and add services.");
+INSERT INTO `ocmanager`.`roles`(id, rolename, description) VALUES("a1149421-524a-11e7-9dbb-fa163ed7d0ae", "subsidiary.admin", "subsidiary admin create project, add users and assign role to user.");
+INSERT INTO `ocmanager`.`roles`(id, rolename, description) VALUES("a12a84d0-524a-11e7-9dbb-fa163ed7d0ae", "project.admin", "project admin can add uses to the project and assign role to user.");
+INSERT INTO `ocmanager`.`roles`(id, rolename, description) VALUES("a13dd087-524a-11e7-9dbb-fa163ed7d0ae", "team.member", "the user only can read the project information that he is in.");
+
+
+-- -----------------------------------------------------
+-- Init the services type into the table `ocmanager`.`services`
+-- -----------------------------------------------------
+-- INSERT INTO `ocmanager`.`services`(id, servicename, description) VALUES("ae67d4ba-5c4e-4937-a68b-5b47cfe356d8", "HDFS", "Provide HDFS service");
+-- INSERT INTO `ocmanager`.`services`(id, servicename, description) VALUES("d9845ade-9410-4c7f-8689-4e032c1a8450", "HBase", "Provide HBase service");
+-- INSERT INTO `ocmanager`.`services`(id, servicename, description) VALUES( "2ef26018-003d-4b2b-b786-0481d4ee9fa3", "Hive", "Provide Hive service");
+-- INSERT INTO `ocmanager`.`services`(id, servicename, description) VALUES("ae0f2324-27a8-415b-9c7f-64ab6cd88d40", "MapReduce", "Provide MapReduce service");
+-- INSERT INTO `ocmanager`.`services`(id, servicename, description) VALUES("d3b9a485-f038-4605-9b9b-29792f5c61d1", "Spark", "Provide Spark service");
+-- INSERT INTO `ocmanager`.`services`(id, servicename, description) VALUES("7b738c78-d412-422b-ac3e-43a9fc72a4a7", "Kafka", "Provide Kafka service");
+
+
+

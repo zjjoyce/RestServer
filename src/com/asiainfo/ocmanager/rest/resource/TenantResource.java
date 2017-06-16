@@ -1,7 +1,9 @@
 package com.asiainfo.ocmanager.rest.resource;
 
+import java.util.Enumeration;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -10,6 +12,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -99,7 +102,9 @@ public class TenantResource {
 	 */
 	@GET
 	@Path("{id}/users")
-	public Response getTenantUsers(@PathParam("id") String tenantId) {
+	public Response getTenantUsers(@PathParam("id") String tenantId, @Context HttpServletRequest request) {
+		// TODO how to get the request header info following comment code can do this
+//		Enumeration<String> aa = request.getHeaderNames();
 		List<UserRoleView> usersRoles = UserRoleViewPersistenceWrapper.getUsersInTenant(tenantId);
 		return Response.ok().entity(usersRoles).build();
 	}

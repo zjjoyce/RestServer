@@ -57,4 +57,28 @@ public class ServicePersistenceWrapper {
 		}
 		return service;
 	}
+
+	/**
+	 * 
+	 * @param service
+	 * @return
+	 */
+	public static void addService(Service service) {
+		SqlSession session = DBConnectorFactory.getSession();
+		try {
+			ServiceMapper mapper = session.getMapper(ServiceMapper.class);
+
+			mapper.insertService(service);
+			session.commit();
+
+//			service = mapper.selectServiceById(service.getId());
+//			session.commit();
+		} catch (Exception e) {
+			session.rollback();
+		} finally {
+			session.close();
+		}
+//		return service;
+	}
+
 }
