@@ -19,7 +19,7 @@
 		values (#{id}, #{username}, #{password}, #{email}, #{description})
 	</insert>
 	<!-- update user -->
-	<insert id="updateUser"
+	<update id="updateUser"
 		parameterType="com.asiainfo.ocmanager.persistence.model.User">
 		update users set
 			username = #{username},
@@ -27,7 +27,7 @@
 			email = #{email},
 			description = #{description}
 		where id = #{id}
-	</insert>
+	</update>
 	<!-- delete user -->
 	<delete id="deleteUser">
 		delete from users where id = #{id}
