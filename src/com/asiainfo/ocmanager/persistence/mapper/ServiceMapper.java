@@ -26,4 +26,12 @@ public interface ServiceMapper {
 	 */
 	public Service selectServiceById(String serviceId);
 	
+	
+	/**
+	 * 
+	 * @param service
+	 * @return
+	 */
+	public void insertService(Service service);
+	
 }
