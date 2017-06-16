@@ -11,6 +11,7 @@ import org.apache.ibatis.session.SqlSession;
 import com.asiainfo.ocmanager.persistence.mapper.UserMapper;
 import com.asiainfo.ocmanager.persistence.model.User;
 import com.asiainfo.ocmanager.persistence.test.DBConnectorFactory;
+import com.asiainfo.ocmanager.rest.utils.UUIDFactory;
 
 /**
  * 
@@ -73,7 +74,7 @@ public class UserPersistenceWrapper {
 		SqlSession session = DBConnectorFactory.getSession();
 		try {
 			UserMapper mapper = session.getMapper(UserMapper.class);
-			String uuid = UUID.randomUUID().toString();
+			String uuid = UUIDFactory.getUUID();
 			user.setId(uuid);
 			mapper.insertUser(user);
 
