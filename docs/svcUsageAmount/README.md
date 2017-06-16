@@ -132,7 +132,7 @@ json消息体与Amount API返回的一样。
 ## hadoop
 
 ```
-GET /svc/v1/hadoop/:name/????/:????
+GET /svc/v1/hadoop/:name/instanace/:instanceId
 ```
 ### 路径参数
 
@@ -143,11 +143,11 @@ GET /svc/v1/hadoop/:name/????/:????
     </tr>
     <tr>
         <td>name</td>
-        <td>hadoop broker提供的服务，Hive，Hbase等。</td>
+        <td>hadoop broker提供的服务，包括Hive，HBase, Hive, MapReduce, Spark, Kafka。</td>
     </tr>
     <tr>
-        <td>????</td>
-        <td>????</td>
+        <td>instanceId</td>
+        <td>服务实例的id。</td>
     </tr>
 </table>
 
