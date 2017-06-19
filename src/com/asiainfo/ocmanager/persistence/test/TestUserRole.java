@@ -21,9 +21,22 @@ public class TestUserRole {
 				System.out.println(ur.getUserDescription());
 				System.out.println(ur.getRoleId());
 				System.out.println(ur.getRoleName());
+				System.out.println(ur.getTenantId());
 			}
-
 			session.commit();
+			
+			System.out.println("============");
+			UserRoleView urs1 = mapper.selectRoleBasedOnUserAndTenant("zhaoyim", "2");
+			
+				System.out.println(urs1.getUserId());
+				System.out.println(urs1.getUserName());
+				System.out.println(urs1.getUserDescription());
+				System.out.println(urs1.getRoleId());
+				System.out.println(urs1.getRoleName());
+				System.out.println(urs1.getTenantId());
+			
+			session.commit();
+			
 		} catch (Exception e) {
 			session.rollback();
 		} finally {

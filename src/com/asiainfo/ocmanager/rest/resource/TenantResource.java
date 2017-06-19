@@ -30,12 +30,15 @@ import org.apache.http.util.EntityUtils;
 import com.asiainfo.ocmanager.persistence.model.ServiceInstance;
 import com.asiainfo.ocmanager.persistence.model.Tenant;
 import com.asiainfo.ocmanager.persistence.model.TenantUserRoleAssignment;
+import com.asiainfo.ocmanager.persistence.model.User;
 import com.asiainfo.ocmanager.persistence.model.UserRoleView;
 import com.asiainfo.ocmanager.rest.bean.AdapterResponseBean;
+import com.asiainfo.ocmanager.rest.constant.Constant;
 import com.asiainfo.ocmanager.rest.resource.utils.ServiceInstancePersistenceWrapper;
 import com.asiainfo.ocmanager.rest.resource.utils.TURAssignmentPersistenceWrapper;
 import com.asiainfo.ocmanager.rest.resource.utils.TenantPersistenceWrapper;
 import com.asiainfo.ocmanager.rest.resource.utils.UserRoleViewPersistenceWrapper;
+import com.asiainfo.ocmanager.rest.utils.DFPropertiesFactory;
 import com.asiainfo.ocmanager.rest.utils.SSLSocketIgnoreCA;
 import com.asiainfo.ocmanager.rest.utils.UUIDFactory;
 import com.google.gson.JsonElement;
@@ -121,39 +124,10 @@ public class TenantResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getTenantServiceInstances(@PathParam("id") String tenantId) {
 
-		List<ServiceInstance> serviceInstances = ServiceInstancePersistenceWrapper.getServiceInstancesInTenant(tenantId);
+		List<ServiceInstance> serviceInstances = ServiceInstancePersistenceWrapper
+				.getServiceInstancesInTenant(tenantId);
 		return Response.ok().entity(serviceInstances).build();
-		
-		// TODO following is call df api directly, just comment here FYI, will delete in future
-//		String dfRestUrl = "https://10.1.130.134:8443/oapi/v1/namespaces/" + tenantId + "/backingserviceinstances";
-//		try {
-//			SSLConnectionSocketFactory sslsf = SSLSocketIgnoreCA.createSSLSocketFactory();
-//
-//			CloseableHttpClient httpclient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
-//			try {
-//				HttpGet httpGet = new HttpGet(dfRestUrl);
-//				httpGet.addHeader("Content-type", "application/json");
-//				httpGet.addHeader("Authorization", "bearer "
-//						+ "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJkZWZhdWx0Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6Im9jbS10b2tlbi12NzZtNyIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50Lm5hbWUiOiJvY20iLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC51aWQiOiI1ZTg1MGY0Yi00YzM3LTExZTctYWE0OS1mYTE2M2VmZGJlYTgiLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6ZGVmYXVsdDpvY20ifQ.t1SrAN167RVL4slBo2botWDzjNtXG8J4tRlnlNJJL85HOHMYNEi-FvGJ5Nt37mKVVVPaZFjUoU5pGLBCzcE79pzrRJyBMXe_duCsCX23z9M-cEllX9Srn7Kex2N5D596M8S8mnSwtLSvXjYuX2ftW7eCWw1738hUtTg1UxXWO-HYW8yPYGTusZJFErtkdl7pV6wAcDl__ltSI62IjoeIjKT5ZGM5GLmInWDu9Dkk6i0pBy2kTWbLQqRD94QZKXMK9Zp4uAjCFaYaumT_DWhRh9DvHYK6dXvmxVXKvqXe9uVHYwT2AbNVZq-ix1Tev3xzaNw8ju9XZq4xHFLNi4LzFQ");
-//
-//				CloseableHttpResponse response1 = httpclient.execute(httpGet);
-//
-//				try {
-//					// int statusCode =
-//					// response1.getStatusLine().getStatusCode();
-//
-//					String bodyStr = EntityUtils.toString(response1.getEntity());
-//
-//					return Response.ok().entity(bodyStr).build();
-//				} finally {
-//					response1.close();
-//				}
-//			} finally {
-//				httpclient.close();
-//			}
-//		} catch (Exception e) {
-//			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
-//		}
+
 	}
 
 	/**
@@ -166,7 +140,7 @@ public class TenantResource {
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response createTenant(Tenant tenant) {
+	public Response createTenant(Tenant tenant, @Context HttpServletRequest request) {
 
 		if (tenant.getName() == null) {
 			return Response.status(Status.BAD_REQUEST).entity("input format is not correct").build();
@@ -175,6 +149,10 @@ public class TenantResource {
 		tenant.setId(UUIDFactory.getUUID());
 
 		try {
+			String url = DFPropertiesFactory.getDFProperties().get(Constant.DATAFACTORY_URL);
+			String token = DFPropertiesFactory.getDFProperties().get(Constant.DATAFACTORY_TOKEN);
+			String dfRestUrl = url + "/oapi/v1/projectrequests";
+			
 			JsonObject jsonObj1 = new JsonObject();
 			jsonObj1.addProperty("apiVersion", "v1");
 			jsonObj1.addProperty("kind", "ProjectRequest");
@@ -193,10 +171,9 @@ public class TenantResource {
 
 			CloseableHttpClient httpclient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
 			try {
-				HttpPost httpPost = new HttpPost("https://10.1.130.134:8443/oapi/v1/projectrequests");
+				HttpPost httpPost = new HttpPost(dfRestUrl);
 				httpPost.addHeader("Content-type", "application/json");
-				httpPost.addHeader("Authorization", "bearer "
-						+ "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJkZWZhdWx0Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6Im9jbS10b2tlbi12NzZtNyIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50Lm5hbWUiOiJvY20iLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC51aWQiOiI1ZTg1MGY0Yi00YzM3LTExZTctYWE0OS1mYTE2M2VmZGJlYTgiLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6ZGVmYXVsdDpvY20ifQ.t1SrAN167RVL4slBo2botWDzjNtXG8J4tRlnlNJJL85HOHMYNEi-FvGJ5Nt37mKVVVPaZFjUoU5pGLBCzcE79pzrRJyBMXe_duCsCX23z9M-cEllX9Srn7Kex2N5D596M8S8mnSwtLSvXjYuX2ftW7eCWw1738hUtTg1UxXWO-HYW8yPYGTusZJFErtkdl7pV6wAcDl__ltSI62IjoeIjKT5ZGM5GLmInWDu9Dkk6i0pBy2kTWbLQqRD94QZKXMK9Zp4uAjCFaYaumT_DWhRh9DvHYK6dXvmxVXKvqXe9uVHYwT2AbNVZq-ix1Tev3xzaNw8ju9XZq4xHFLNi4LzFQ");
+				httpPost.addHeader("Authorization", "bearer " + token);
 
 				StringEntity se = new StringEntity(reqBody);
 				se.setContentType("application/json");
@@ -236,8 +213,13 @@ public class TenantResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response createServiceInstanceInTenant(@PathParam("id") String tenantId, String reqBodyStr) {
 
-		String dfRestUrl = "https://10.1.130.134:8443/oapi/v1/namespaces/" + tenantId + "/backingserviceinstances";
+		
 		try {
+			String url = DFPropertiesFactory.getDFProperties().get(Constant.DATAFACTORY_URL);
+			String token = DFPropertiesFactory.getDFProperties().get(Constant.DATAFACTORY_TOKEN);
+			String dfRestUrl = url + "/oapi/v1/namespaces/" + tenantId + "/backingserviceinstances";
+			
+			
 			// parse the req body make sure it is json
 			JsonElement reqBodyJson = new JsonParser().parse(reqBodyStr);
 			SSLConnectionSocketFactory sslsf = SSLSocketIgnoreCA.createSSLSocketFactory();
@@ -246,8 +228,7 @@ public class TenantResource {
 			try {
 				HttpPost httpPost = new HttpPost(dfRestUrl);
 				httpPost.addHeader("Content-type", "application/json");
-				httpPost.addHeader("Authorization", "bearer "
-						+ "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJkZWZhdWx0Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6Im9jbS10b2tlbi12NzZtNyIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50Lm5hbWUiOiJvY20iLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC51aWQiOiI1ZTg1MGY0Yi00YzM3LTExZTctYWE0OS1mYTE2M2VmZGJlYTgiLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6ZGVmYXVsdDpvY20ifQ.t1SrAN167RVL4slBo2botWDzjNtXG8J4tRlnlNJJL85HOHMYNEi-FvGJ5Nt37mKVVVPaZFjUoU5pGLBCzcE79pzrRJyBMXe_duCsCX23z9M-cEllX9Srn7Kex2N5D596M8S8mnSwtLSvXjYuX2ftW7eCWw1738hUtTg1UxXWO-HYW8yPYGTusZJFErtkdl7pV6wAcDl__ltSI62IjoeIjKT5ZGM5GLmInWDu9Dkk6i0pBy2kTWbLQqRD94QZKXMK9Zp4uAjCFaYaumT_DWhRh9DvHYK6dXvmxVXKvqXe9uVHYwT2AbNVZq-ix1Tev3xzaNw8ju9XZq4xHFLNi4LzFQ");
+				httpPost.addHeader("Authorization", "bearer " + token);
 
 				StringEntity se = new StringEntity(reqBodyJson.toString());
 				se.setContentType("application/json");
@@ -310,17 +291,19 @@ public class TenantResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response deleteServiceInstanceInTenant(@PathParam("id") String tenantId,
 			@PathParam("instanceName") String instanceName) {
-		String dfRestUrl = "https://10.1.130.134:8443/oapi/v1/namespaces/" + tenantId + "/backingserviceinstances/"
-				+ instanceName;
+		
 		try {
+			String url = DFPropertiesFactory.getDFProperties().get(Constant.DATAFACTORY_URL);
+			String token = DFPropertiesFactory.getDFProperties().get(Constant.DATAFACTORY_TOKEN);
+			String dfRestUrl = url + "/oapi/v1/namespaces/" + tenantId + "/backingserviceinstances/" + instanceName;
+			
 			SSLConnectionSocketFactory sslsf = SSLSocketIgnoreCA.createSSLSocketFactory();
 
 			CloseableHttpClient httpclient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
 			try {
 				HttpDelete httpDelete = new HttpDelete(dfRestUrl);
 				httpDelete.addHeader("Content-type", "application/json");
-				httpDelete.addHeader("Authorization", "bearer "
-						+ "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJkZWZhdWx0Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6Im9jbS10b2tlbi12NzZtNyIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50Lm5hbWUiOiJvY20iLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC51aWQiOiI1ZTg1MGY0Yi00YzM3LTExZTctYWE0OS1mYTE2M2VmZGJlYTgiLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6ZGVmYXVsdDpvY20ifQ.t1SrAN167RVL4slBo2botWDzjNtXG8J4tRlnlNJJL85HOHMYNEi-FvGJ5Nt37mKVVVPaZFjUoU5pGLBCzcE79pzrRJyBMXe_duCsCX23z9M-cEllX9Srn7Kex2N5D596M8S8mnSwtLSvXjYuX2ftW7eCWw1738hUtTg1UxXWO-HYW8yPYGTusZJFErtkdl7pV6wAcDl__ltSI62IjoeIjKT5ZGM5GLmInWDu9Dkk6i0pBy2kTWbLQqRD94QZKXMK9Zp4uAjCFaYaumT_DWhRh9DvHYK6dXvmxVXKvqXe9uVHYwT2AbNVZq-ix1Tev3xzaNw8ju9XZq4xHFLNi4LzFQ");
+				httpDelete.addHeader("Authorization", "bearer " + token);
 
 				CloseableHttpResponse response1 = httpclient.execute(httpDelete);
 
@@ -383,8 +366,22 @@ public class TenantResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response assignRoleToUserInTenant(@PathParam("id") String tenantId, TenantUserRoleAssignment assignment) {
+		// assgin to the input tenant
 		assignment.setTenantId(tenantId);
 		assignment = TURAssignmentPersistenceWrapper.assignRoleToUserInTenant(assignment);
+		
+		// assign to the child tenants
+//		List<Tenant> children = TenantPersistenceWrapper.getChildrenTenants(tenantId);
+//		if (children.size() != 0) {
+//			for(Tenant child: children){
+//				TenantUserRoleAssignment childAssignment = new TenantUserRoleAssignment();
+//				childAssignment.setTenantId(child.getId());
+//				childAssignment.setUserId(assignment.getUserId());
+//				childAssignment.setRoleId(assignment.getRoleId());
+//				TURAssignmentPersistenceWrapper.assignRoleToUserInTenant(childAssignment);
+//			}
+//		}
+		
 		return Response.ok().entity(assignment).build();
 	}
 
@@ -420,5 +417,30 @@ public class TenantResource {
 		TURAssignmentPersistenceWrapper.unassignRoleFromUserInTenant(tenantId, userId);
 		return Response.ok().entity(new AdapterResponseBean("delete success", userId, 200)).build();
 	}
+	
+	
+	
+	
+//	private boolean nonAdminHasPermission(Tenant tenant, User user){
+//		
+//		
+//		// root tenant only the admin can create
+//		if (tenant.getParentId() == null){
+//			return false;
+//		}
+//		
+//		UserRoleView userView = UserRoleViewPersistenceWrapper.getRoleBasedOnUserAndTenant(user.getUsername(), tenant.getParentId());
+//		if ( userView == null){
+//			return false;
+//		}
+//		
+//		if (userView.getRoleName().equals("subsidiary.admin") || userView.getRoleName().equals("project.admin")){
+//			return true;
+//		}
+//		
+//		return false;
+//	}
+	
+	
 	
 }
