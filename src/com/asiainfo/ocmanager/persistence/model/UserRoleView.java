@@ -6,6 +6,7 @@ public class UserRoleView {
 	private String userDescription;
 	private String roleId;
 	private String roleName;
+	private String tenantId;
 
 	public String getUserId() {
 		return userId;
@@ -45,6 +46,14 @@ public class UserRoleView {
 
 	public void setRoleName(String roleName) {
 		this.roleName = roleName;
+	}
+
+	public String getTenantId() {
+		return tenantId;
+	}
+
+	public void setTenantId(String tenantId) {
+		this.tenantId = tenantId;
 	}
 
 }

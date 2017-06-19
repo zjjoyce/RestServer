@@ -25,7 +25,8 @@ CREATE TABLE IF NOT EXISTS `ocmanager`.`users` (
   `password` VARCHAR(64) NULL,
   `email` VARCHAR(64) NULL,
   `description` MEDIUMTEXT NULL,
-  PRIMARY KEY (`id`))
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `username_UNIQUE` (`username` ASC))
 ENGINE = InnoDB;
 
 

@@ -35,4 +35,29 @@ public class UserRoleViewPersistenceWrapper {
 		}
 		return usersWithRoles;
 	}
+	
+	
+	
+	/**
+	 * 
+	 * @param userName
+	 * @param tenantId
+	 * @return
+	 */
+	public static UserRoleView getRoleBasedOnUserAndTenant(String userName, String tenantId) {
+		SqlSession session = DBConnectorFactory.getSession();
+		UserRoleView RUT = new UserRoleView();
+		try {
+			UserRoleMapper mapper = session.getMapper(UserRoleMapper.class);
+			RUT = mapper.selectRoleBasedOnUserAndTenant(userName, tenantId);
+			session.commit();
+		} catch (Exception e) {
+			session.rollback();
+		} finally {
+			session.close();
+		}
+		return RUT;
+	}
+	
+	
 }
