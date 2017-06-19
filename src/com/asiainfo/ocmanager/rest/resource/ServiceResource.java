@@ -1,5 +1,9 @@
 package com.asiainfo.ocmanager.rest.resource;
 
+import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 import javax.ws.rs.GET;
@@ -11,6 +15,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -23,7 +28,9 @@ import org.apache.http.util.EntityUtils;
 import com.asiainfo.ocmanager.persistence.model.Service;
 import com.asiainfo.ocmanager.rest.resource.utils.ServicePersistenceWrapper;
 import com.asiainfo.ocmanager.rest.utils.SSLSocketIgnoreCA;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 /**
@@ -42,6 +49,40 @@ public class ServiceResource {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getServices() {
+		
+		try {
+			// TODO should call df service api and compare with adapter db
+			// service data, insert the data which is not in the adapter db
+			// every time when call the get all services api it will symnc the adapter db with df services data
+			// this is not a good solution should be enhance in future
+			List<Service> servicesInDB = ServicePersistenceWrapper.getAllServices();
+
+			String servicesFromDf = ServiceResource.callDFToGetAllServices();
+			JsonObject servicesFromDfJson = new JsonParser().parse(servicesFromDf).getAsJsonObject();
+			JsonArray items = servicesFromDfJson.getAsJsonArray("items");
+
+			if (items != null || items.size() != 0) {
+				for (int i = 0; i < items.size(); i++) {
+					String name = items.get(i).getAsJsonObject().getAsJsonObject("spec").get("name").getAsString();
+					String id = items.get(i).getAsJsonObject().getAsJsonObject("spec").get("id").getAsString();
+					String description = items.get(i).getAsJsonObject().getAsJsonObject("spec").get("description")
+							.getAsString();
+
+					if (servicesInDB.size() == 0) {
+						ServicePersistenceWrapper.addService(new Service(id, name, description));
+					} else {
+						for (Service s : servicesInDB) {
+							if (!s.getId().equals(id)) {
+								ServicePersistenceWrapper.addService(new Service(id, name, description));
+							}
+						}
+					}
+
+				}
+			}
+		} catch (Exception e) {
+			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+		}
 
 		List<Service> services = ServicePersistenceWrapper.getAllServices();
 
@@ -94,9 +135,31 @@ public class ServiceResource {
 				try {
 					int statusCode = response2.getStatusLine().getStatusCode();
 					String bodyStr = EntityUtils.toString(response2.getEntity());
-					if (statusCode == 201) {
-						// TODO should call df service api and compare with adapter db service data, insert the data which is not in the adapter db
-					}
+//					if (statusCode == 201) {
+//						// TODO should call df service api and compare with adapter db service data, insert the data which is not in the adapter db
+//						List<Service> servicesInDB = ServicePersistenceWrapper.getAllServices();
+//						
+//						String servicesFromDf = ServiceResource.callDFToGetAllServices();
+//						JsonObject servicesFromDfJson = new JsonParser().parse(servicesFromDf).getAsJsonObject();
+//						JsonArray items = servicesFromDfJson.getAsJsonArray("items");
+//						
+//						if (items != null || items.size() != 0) {
+//							for (int i = 0; i < items.size(); i++) {
+//								String name = items.get(i).getAsJsonObject().getAsJsonObject("spec")
+//										.get("name").getAsString();
+//								String id = items.get(i).getAsJsonObject().getAsJsonObject("spec")
+//										.get("id").getAsString();
+//								String description = items.get(i).getAsJsonObject().getAsJsonObject("spec")
+//										.get("description").getAsString();
+//
+//								for(Service s: servicesInDB){
+//									if (!s.getId().equals(id)) {
+//										ServicePersistenceWrapper.addService(new Service(id, name, description));
+//									}
+//								}
+//							}
+//						}
+//					}
 
 					return Response.ok().entity(bodyStr).build();
 				} finally {
@@ -120,8 +183,19 @@ public class ServiceResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getServiceFromDf() {
 
-		String dfRestUrl = "https://10.1.130.134:8443/oapi/v1/namespaces/openshift/backingservices";
 		try {
+
+			return Response.ok().entity(ServiceResource.callDFToGetAllServices()).build();
+
+		} catch (Exception e) {
+			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+		}
+	}
+	
+	
+	private static String callDFToGetAllServices() throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException, ClientProtocolException, IOException{
+		String dfRestUrl = "https://10.1.130.134:8443/oapi/v1/namespaces/openshift/backingservices";
+
 			SSLConnectionSocketFactory sslsf = SSLSocketIgnoreCA.createSSLSocketFactory();
 
 			CloseableHttpClient httpclient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
@@ -139,16 +213,15 @@ public class ServiceResource {
 
 					String bodyStr = EntityUtils.toString(response1.getEntity());
 
-					return Response.ok().entity(bodyStr).build();
+					return bodyStr;
 				} finally {
 					response1.close();
 				}
 			} finally {
 				httpclient.close();
 			}
-		} catch (Exception e) {
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
-		}
 	}
-
+	
+	
+	
 }
