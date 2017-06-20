@@ -6,6 +6,7 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -17,6 +18,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
@@ -51,11 +53,12 @@ public class ServiceResource {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getServices() {
-		
+
 		try {
 			// TODO should call df service api and compare with adapter db
 			// service data, insert the data which is not in the adapter db
-			// every time when call the get all services api it will symnc the adapter db with df services data
+			// every time when call the get all services api it will symnc the
+			// adapter db with df services data
 			// this is not a good solution should be enhance in future
 			List<Service> servicesInDB = ServicePersistenceWrapper.getAllServices();
 
@@ -112,6 +115,7 @@ public class ServiceResource {
 	 * @return service
 	 */
 	@POST
+	@Path("/broker")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response addServiceBroker(String reqBodyStr) {
 
@@ -138,31 +142,41 @@ public class ServiceResource {
 				try {
 					int statusCode = response2.getStatusLine().getStatusCode();
 					String bodyStr = EntityUtils.toString(response2.getEntity());
-//					if (statusCode == 201) {
-//						// TODO should call df service api and compare with adapter db service data, insert the data which is not in the adapter db
-//						List<Service> servicesInDB = ServicePersistenceWrapper.getAllServices();
-//						
-//						String servicesFromDf = ServiceResource.callDFToGetAllServices();
-//						JsonObject servicesFromDfJson = new JsonParser().parse(servicesFromDf).getAsJsonObject();
-//						JsonArray items = servicesFromDfJson.getAsJsonArray("items");
-//						
-//						if (items != null || items.size() != 0) {
-//							for (int i = 0; i < items.size(); i++) {
-//								String name = items.get(i).getAsJsonObject().getAsJsonObject("spec")
-//										.get("name").getAsString();
-//								String id = items.get(i).getAsJsonObject().getAsJsonObject("spec")
-//										.get("id").getAsString();
-//								String description = items.get(i).getAsJsonObject().getAsJsonObject("spec")
-//										.get("description").getAsString();
-//
-//								for(Service s: servicesInDB){
-//									if (!s.getId().equals(id)) {
-//										ServicePersistenceWrapper.addService(new Service(id, name, description));
-//									}
-//								}
-//							}
-//						}
-//					}
+					// if (statusCode == 201) {
+					// // TODO should call df service api and compare with
+					// adapter db service data, insert the data which is not in
+					// the adapter db
+					// List<Service> servicesInDB =
+					// ServicePersistenceWrapper.getAllServices();
+					//
+					// String servicesFromDf =
+					// ServiceResource.callDFToGetAllServices();
+					// JsonObject servicesFromDfJson = new
+					// JsonParser().parse(servicesFromDf).getAsJsonObject();
+					// JsonArray items =
+					// servicesFromDfJson.getAsJsonArray("items");
+					//
+					// if (items != null || items.size() != 0) {
+					// for (int i = 0; i < items.size(); i++) {
+					// String name =
+					// items.get(i).getAsJsonObject().getAsJsonObject("spec")
+					// .get("name").getAsString();
+					// String id =
+					// items.get(i).getAsJsonObject().getAsJsonObject("spec")
+					// .get("id").getAsString();
+					// String description =
+					// items.get(i).getAsJsonObject().getAsJsonObject("spec")
+					// .get("description").getAsString();
+					//
+					// for(Service s: servicesInDB){
+					// if (!s.getId().equals(id)) {
+					// ServicePersistenceWrapper.addService(new Service(id,
+					// name, description));
+					// }
+					// }
+					// }
+					// }
+					// }
 
 					return Response.ok().entity(bodyStr).build();
 				} finally {
@@ -185,31 +199,65 @@ public class ServiceResource {
 	@Path("/df")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getServiceFromDf() {
-
 		try {
-
 			return Response.ok().entity(ServiceResource.callDFToGetAllServices()).build();
-
 		} catch (Exception e) {
 			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
 		}
 	}
-	
-	
+
 	/**
 	 * delete service broker
 	 * 
 	 * @return service
 	 */
-	@POST
+	@DELETE
+	@Path("/broker/{name}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response deleteServiceBroker() {
-		// TODO implement the service broker delete
-		return null;
+	public Response deleteServiceBroker(@PathParam("name") String serviceBrokerName) {
+		try {
+			String url = DFPropertiesFactory.getDFProperties().get(Constant.DATAFACTORY_URL);
+			String token = DFPropertiesFactory.getDFProperties().get(Constant.DATAFACTORY_TOKEN);
+			String dfRestUrl = url + "/oapi/v1/servicebrokers/" + serviceBrokerName;
+
+			SSLConnectionSocketFactory sslsf = SSLSocketIgnoreCA.createSSLSocketFactory();
+
+			CloseableHttpClient httpclient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
+			try {
+				HttpDelete httpDelete = new HttpDelete(dfRestUrl);
+				httpDelete.addHeader("Content-type", "application/json");
+				httpDelete.addHeader("Authorization", "bearer " + token);
+
+				CloseableHttpResponse response1 = httpclient.execute(httpDelete);
+
+				try {
+					// int statusCode =
+					// response1.getStatusLine().getStatusCode();
+
+					String bodyStr = EntityUtils.toString(response1.getEntity());
+
+					return Response.ok().entity(bodyStr).build();
+				} finally {
+					response1.close();
+				}
+			} finally {
+				httpclient.close();
+			}
+		} catch (Exception e) {
+			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+		}
 	}
-	
-	
-	
+
+	/**
+	 * call data foundry rest api
+	 * 
+	 * @return
+	 * @throws KeyManagementException
+	 * @throws NoSuchAlgorithmException
+	 * @throws KeyStoreException
+	 * @throws ClientProtocolException
+	 * @throws IOException
+	 */
 	private static String callDFToGetAllServices() throws KeyManagementException, NoSuchAlgorithmException,
 			KeyStoreException, ClientProtocolException, IOException {
 
@@ -241,7 +289,5 @@ public class ServiceResource {
 			httpclient.close();
 		}
 	}
-	
-	
-	
+
 }
