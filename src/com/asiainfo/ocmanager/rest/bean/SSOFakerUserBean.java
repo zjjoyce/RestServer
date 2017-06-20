@@ -7,30 +7,62 @@ package com.asiainfo.ocmanager.rest.bean;
  */
 public class SSOFakerUserBean {
 
-	private String currentUser;
+	private String http_x_proxy_cas_loginname;
+	private String http_x_proxy_cas_username;
+	private String http_x_proxy_cas_email;
+	private String http_x_proxy_cas_userid;
+	private String http_x_proxy_cas_mobile;
 
 	public SSOFakerUserBean() {
 
 	}
 
-	public SSOFakerUserBean(String currentUser) {
-		this.currentUser = currentUser;
+	public SSOFakerUserBean(String http_x_proxy_cas_loginname, String http_x_proxy_cas_username,
+			String http_x_proxy_cas_email, String http_x_proxy_cas_userid, String http_x_proxy_cas_mobile) {
+		this.http_x_proxy_cas_loginname = http_x_proxy_cas_loginname;
+		this.http_x_proxy_cas_username = http_x_proxy_cas_username;
+		this.http_x_proxy_cas_email = http_x_proxy_cas_email;
+		this.http_x_proxy_cas_userid = http_x_proxy_cas_userid;
+		this.http_x_proxy_cas_mobile = http_x_proxy_cas_mobile;
 	}
 
-	/**
-	 * 
-	 * @return
-	 */
-	public String getCurrentUser() {
-		return currentUser;
+	public String getHttp_x_proxy_cas_loginname() {
+		return http_x_proxy_cas_loginname;
 	}
 
-	/**
-	 * 
-	 * @param currentUser
-	 */
-	public void setCurrentUser(String currentUser) {
-		this.currentUser = currentUser;
+	public void setHttp_x_proxy_cas_loginname(String http_x_proxy_cas_loginname) {
+		this.http_x_proxy_cas_loginname = http_x_proxy_cas_loginname;
 	}
 
+	public String getHttp_x_proxy_cas_username() {
+		return http_x_proxy_cas_username;
+	}
+
+	public void setHttp_x_proxy_cas_username(String http_x_proxy_cas_username) {
+		this.http_x_proxy_cas_username = http_x_proxy_cas_username;
+	}
+
+	public String getHttp_x_proxy_cas_email() {
+		return http_x_proxy_cas_email;
+	}
+
+	public void setHttp_x_proxy_cas_email(String http_x_proxy_cas_email) {
+		this.http_x_proxy_cas_email = http_x_proxy_cas_email;
+	}
+
+	public String getHttp_x_proxy_cas_userid() {
+		return http_x_proxy_cas_userid;
+	}
+
+	public void setHttp_x_proxy_cas_userid(String http_x_proxy_cas_userid) {
+		this.http_x_proxy_cas_userid = http_x_proxy_cas_userid;
+	}
+
+	public String getHttp_x_proxy_cas_mobile() {
+		return http_x_proxy_cas_mobile;
+	}
+
+	public void setHttp_x_proxy_cas_mobile(String http_x_proxy_cas_mobile) {
+		this.http_x_proxy_cas_mobile = http_x_proxy_cas_mobile;
+	}
 }
