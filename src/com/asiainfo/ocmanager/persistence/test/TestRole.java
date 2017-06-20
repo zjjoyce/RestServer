@@ -10,7 +10,7 @@ import com.asiainfo.ocmanager.persistence.model.Role;
 public class TestRole {
 
 	public static void main(String[] args) {
-		SqlSession session = DBConnectorFactory.getSession();
+		SqlSession session = TestDBConnectorFactory.getSession();
 		try {
 			RoleMapper mapper = session.getMapper(RoleMapper.class);
 			List<Role> roles = mapper.selectAllRoles();

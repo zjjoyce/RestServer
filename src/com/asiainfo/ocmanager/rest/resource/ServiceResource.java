@@ -196,6 +196,20 @@ public class ServiceResource {
 	}
 	
 	
+	/**
+	 * delete service broker
+	 * 
+	 * @return service
+	 */
+	@POST
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response deleteServiceBroker() {
+		// TODO implement the service broker delete
+		return null;
+	}
+	
+	
+	
 	private static String callDFToGetAllServices() throws KeyManagementException, NoSuchAlgorithmException,
 			KeyStoreException, ClientProtocolException, IOException {
 

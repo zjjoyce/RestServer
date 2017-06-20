@@ -10,7 +10,7 @@ import com.asiainfo.ocmanager.persistence.model.UserRoleView;
 public class TestUserRole {
 
 	public static void main(String[] args) {
-		SqlSession session = DBConnectorFactory.getSession();
+		SqlSession session = TestDBConnectorFactory.getSession();
 		try {
 			UserRoleMapper mapper = session.getMapper(UserRoleMapper.class);
 			List<UserRoleView> urs = mapper.selectUsersRolesInTenant("1");

@@ -15,7 +15,7 @@ import com.asiainfo.ocmanager.persistence.model.Tenant;
 public class TestTenant {
 
 	public static void main(String[] args) {
-		SqlSession session = DBConnectorFactory.getSession();
+		SqlSession session = TestDBConnectorFactory.getSession();
 		try {
 			TenantMapper mapper = session.getMapper(TenantMapper.class);
 			

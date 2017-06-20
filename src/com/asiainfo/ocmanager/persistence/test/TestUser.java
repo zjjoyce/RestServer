@@ -14,7 +14,7 @@ import com.asiainfo.ocmanager.persistence.model.User;
  */
 public class TestUser {
 	public static void main(String[] args) {
-		SqlSession session = DBConnectorFactory.getSession();
+		SqlSession session = TestDBConnectorFactory.getSession();
 		try {
 			UserMapper mapper = session.getMapper(UserMapper.class);
 

@@ -19,7 +19,7 @@ import com.asiainfo.ocmanager.rest.utils.DFPropertiesFactory;
  *
  */
 
-public class DBConnectorFactory {
+public class TestDBConnectorFactory {
 
 	public static SqlSessionFactory sessionFactory;
 

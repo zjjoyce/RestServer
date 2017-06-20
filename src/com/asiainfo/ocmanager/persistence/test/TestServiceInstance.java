@@ -10,7 +10,7 @@ import com.asiainfo.ocmanager.persistence.model.ServiceInstance;
 public class TestServiceInstance {
 
 	public static void main(String[] args) {
-		SqlSession session = DBConnectorFactory.getSession();
+		SqlSession session = TestDBConnectorFactory.getSession();
 		try {
 			ServiceInstanceMapper mapper = session.getMapper(ServiceInstanceMapper.class);
 			mapper.insertServiceInstance(new ServiceInstance("9", "inst9", "2", "300", "ETCD", "hdfs tenant 005 quota"));
