@@ -211,6 +211,10 @@
               <directory>WebContent/META-INF</directory>
               <targetPath>META-INF</targetPath>
             </resource>
+            <resource>
+              <directory>WebContent/WEB-INF/conf</directory>
+              <targetPath>WEB-INF/conf</targetPath>
+            </resource>
           </webResources>
           <webXml>WebContent/WEB-INF/web.xml</webXml>
         </configuration>
