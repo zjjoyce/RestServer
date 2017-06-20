@@ -1,6 +1,5 @@
 # RestServer Readme
 
-__NOTE: Following is the manual steps to quick setup the rest server dev environment, the readme will be update to get the Jersey jars with Maven in build scripts__
 
 ## How to deploy the OCManager REST API into the tomcat
 
@@ -9,38 +8,49 @@ __NOTE: Following is the manual steps to quick setup the rest server dev environ
 git clone git@github.com:OCManager/RestServer.git
 ```
 
-2. Install the tomcat into your dev environemnt
+2. Install the Maven access the link: __http://maven.apache.org/download.cgi__ to get the Maven 
 
-3. Create the folders under the __<TOMCAT_HOME>/webapps__
+
+3. Build the RestServer, go to the RestServer folder run
+(__note:__ should configure the environemnt var)
 ```
-mkdir -p <TOMCAT_HOME>/webapps/ocmanager/WEB-INF
-mkdir <TOMCAT_HOME>/webapps/ocmanager/WEB-INF/classes
-mkdir <TOMCAT_HOME>/webapps/ocmanager/WEB-INF/lib
+mvn install
+```
+After build successlly, it will have a __ocmanager.war__ under the __target__ folder
+
+
+4. Install the tomcat into your dev environemnt
+
+5. Install the mysql dadtabase on your environment 
+
+6. Copy the __ocmanager.war__ folders into the __<TOMCAT_HOME>/webapps__
+```
+cp ocmanager.war <TOMCAT_HOME>/webapps
 ```
 
-4. Compile the code under src folder, the copy the whole package into the __<TOMCAT_HOME>/webapps/ocmanager/WEB-INF/classes__ folder
+7. Start tomcat
+```
+<TOMCAT_HOME>/bin/startup.sh
+```
 
-5. Go the the web https://jersey.github.io/download.html
-to download the Jersey jars, then copy the them into the __<TOMCAT_HOME>/webapps/ocmanager/WEB-INF/lib__ folder
+8. Congifure the database properties, go to __<TOMCAT_HOME>/webapps/ocmanager/WEB-INF/conf__ , edit the config.properties
+```
+jdbc.driver=com.mysql.jdbc.Driver
+jdbc.encoding=useUnicode=true&characterEncoding=utf8
+jdbc.url=jdbc:mysql://<mysql server ip>:3306/ocmanager
+jdbc.username=<the user create the ocmanager scheame>
+jdbc.password=<the user password create the ocmanager scheame>
+```
 
-6. Copy the __WebContent/WEB-INF/web.xml__ into the __<TOMCAT_HOME>/webapps/ocmanager/WEB-INF__ folder
+9. Congifure the df properties, go to __<TOMCAT_HOME>/webapps/ocmanager/WEB-INF/conf__ , edit the dataFactory.properties
+```
+dataFactory.url=https://<df rest api server IP>:8443
+dataFactory.token=<df admin token>
+```
 
-7. Then restart the tomcat server
+10. Then restart the tomcat server
 
-8. Access the __http://<your tomcat server>:<port>/ocmanager/v1/api/tenant__ with __POST__ request, you will get the __Hello World!__
+11. Then Access __http://<your tomcat server>:<port>/ocmanager/v1/api/tenant__ you can see the data
 
 
-
-## How to deploy the OCManager persistence
-
-__pre-request:__ you need install the mysql DB and run the database/mysql/initOCManager.sql to create the database. And insert some data into the tables
-
-1. Go to the link: https://github.com/mybatis/mybatis-3/releases to download 3.4.4 jars
-
-2. Then copy the them into the __<TOMCAT_HOME>/webapps/ocmanager/WEB-INF/lib__ folder
-
-3. Because in the __OCManager REST API deployment step 4__ we already copy the class files, here not need to deploy the persistence code
-
-4. Then restart the tomcat server
-
-5. Then Access __http://<your tomcat server>:<port>/ocmanager/v1/api/tenant/<tenant id>__ you can see the data
+__NOTE: __ More rest api, please access the link: https://github.com/OCManager/RestServer/tree/master/docs/adaptorRest
