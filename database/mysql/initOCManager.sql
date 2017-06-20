@@ -49,6 +49,7 @@ CREATE TABLE IF NOT EXISTS `ocmanager`.`roles` (
   `id` VARCHAR(64) NOT NULL,
   `rolename` VARCHAR(64) NOT NULL,
   `description` MEDIUMTEXT NULL,
+  `permission` MEDIUMTEXT NOT NULL DEFAULT '{}',
   PRIMARY KEY (`id`))
 ENGINE = InnoDB;
 

@@ -13,12 +13,13 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.asiainfo.ocmanager.auth.PageAuth;
 import com.asiainfo.ocmanager.persistence.model.User;
 import com.asiainfo.ocmanager.rest.bean.AdapterResponseBean;
 import com.asiainfo.ocmanager.rest.resource.utils.UserPersistenceWrapper;
 
 /**
- * 
+ *
  * @author zhaoyim
  *
  */
@@ -28,7 +29,7 @@ public class UserResource {
 
 	/**
 	 * Get All OCManager users
-	 * 
+	 *
 	 * @return user list
 	 */
 	@GET
@@ -40,7 +41,7 @@ public class UserResource {
 
 	/**
 	 * Get the specific user by id
-	 * 
+	 *
 	 * @param userId
 	 *            user id
 	 * @return user
@@ -55,12 +56,13 @@ public class UserResource {
 
 	/**
 	 * Create a new user
-	 * 
+	 *
 	 * @param user
 	 *            user obj json
 	 * @return new user info
 	 */
 	@POST
+  @PageAuth(requiredPermission = "CreateUser")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response createUser(User user) {
@@ -70,12 +72,13 @@ public class UserResource {
 
 	/**
 	 * Update the existing user info
-	 * 
+	 *
 	 * @param user
 	 *            user obj json
 	 * @return updated user info
 	 */
 	@PUT
+  @PageAuth(requiredPermission = "UpdateUser")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response updateUser(User user) {
@@ -85,11 +88,12 @@ public class UserResource {
 
 	/**
 	 * Delete a user
-	 * 
+	 *
 	 * @param userId
 	 *            user id
 	 */
 	@DELETE
+  @PageAuth(requiredPermission = "DeleteUser")
 	@Path("{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response deleteUser(@PathParam("id") String userId) {
