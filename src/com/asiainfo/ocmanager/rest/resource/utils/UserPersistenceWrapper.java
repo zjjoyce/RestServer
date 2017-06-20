@@ -9,7 +9,7 @@ import org.apache.ibatis.session.SqlSession;
 
 import com.asiainfo.ocmanager.persistence.mapper.UserMapper;
 import com.asiainfo.ocmanager.persistence.model.User;
-import com.asiainfo.ocmanager.persistence.test.DBConnectorFactory;
+import com.asiainfo.ocmanager.persistence.DBConnectorFactory;
 import com.asiainfo.ocmanager.rest.utils.UUIDFactory;
 
 /**

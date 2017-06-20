@@ -7,7 +7,7 @@ import org.apache.ibatis.session.SqlSession;
 
 import com.asiainfo.ocmanager.persistence.mapper.ServiceMapper;
 import com.asiainfo.ocmanager.persistence.model.Service;
-import com.asiainfo.ocmanager.persistence.test.DBConnectorFactory;
+import com.asiainfo.ocmanager.persistence.DBConnectorFactory;
 
 /**
  * 

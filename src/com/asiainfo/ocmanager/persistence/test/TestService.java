@@ -10,7 +10,7 @@ import com.asiainfo.ocmanager.persistence.model.Service;
 public class TestService {
 
 	public static void main(String[] args) {
-		SqlSession session = DBConnectorFactory.getSession();
+		SqlSession session = TestDBConnectorFactory.getSession();
 		try {
 			ServiceMapper mapper = session.getMapper(ServiceMapper.class);
 			mapper.insertService(new Service("700", "hdfs17", "hdfs description"));

@@ -4,7 +4,7 @@ import org.apache.ibatis.session.SqlSession;
 
 import com.asiainfo.ocmanager.persistence.mapper.TenantUserRoleAssignmentMapper;
 import com.asiainfo.ocmanager.persistence.model.TenantUserRoleAssignment;
-import com.asiainfo.ocmanager.persistence.test.DBConnectorFactory;
+import com.asiainfo.ocmanager.persistence.DBConnectorFactory;
 
 /**
  * 

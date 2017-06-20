@@ -8,7 +8,7 @@ import com.asiainfo.ocmanager.persistence.model.TenantUserRoleAssignment;
 public class TestTenantUserRoleAssignment {
 
 	public static void main(String[] args) {
-		SqlSession session = DBConnectorFactory.getSession();
+		SqlSession session = TestDBConnectorFactory.getSession();
 		try {
 			TenantUserRoleAssignmentMapper mapper = session.getMapper(TenantUserRoleAssignmentMapper.class);
 
