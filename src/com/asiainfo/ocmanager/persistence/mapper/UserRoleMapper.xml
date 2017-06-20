@@ -5,7 +5,7 @@
 <mapper namespace="com.asiainfo.ocmanager.persistence.mapper.UserRoleMapper">
 	<select id="selectUsersRolesInTenant" parameterType="java.lang.String"
 		resultType="com.asiainfo.ocmanager.persistence.model.UserRoleView">
-		select 
+		select
 		  U.id as "userId",
 		  U.username as "userName",
 		  U.description as "userDescription",
@@ -19,12 +19,13 @@
 	<!-- select the role based on the given tenant and user -->
 	<select id="selectRoleBasedOnUserAndTenant" parameterType="java.lang.String"
 		resultType="com.asiainfo.ocmanager.persistence.model.UserRoleView">
-		select 
-			U.id as "userId", 
+		select
+			U.id as "userId",
 			U.username as "userName",
 			TUR.role_id as "roleId",
-			TUR.tenant_id as "tenantId"
-			from 
+			TUR.tenant_id as "tenantId",
+			R.permission as "permission"
+			from
 		         users as U, tenants_users_roles_assignment as TUR, roles as R where
 		         U.id=TUR.user_id and TUR.role_id=R.id and U.username=#{userName} and
 		         TUR.tenant_id=#{tenantId}
