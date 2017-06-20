@@ -33,7 +33,14 @@ cp ocmanager.war <TOMCAT_HOME>/webapps
 <TOMCAT_HOME>/bin/startup.sh
 ```
 
-8. Congifure the database properties, go to __<TOMCAT_HOME>/webapps/ocmanager/WEB-INF/conf__ , edit the config.properties
+8. Connect to the mysql, then run the comanager  initOCManager.sql
+```
+mysql -u user -p password
+mysql> source <TOMCAT_HOME>/webapps/ocmanager/WEB-INF/database/mysql/initOCManager.sql
+```
+
+
+9. Congifure the database properties, go to __<TOMCAT_HOME>/webapps/ocmanager/WEB-INF/conf__ , edit the config.properties
 ```
 jdbc.driver=com.mysql.jdbc.Driver
 jdbc.encoding=useUnicode=true&characterEncoding=utf8
@@ -42,15 +49,15 @@ jdbc.username=<the user create the ocmanager scheame>
 jdbc.password=<the user password create the ocmanager scheame>
 ```
 
-9. Congifure the df properties, go to __<TOMCAT_HOME>/webapps/ocmanager/WEB-INF/conf__ , edit the dataFactory.properties
+10. Congifure the df properties, go to __<TOMCAT_HOME>/webapps/ocmanager/WEB-INF/conf__ , edit the dataFactory.properties
 ```
 dataFactory.url=https://<df rest api server IP>:8443
 dataFactory.token=<df admin token>
 ```
 
-10. Then restart the tomcat server
+11. Then restart the tomcat server
 
-11. Then Access __http://<your tomcat server>:<port>/ocmanager/v1/api/tenant__ you can see the data
+12. Then Access __http://<your tomcat server>:<port>/ocmanager/v1/api/tenant__ you can see the data
 
 
 __NOTE: __ More rest api, please access the link: https://github.com/OCManager/RestServer/tree/master/docs/adaptorRest

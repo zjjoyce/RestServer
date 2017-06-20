@@ -215,6 +215,10 @@
               <directory>WebContent/WEB-INF/conf</directory>
               <targetPath>WEB-INF/conf</targetPath>
             </resource>
+            <resource>
+              <directory>database</directory>
+              <targetPath>WEB-INF/database</targetPath>
+            </resource>
           </webResources>
           <webXml>WebContent/WEB-INF/web.xml</webXml>
         </configuration>
