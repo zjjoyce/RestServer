@@ -748,6 +748,49 @@ __response:__
 ```
 
 
+13. 获取服务实例访问信息（只有服务实例状态是Active的时候才会有访问信息）
+```
+GET /ocmanager/v1/api/tenant/{tenantId}/service/instance/{serviceInstanceName}/access/info
+```
+__response:__
+```
+{
+  "kind": "BackingServiceInstance",
+  "apiVersion": "v1",
+  "metadata": {
+    "name": "ETCD-instance014",
+    "namespace": "zhaoyim",
+    "selfLink": "/oapi/v1/namespaces/zhaoyim/backingserviceinstances/ETCD-instance014",
+    "uid": "fae1f410-50ee-11e7-87b1-fa163efdbea8",
+    "resourceVersion": "16363936",
+    "creationTimestamp": "2017-06-14T10:48:19Z"
+  },
+  "spec": {
+    "provisioning": {
+      "dashboard_url": "",
+      "backingservice_name": "ETCD",
+      "backingservice_spec_id": "",
+      "backingservice_plan_guid": "204F8288-F8D9-4806-8661-EB48D94504B3",
+      "backingservice_plan_name": "",
+      "parameters": null,
+      "credentials": null
+    },
+    "userprovidedservice": {
+      "credentials": null
+    },
+    "binding": null,
+    "bound": 0,
+    "instance_id": "",
+    "tags": null
+  },
+  "status": {
+    "phase": "Provisioning",
+    "action": "",
+    "last_operation": null
+  }
+}
+```
+
 
 ### Single Sign on APIs
 1. 获取当前用户(所要用户信息需要设置在request header中)
