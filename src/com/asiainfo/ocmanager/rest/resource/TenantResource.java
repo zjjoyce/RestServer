@@ -212,6 +212,7 @@ public class TenantResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response createServiceInstanceInTenant(@PathParam("id") String tenantId, String reqBodyStr) {
 
+
 		try {
 			String url = DFPropertiesFactory.getDFProperties().get(Constant.DATAFACTORY_URL);
 			String token = DFPropertiesFactory.getDFProperties().get(Constant.DATAFACTORY_TOKEN);
@@ -414,7 +415,6 @@ public class TenantResource {
 		// TURAssignmentPersistenceWrapper.assignRoleToUserInTenant(childAssignment);
 		// }
 		// }
-
 
 		return Response.ok().entity(assignment).build();
 	}
