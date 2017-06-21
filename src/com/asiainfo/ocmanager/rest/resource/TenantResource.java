@@ -104,8 +104,9 @@ public class TenantResource {
 	@GET
 	@Path("{id}/users")
 	public Response getTenantUsers(@PathParam("id") String tenantId, @Context HttpServletRequest request) {
-		// TODO how to get the request header info following comment code can do this
-//		Enumeration<String> aa = request.getHeaderNames();
+		// TODO how to get the request header info following comment code can do
+		// this
+		// Enumeration<String> aa = request.getHeaderNames();
 		List<UserRoleView> usersRoles = UserRoleViewPersistenceWrapper.getUsersInTenant(tenantId);
 		return Response.ok().entity(usersRoles).build();
 	}
@@ -216,7 +217,6 @@ public class TenantResource {
 			String url = DFPropertiesFactory.getDFProperties().get(Constant.DATAFACTORY_URL);
 			String token = DFPropertiesFactory.getDFProperties().get(Constant.DATAFACTORY_TOKEN);
 			String dfRestUrl = url + "/oapi/v1/namespaces/" + tenantId + "/backingserviceinstances";
-
 
 			// parse the req body make sure it is json
 			JsonElement reqBodyJson = new JsonParser().parse(reqBodyStr);
@@ -354,7 +354,7 @@ public class TenantResource {
 			String url = DFPropertiesFactory.getDFProperties().get(Constant.DATAFACTORY_URL);
 			String token = DFPropertiesFactory.getDFProperties().get(Constant.DATAFACTORY_TOKEN);
 			String dfRestUrl = url + "/oapi/v1/projects/" + tenantId;
-			
+
 			SSLConnectionSocketFactory sslsf = SSLSocketIgnoreCA.createSSLSocketFactory();
 
 			CloseableHttpClient httpclient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
@@ -399,19 +399,22 @@ public class TenantResource {
 	public Response assignRoleToUserInTenant(@PathParam("id") String tenantId, TenantUserRoleAssignment assignment) {
 		// assgin to the input tenant
 		assignment.setTenantId(tenantId);
-    assignment = TURAssignmentPersistenceWrapper.assignRoleToUserInTenant(assignment);
+
+		assignment = TURAssignmentPersistenceWrapper.assignRoleToUserInTenant(assignment);
 
 		// assign to the child tenants
-//		List<Tenant> children = TenantPersistenceWrapper.getChildrenTenants(tenantId);
-//		if (children.size() != 0) {
-//			for(Tenant child: children){
-//				TenantUserRoleAssignment childAssignment = new TenantUserRoleAssignment();
-//				childAssignment.setTenantId(child.getId());
-//				childAssignment.setUserId(assignment.getUserId());
-//				childAssignment.setRoleId(assignment.getRoleId());
-//				TURAssignmentPersistenceWrapper.assignRoleToUserInTenant(childAssignment);
-//			}
-//		}
+		// List<Tenant> children =
+		// TenantPersistenceWrapper.getChildrenTenants(tenantId);
+		// if (children.size() != 0) {
+		// for(Tenant child: children){
+		// TenantUserRoleAssignment childAssignment = new
+		// TenantUserRoleAssignment();
+		// childAssignment.setTenantId(child.getId());
+		// childAssignment.setUserId(assignment.getUserId());
+		// childAssignment.setRoleId(assignment.getRoleId());
+		// TURAssignmentPersistenceWrapper.assignRoleToUserInTenant(childAssignment);
+		// }
+		// }
 
 		return Response.ok().entity(assignment).build();
 	}
@@ -447,5 +450,6 @@ public class TenantResource {
 	public Response unassignRoleFromUserInTenant(@PathParam("id") String tenantId, @PathParam("userId") String userId) {
 		TURAssignmentPersistenceWrapper.unassignRoleFromUserInTenant(tenantId, userId);
 		return Response.ok().entity(new AdapterResponseBean("delete success", userId, 200)).build();
+	}
 
 }
