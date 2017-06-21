@@ -97,4 +97,22 @@ public class TenantPersistenceWrapper {
 		return childrenTenants;
 	}
 
+	/**
+	 * 
+	 * @param tenantId
+	 */
+	public static void deleteTenant(String tenantId) {
+		SqlSession session = DBConnectorFactory.getSession();
+
+		try {
+			TenantMapper mapper = session.getMapper(TenantMapper.class);
+			mapper.deleteTenant(tenantId);
+			session.commit();
+		} catch (Exception e) {
+			session.rollback();
+		} finally {
+			session.close();
+		}
+	}
+
 }
