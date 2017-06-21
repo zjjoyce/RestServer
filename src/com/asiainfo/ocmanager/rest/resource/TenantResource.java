@@ -348,8 +348,40 @@ public class TenantResource {
 	@DELETE
 	@Path("{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public void deleteTenant(@PathParam("id") String tenantId) {
-		// TODO not consider in this stage 2
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response deleteTenant(@PathParam("id") String tenantId) {
+		try {
+			String url = DFPropertiesFactory.getDFProperties().get(Constant.DATAFACTORY_URL);
+			String token = DFPropertiesFactory.getDFProperties().get(Constant.DATAFACTORY_TOKEN);
+			String dfRestUrl = url + "/oapi/v1/projects/" + tenantId;
+			
+			SSLConnectionSocketFactory sslsf = SSLSocketIgnoreCA.createSSLSocketFactory();
+
+			CloseableHttpClient httpclient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
+			try {
+				HttpDelete httpDelete = new HttpDelete(dfRestUrl);
+				httpDelete.addHeader("Content-type", "application/json");
+				httpDelete.addHeader("Authorization", "bearer " + token);
+
+				CloseableHttpResponse response1 = httpclient.execute(httpDelete);
+
+				try {
+					int statusCode = response1.getStatusLine().getStatusCode();
+					if (statusCode == 200) {
+						TenantPersistenceWrapper.deleteTenant(tenantId);
+					}
+					String bodyStr = EntityUtils.toString(response1.getEntity());
+
+					return Response.ok().entity(bodyStr).build();
+				} finally {
+					response1.close();
+				}
+			} finally {
+				httpclient.close();
+			}
+		} catch (Exception e) {
+			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+		}
 	}
 
 	/**
@@ -415,31 +447,5 @@ public class TenantResource {
 	public Response unassignRoleFromUserInTenant(@PathParam("id") String tenantId, @PathParam("userId") String userId) {
 		TURAssignmentPersistenceWrapper.unassignRoleFromUserInTenant(tenantId, userId);
 		return Response.ok().entity(new AdapterResponseBean("delete success", userId, 200)).build();
-	}
-
-
-
-
-//	private boolean nonAdminHasPermission(Tenant tenant, User user){
-//
-//
-//		// root tenant only the admin can create
-//		if (tenant.getParentId() == null){
-//			return false;
-//		}
-//
-//		UserRoleView userView = UserRoleViewPersistenceWrapper.getRoleBasedOnUserAndTenant(user.getUsername(), tenant.getParentId());
-//		if ( userView == null){
-//			return false;
-//		}
-//
-//		if (userView.getRoleName().equals("subsidiary.admin") || userView.getRoleName().equals("project.admin")){
-//			return true;
-//		}
-//
-//		return false;
-//	}
-
-
 
 }

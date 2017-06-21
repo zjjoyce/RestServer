@@ -23,4 +23,8 @@
 		insert into tenants (id, name, description, parentId)
 		values (#{id}, #{name}, #{description}, #{parentId})
 	</insert>
+	<!-- delete tenant -->
+	<delete id="deleteTenant">
+		delete from tenants where id=#{id}
+	</delete>
 </mapper>
