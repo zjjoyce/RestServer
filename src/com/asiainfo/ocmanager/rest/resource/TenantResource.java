@@ -19,6 +19,7 @@ import javax.ws.rs.core.Response.Status;
 import com.asiainfo.ocmanager.auth.PageAuth;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.entity.StringEntity;
@@ -130,6 +131,52 @@ public class TenantResource {
 	}
 
 	/**
+	 * get the tenant service instance info which include the access info
+	 * 
+	 * @param tenantId
+	 * @param InstanceName
+	 * @return
+	 */
+	@GET
+	@Path("{tenantId}/service/instance/{InstanceName}/access/info")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getTenantServiceInstanceAccessInfo(@PathParam("tenantId") String tenantId,
+			@PathParam("InstanceName") String InstanceName) {
+		try {
+			String url = DFPropertiesFactory.getDFProperties().get(Constant.DATAFACTORY_URL);
+			String token = DFPropertiesFactory.getDFProperties().get(Constant.DATAFACTORY_TOKEN);
+			String dfRestUrl = url + "/oapi/v1/namespaces/" + tenantId + "/backingserviceinstances/" + InstanceName;
+
+			SSLConnectionSocketFactory sslsf = SSLSocketIgnoreCA.createSSLSocketFactory();
+
+			CloseableHttpClient httpclient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
+			try {
+				HttpGet httpGet = new HttpGet(dfRestUrl);
+				httpGet.addHeader("Content-type", "application/json");
+				httpGet.addHeader("Authorization", "bearer " + token);
+
+				CloseableHttpResponse response1 = httpclient.execute(httpGet);
+
+				try {
+					// int statusCode =
+					// response1.getStatusLine().getStatusCode();
+
+					String bodyStr = EntityUtils.toString(response1.getEntity());
+
+					return Response.ok().entity(bodyStr).build();
+				} finally {
+					response1.close();
+				}
+			} finally {
+				httpclient.close();
+			}
+		} catch (Exception e) {
+			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+		}
+
+	}
+
+	/**
 	 * Create a new tenant
 	 *
 	 * @param tenant
@@ -211,7 +258,6 @@ public class TenantResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response createServiceInstanceInTenant(@PathParam("id") String tenantId, String reqBodyStr) {
-
 
 		try {
 			String url = DFPropertiesFactory.getDFProperties().get(Constant.DATAFACTORY_URL);
@@ -392,7 +438,7 @@ public class TenantResource {
 	 * @return
 	 */
 	@POST
-  @PageAuth(requiredPermission = "Grant")
+	@PageAuth(requiredPermission = "Grant")
 	@Path("{id}/user/role/assignment")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
