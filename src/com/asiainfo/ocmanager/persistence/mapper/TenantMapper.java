@@ -2,6 +2,8 @@ package com.asiainfo.ocmanager.persistence.mapper;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Param;
+
 import com.asiainfo.ocmanager.persistence.model.Tenant;
 
 /**
@@ -30,10 +32,16 @@ public interface TenantMapper {
 	 * @return
 	 */
 	public List<Tenant> selectAllTenants();
-	
+
 	/**
 	 * 
 	 * @return
 	 */
 	public List<Tenant> selectChildrenTenants(String parentTenantId);
+
+	/**
+	 * 
+	 * @param id
+	 */
+	public void deleteTenant(@Param("id") String id);
 }

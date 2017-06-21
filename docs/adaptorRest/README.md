@@ -137,6 +137,217 @@ __response:__
 }
 ```
 
+3. 添加Service broker（添加服务， 服务是注册在service broker 里面的，，因此会添加service broker 中注册的所有服务）
+```
+POST /ocmanager/v1/api/service/broker
+```
+__request body:__
+```
+{
+  "kind":"ServiceBroker",
+  "apiVersion":"v1",
+  "metadata":
+    {
+      "name":"rds9"
+    },
+  "spec":
+    {
+      "url":"http://localhost:9900",
+      "username":"test",
+      "password":"test"
+    }
+}
+```
+
+__response:__
+```
+{
+  "kind": "ServiceBroker",
+  "apiVersion": "v1",
+  "metadata": {
+    "name": "rds9",
+    "selfLink": "/oapi/v1/servicebrokers/rds9",
+    "uid": "edf41739-564a-11e7-8f1f-fa163efdbea8",
+    "resourceVersion": "17209399",
+    "creationTimestamp": "2017-06-21T06:29:07Z"
+  },
+  "spec": {
+    "url": "http://localhost:9900",
+    "name": "",
+    "username": "test",
+    "password": "test"
+  },
+  "status": {
+    "phase": "New"
+  }
+}
+```
+
+4. 删除Service broker（删除服务， 服务是注册在service broker 里面的，因此会删除service broker 中注册的所有服务）
+```
+POST /ocmanager/v1/api/service/broker/{name}
+```
+
+__response:__
+```
+{
+  "kind": "ServiceBroker",
+  "apiVersion": "v1",
+  "metadata": {
+    "name": "rds9",
+    "selfLink": "/oapi/v1/servicebrokers/rds9",
+    "uid": "edf41739-564a-11e7-8f1f-fa163efdbea8",
+    "resourceVersion": "17209607",
+    "creationTimestamp": "2017-06-21T06:29:07Z",
+    "deletionTimestamp": "2017-06-21T06:31:36Z",
+    "annotations": {
+      "ServiceBroker/LastPing": "1498026648288080254",
+      "ServiceBroker/NewRetryTimes": "1"
+    }
+  },
+  "spec": {
+    "url": "http://localhost:9900",
+    "name": "",
+    "username": "test",
+    "password": "test"
+  },
+  "status": {
+    "phase": "Deleting"
+  }
+}
+```
+
+
+5. 获取Data Foundry服务列表
+```
+GET /ocmanager/v1/api/service/df
+```
+__response:__
+```
+{
+  "kind": "BackingServiceList",
+  "apiVersion": "v1",
+  "metadata": {
+    "selfLink": "/oapi/v1/namespaces/openshift/backingservices",
+    "resourceVersion": "17209829"
+  },
+  "items": [
+    {
+      "metadata": {
+        "name": "Cassandra",
+        "generateName": "etcd",
+        "namespace": "openshift",
+        "selfLink": "/oapi/v1/namespaces/openshift/backingservices/Cassandra",
+        "uid": "38fa4221-cd9f-11e6-b10e-4e10dba0edae",
+        "resourceVersion": "6202322",
+        "creationTimestamp": "2016-12-29T08:17:22Z",
+        "labels": {
+          "asiainfo.io/servicebroker": "etcd"
+        }
+      },
+      "spec": {
+        "name": "Cassandra",
+        "id": "3D7D7D07-D704-4B22-B492-EE5AE5301A55",
+        "description": "A Sample Cassandra (v3.4) cluster on Openshift",
+        "bindable": true,
+        "plan_updateable": false,
+        "tags": [
+          "cassandra",
+          "openshift"
+        ],
+        "requires": null,
+        "metadata": {
+          "displayName": "Cassandra",
+          "documentationUrl": "https://wiki.apache.org/cassandra/GettingStarted",
+          "imageUrl": "https://cassandra.apache.org/media/img/cassandra_logo.png",
+          "longDescription": "Managed, highly available cassandra clusters in the cloud.",
+          "providerDisplayName": "Asiainfo",
+          "supportUrl": "https://cassandra.apache.org/"
+        },
+        "plans": [
+          {
+            "name": "standalone",
+            "id": "7B7EC041-2090-4ACB-AE0F-E8BDF315A778",
+            "description": "HA Cassandra on Openshift",
+            "metadata": {
+              "bullets": [
+                "20 GB of Disk",
+                "20 connections"
+              ],
+              "costs": null,
+              "displayName": "Shared and Free",
+              "customize": null
+            },
+            "free": true
+          }
+        ],
+        "dashboard_client": null
+      },
+      "status": {
+        "phase": "Inactive"
+      }
+    },
+    {
+      "metadata": {
+        "name": "liuxu",
+        "generateName": "liuxu",
+        "namespace": "openshift",
+        "selfLink": "/oapi/v1/namespaces/openshift/backingservices/liuxu",
+        "uid": "95468dec-28c4-11e7-9b96-fa163efdbea8",
+        "resourceVersion": "7495189",
+        "creationTimestamp": "2017-04-24T08:04:04Z",
+        "labels": {
+          "asiainfo.io/servicebroker": "liuxu"
+        }
+      },
+      "spec": {
+        "name": "Greenplum",
+        "id": "98E2AFE3-7279-40CA-B04E-74276B3FF4B2",
+        "description": "Greenplumæ¯Pivotalå¼æºçMPPæ°æ®åºã",
+        "bindable": true,
+        "plan_updateable": false,
+        "tags": [
+          "Greenplum",
+          "mpp",
+          "database"
+        ],
+        "requires": null,
+        "metadata": {
+          "displayName": "Greenplum",
+          "documentationUrl": "http://gpdb.docs.pivotal.io",
+          "imageUrl": "pub/assets/Greenplum.png",
+          "longDescription": "The First Open SourceMassively Parallel Data Warehouse",
+          "providerDisplayName": "Asiainfo",
+          "supportUrl": "http://greenplum.org"
+        },
+        "plans": [
+          {
+            "name": "Experimental",
+            "id": "B48A3972-536F-47A6-B04F-A5344F4DC5E0",
+            "description": "åç¬Greenplumå®ä¾",
+            "metadata": {
+              "bullets": [
+                "20 GB of Disk",
+                "20 connections"
+              ],
+              "costs": null,
+              "displayName": "Shared and Free",
+              "customize": null
+            },
+            "free": false
+          }
+        ],
+        "dashboard_client": null
+      },
+      "status": {
+        "phase": "Active"
+      }
+    },
+    ...
+  ]
+}
+```
+
 
 
 ### Roles APIs
@@ -477,6 +688,35 @@ __response:__
 ``` 
 
 
+12. 删除租户
+```
+DELETE /ocmanager/v1/api/tenant/{id}
+```
+__response:__
+```
+{
+  "kind": "Status",
+  "apiVersion": "v1",
+  "metadata": {},
+  "status": "Success",
+  "code": 200
+}
+```
 
 
 
+### Single Sign on APIs
+1. 获取当前用户(所要用户信息需要设置在request header中)
+```
+GET /ocmanager/v1/api/sso/user
+```
+__response:__
+```
+{
+  "http_x_proxy_cas_email": "",
+  "http_x_proxy_cas_loginname": "user1",
+  "http_x_proxy_cas_mobile": "",
+  "http_x_proxy_cas_userid": "",
+  "http_x_proxy_cas_username": "user1"
+}
+```

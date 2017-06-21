@@ -42,10 +42,14 @@ public class TestTenant {
 				System.out.println(c.getParentId());
 			}
 			
-			Tenant tenant = mapper.selectTenantById("1");
+			Tenant tenant = mapper.selectTenantById("id7");
 			System.out.println(tenant);
 			System.out.println(tenant.getId());
 			System.out.println(tenant.getName());
+			
+			System.out.println("=== delete tenant ===");
+			mapper.deleteTenant("id7");
+			
 			session.commit();
 		} catch (Exception e) {
 			session.rollback();
