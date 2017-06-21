@@ -16,6 +16,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import com.asiainfo.ocmanager.auth.PageAuth;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
@@ -38,7 +39,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 /**
- * 
+ *
  * @author zhaoyim
  *
  */
@@ -47,7 +48,7 @@ public class ServiceResource {
 
 	/**
 	 * Get All OCManager services
-	 * 
+	 *
 	 * @return service list
 	 */
 	@GET
@@ -96,7 +97,7 @@ public class ServiceResource {
 
 	/**
 	 * Get service by id
-	 * 
+	 *
 	 * @return service
 	 */
 	@GET
@@ -111,10 +112,11 @@ public class ServiceResource {
 
 	/**
 	 * Add service broker
-	 * 
+	 *
 	 * @return service
 	 */
 	@POST
+  @PageAuth(requiredPermission = "AddService")
 	@Path("/broker")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response addServiceBroker(String reqBodyStr) {
@@ -192,7 +194,7 @@ public class ServiceResource {
 
 	/**
 	 * Get all service from df
-	 * 
+	 *
 	 * @return services
 	 */
 	@GET
@@ -208,10 +210,11 @@ public class ServiceResource {
 
 	/**
 	 * delete service broker
-	 * 
+	 *
 	 * @return service
 	 */
 	@DELETE
+  @PageAuth(requiredPermission = "DeleteService")
 	@Path("/broker/{name}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response deleteServiceBroker(@PathParam("name") String serviceBrokerName) {
@@ -250,7 +253,7 @@ public class ServiceResource {
 
 	/**
 	 * call data foundry rest api
-	 * 
+	 *
 	 * @return
 	 * @throws KeyManagementException
 	 * @throws NoSuchAlgorithmException

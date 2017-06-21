@@ -20,12 +20,11 @@ public class PagePermission {
   private boolean createUser;
   private boolean updateUser;
   private boolean deleteUser;
+
   private boolean addService;
   private boolean deleteService;
-  private boolean grantSysManagement;
-  private boolean grantChildComManagement;
-  private boolean grantProjectManagement;
-  private boolean grantTeamMember;
+
+  private boolean grant;
 
   public boolean isCreateUser() {
     return createUser;
@@ -67,35 +66,11 @@ public class PagePermission {
     this.deleteService = deleteService;
   }
 
-  public boolean isGrantSysManagement() {
-    return grantSysManagement;
+  public boolean isGrant() {
+    return grant;
   }
 
-  public void setGrantSysManagement(boolean grantSysManagement) {
-    this.grantSysManagement = grantSysManagement;
-  }
-
-  public boolean isGrantChildComManagement() {
-    return grantChildComManagement;
-  }
-
-  public void setGrantChildComManagement(boolean grantChildComManagement) {
-    this.grantChildComManagement = grantChildComManagement;
-  }
-
-  public boolean isGrantProjectManagement() {
-    return grantProjectManagement;
-  }
-
-  public void setGrantProjectManagement(boolean grantProjectManagement) {
-    this.grantProjectManagement = grantProjectManagement;
-  }
-
-  public boolean isGrantTeamMember() {
-    return grantTeamMember;
-  }
-
-  public void setGrantTeamMember(boolean grantTeamMember) {
-    this.grantTeamMember = grantTeamMember;
+  public void setGrant(boolean grant) {
+    this.grant = grant;
   }
 }

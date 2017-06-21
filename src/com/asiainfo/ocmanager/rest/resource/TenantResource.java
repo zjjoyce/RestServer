@@ -1,6 +1,5 @@
 package com.asiainfo.ocmanager.rest.resource;
 
-import java.util.Enumeration;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,9 +16,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import com.asiainfo.ocmanager.auth.PageAuth;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.entity.StringEntity;
@@ -30,7 +29,6 @@ import org.apache.http.util.EntityUtils;
 import com.asiainfo.ocmanager.persistence.model.ServiceInstance;
 import com.asiainfo.ocmanager.persistence.model.Tenant;
 import com.asiainfo.ocmanager.persistence.model.TenantUserRoleAssignment;
-import com.asiainfo.ocmanager.persistence.model.User;
 import com.asiainfo.ocmanager.persistence.model.UserRoleView;
 import com.asiainfo.ocmanager.rest.bean.AdapterResponseBean;
 import com.asiainfo.ocmanager.rest.constant.Constant;
@@ -46,7 +44,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 /**
- * 
+ *
  * @author zhaoyim
  *
  */
@@ -56,7 +54,7 @@ public class TenantResource {
 
 	/**
 	 * Get All OCManager tenants
-	 * 
+	 *
 	 * @return tenant list
 	 */
 	@GET
@@ -68,7 +66,7 @@ public class TenantResource {
 
 	/**
 	 * Get the specific tenant by id
-	 * 
+	 *
 	 * @param tenantId
 	 *            tenant id
 	 * @return tenant
@@ -83,7 +81,7 @@ public class TenantResource {
 
 	/**
 	 * Get the child tenants
-	 * 
+	 *
 	 * @param tenantId
 	 *            tenant id
 	 * @return tenant list
@@ -98,7 +96,7 @@ public class TenantResource {
 
 	/**
 	 * Get the users list in the specific tenant
-	 * 
+	 *
 	 * @param tenantId
 	 *            tenant id
 	 * @return user list
@@ -115,7 +113,7 @@ public class TenantResource {
 
 	/**
 	 * Get the service instance list in the specific tenant
-	 * 
+	 *
 	 * @param tenantId
 	 *            tenant id
 	 * @return service instance list
@@ -133,7 +131,7 @@ public class TenantResource {
 
 	/**
 	 * Create a new tenant
-	 * 
+	 *
 	 * @param tenant
 	 *            tenant obj json
 	 * @return new tenant info
@@ -204,7 +202,7 @@ public class TenantResource {
 
 	/**
 	 * Create a service instance in specific tenant
-	 * 
+	 *
 	 * @param
 	 * @return
 	 */
@@ -279,7 +277,7 @@ public class TenantResource {
 
 	/**
 	 * Delete a service instance in specific tenant
-	 * 
+	 *
 	 * @param tenantId
 	 * @param instanceName
 	 * @return
@@ -328,7 +326,7 @@ public class TenantResource {
 
 	/**
 	 * Update the existing tenant info
-	 * 
+	 *
 	 * @param tenant
 	 *            tenant obj json
 	 * @return updated tenant info
@@ -342,7 +340,7 @@ public class TenantResource {
 
 	/**
 	 * Delete a tenant
-	 * 
+	 *
 	 * @param tenantId
 	 *            tenant id
 	 */
@@ -387,18 +385,20 @@ public class TenantResource {
 
 	/**
 	 * Assign role to user in tenant
-	 * 
+	 *
 	 * @param tenantId
 	 * @param assignment
 	 * @return
 	 */
 	@POST
+  @PageAuth(requiredPermission = "Grant")
 	@Path("{id}/user/role/assignment")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response assignRoleToUserInTenant(@PathParam("id") String tenantId, TenantUserRoleAssignment assignment) {
 		// assgin to the input tenant
 		assignment.setTenantId(tenantId);
+
 		assignment = TURAssignmentPersistenceWrapper.assignRoleToUserInTenant(assignment);
 
 		// assign to the child tenants
@@ -415,12 +415,13 @@ public class TenantResource {
 		// }
 		// }
 
+
 		return Response.ok().entity(assignment).build();
 	}
 
 	/**
 	 * Update user role in tenant
-	 * 
+	 *
 	 * @param tenantId
 	 * @param assignment
 	 * @return
@@ -437,7 +438,7 @@ public class TenantResource {
 
 	/**
 	 * Unassign role to user in tenant
-	 * 
+	 *
 	 * @param tenantId
 	 * @param userId
 	 * @return
@@ -450,4 +451,5 @@ public class TenantResource {
 		TURAssignmentPersistenceWrapper.unassignRoleFromUserInTenant(tenantId, userId);
 		return Response.ok().entity(new AdapterResponseBean("delete success", userId, 200)).build();
 	}
+
 }
