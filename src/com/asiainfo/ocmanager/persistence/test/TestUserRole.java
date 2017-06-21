@@ -13,7 +13,7 @@ public class TestUserRole {
 		SqlSession session = TestDBConnectorFactory.getSession();
 		try {
 			UserRoleMapper mapper = session.getMapper(UserRoleMapper.class);
-			List<UserRoleView> urs = mapper.selectUsersRolesInTenant("1");
+			List<UserRoleView> urs = mapper.selectUsersRolesInTenant("t1");
 
 			for (UserRoleView ur : urs) {
 				System.out.println(ur.getUserId());
@@ -24,17 +24,45 @@ public class TestUserRole {
 				System.out.println(ur.getTenantId());
 			}
 			session.commit();
-			
+
 			System.out.println("============");
-			UserRoleView urs1 = mapper.selectRoleBasedOnUserAndTenant("zhaoyim", "2");
+			UserRoleView urs1 = mapper.selectRoleBasedOnUserAndTenant("u1", "t1");
+
+			System.out.println(urs1.getUserId());
+			System.out.println(urs1.getUserName());
+			System.out.println(urs1.getUserDescription());
+			System.out.println(urs1.getRoleId());
+			System.out.println(urs1.getRoleName());
+			System.out.println(urs1.getTenantId());
+
+			session.commit();
+
+			System.out.println("======User Id======");
+			List<UserRoleView> urs2 = mapper.selectTenantAndRoleBasedOnUserId("u1");
+
+			for (UserRoleView ur : urs2) {
+				System.out.println(ur.getUserId());
+				System.out.println(ur.getUserName());
+				System.out.println(ur.getUserDescription());
+				System.out.println(ur.getRoleId());
+				System.out.println(ur.getRoleName());
+				System.out.println(ur.getTenantId());
+				System.out.println(ur.getTenantName());
+			}
+			session.commit();
 			
-				System.out.println(urs1.getUserId());
-				System.out.println(urs1.getUserName());
-				System.out.println(urs1.getUserDescription());
-				System.out.println(urs1.getRoleId());
-				System.out.println(urs1.getRoleName());
-				System.out.println(urs1.getTenantId());
-			
+			System.out.println("======User Name======");
+			List<UserRoleView> urs3 = mapper.selectTenantAndRoleBasedOnUserName("u2");
+
+			for (UserRoleView ur : urs3) {
+				System.out.println(ur.getUserId());
+				System.out.println(ur.getUserName());
+				System.out.println(ur.getUserDescription());
+				System.out.println(ur.getRoleId());
+				System.out.println(ur.getRoleName());
+				System.out.println(ur.getTenantId());
+				System.out.println(ur.getTenantName());
+			}
 			session.commit();
 			
 		} catch (Exception e) {

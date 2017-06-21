@@ -7,6 +7,7 @@ public class UserRoleView {
 	private String roleId;
 	private String roleName;
 	private String tenantId;
+	private String tenantName;
 	private String permission;
 
 	public String getUserId() {
@@ -57,11 +58,19 @@ public class UserRoleView {
 		this.tenantId = tenantId;
 	}
 
-  public String getPermission() {
-    return permission;
-  }
+	public String getTenantName() {
+		return tenantName;
+	}
 
-  public void setPermission(String permission) {
-    this.permission = permission;
-  }
+	public void setTenantName(String tenantName) {
+		this.tenantName = tenantName;
+	}
+
+	public String getPermission() {
+		return permission;
+	}
+
+	public void setPermission(String permission) {
+		this.permission = permission;
+	}
 }

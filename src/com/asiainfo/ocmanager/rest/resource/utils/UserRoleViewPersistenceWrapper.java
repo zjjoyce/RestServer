@@ -15,7 +15,7 @@ import com.asiainfo.ocmanager.persistence.DBConnectorFactory;
  *
  */
 public class UserRoleViewPersistenceWrapper {
-	
+
 	/**
 	 * 
 	 * @param tenantId
@@ -35,9 +35,7 @@ public class UserRoleViewPersistenceWrapper {
 		}
 		return usersWithRoles;
 	}
-	
-	
-	
+
 	/**
 	 * 
 	 * @param userName
@@ -58,6 +56,45 @@ public class UserRoleViewPersistenceWrapper {
 		}
 		return RUT;
 	}
-	
-	
+
+	/**
+	 * 
+	 * @param userId
+	 * @return
+	 */
+	public static List<UserRoleView> getTenantAndRoleBasedOnUserId(String userId) {
+		SqlSession session = DBConnectorFactory.getSession();
+		List<UserRoleView> turs = new ArrayList<UserRoleView>();
+		try {
+			UserRoleMapper mapper = session.getMapper(UserRoleMapper.class);
+			turs = mapper.selectTenantAndRoleBasedOnUserId(userId);
+			session.commit();
+		} catch (Exception e) {
+			session.rollback();
+		} finally {
+			session.close();
+		}
+		return turs;
+	}
+
+	/**
+	 * 
+	 * @param userName
+	 * @return
+	 */
+	public static List<UserRoleView> getTenantAndRoleBasedOnUserName(String userName) {
+		SqlSession session = DBConnectorFactory.getSession();
+		List<UserRoleView> turs = new ArrayList<UserRoleView>();
+		try {
+			UserRoleMapper mapper = session.getMapper(UserRoleMapper.class);
+			turs = mapper.selectTenantAndRoleBasedOnUserName(userName);
+			session.commit();
+		} catch (Exception e) {
+			session.rollback();
+		} finally {
+			session.close();
+		}
+		return turs;
+	}
+
 }
