@@ -106,6 +106,50 @@ __response:__
 ```
 
 
+6. 通过用户ID获取某个用户再哪些租户下
+```
+GET /ocmanager/v1/api/user/id/{id}/tenants
+```
+__response:__
+```
+[
+  {
+    "roleId": "r1",
+    "roleName": "r1",
+    "tenantId": "t1",
+    "tenantName": "t1",
+    "userDescription": "u2 description",
+    "userId": "u2",
+    "userName": "u2"
+  },
+  ...
+]
+```
+
+
+
+7. 通过用户名称获取某个用户再哪些租户下
+```
+GET /ocmanager/v1/api/user/name/{name}/tenants
+```
+__response:__
+```
+[
+  {
+    "roleId": "r1",
+    "roleName": "r1",
+    "tenantId": "t1",
+    "tenantName": "t1",
+    "userDescription": "u2 description",
+    "userId": "u2",
+    "userName": "u2"
+  },
+  ...
+]
+```
+
+
+
 
 ### Services APIs
 1. 获取所有服务

@@ -15,8 +15,10 @@ import javax.ws.rs.core.Response;
 
 import com.asiainfo.ocmanager.auth.PageAuth;
 import com.asiainfo.ocmanager.persistence.model.User;
+import com.asiainfo.ocmanager.persistence.model.UserRoleView;
 import com.asiainfo.ocmanager.rest.bean.AdapterResponseBean;
 import com.asiainfo.ocmanager.rest.resource.utils.UserPersistenceWrapper;
+import com.asiainfo.ocmanager.rest.resource.utils.UserRoleViewPersistenceWrapper;
 
 /**
  *
@@ -62,7 +64,7 @@ public class UserResource {
 	 * @return new user info
 	 */
 	@POST
-  @PageAuth(requiredPermission = "CreateUser")
+	@PageAuth(requiredPermission = "CreateUser")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response createUser(User user) {
@@ -78,7 +80,7 @@ public class UserResource {
 	 * @return updated user info
 	 */
 	@PUT
-  @PageAuth(requiredPermission = "UpdateUser")
+	@PageAuth(requiredPermission = "UpdateUser")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response updateUser(User user) {
@@ -93,7 +95,7 @@ public class UserResource {
 	 *            user id
 	 */
 	@DELETE
-  @PageAuth(requiredPermission = "DeleteUser")
+	@PageAuth(requiredPermission = "DeleteUser")
 	@Path("{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response deleteUser(@PathParam("id") String userId) {
@@ -101,4 +103,24 @@ public class UserResource {
 		return Response.ok().entity(new AdapterResponseBean("delete success", userId, 200)).build();
 	}
 
+	/**
+	 * 
+	 * @param userId
+	 * @return
+	 */
+	@GET
+	@Path("id/{id}/tenants")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getTenantAndRoleById(@PathParam("id") String userId) {
+		List<UserRoleView> turs = UserRoleViewPersistenceWrapper.getTenantAndRoleBasedOnUserId(userId);
+		return Response.ok().entity(turs).build();
+	}
+
+	@GET
+	@Path("name/{name}/tenants")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getTenantAndRoleByName(@PathParam("name") String userName) {
+		List<UserRoleView> turs = UserRoleViewPersistenceWrapper.getTenantAndRoleBasedOnUserName(userName);
+		return Response.ok().entity(turs).build();
+	}
 }

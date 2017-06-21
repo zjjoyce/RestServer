@@ -14,14 +14,27 @@ public interface UserRoleMapper {
 	 * @return
 	 */
 	public List<UserRoleView> selectUsersRolesInTenant(String tenantId);
-	
-	
+
 	/**
 	 * 
 	 * @param userId
 	 * @param tenantId
 	 * @return
 	 */
-	public UserRoleView selectRoleBasedOnUserAndTenant(@Param("userName") String userName, @Param("tenantId") String tenantId);
-	
+	public UserRoleView selectRoleBasedOnUserAndTenant(@Param("userName") String userName,
+			@Param("tenantId") String tenantId);
+
+	/**
+	 * 
+	 * @param userId
+	 * @return
+	 */
+	public List<UserRoleView> selectTenantAndRoleBasedOnUserId(@Param("userId") String userId);
+
+	/**
+	 * 
+	 * @param userName
+	 * @return
+	 */
+	public List<UserRoleView> selectTenantAndRoleBasedOnUserName(@Param("userName") String userName);
 }
