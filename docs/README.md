@@ -2152,9 +2152,182 @@ Content-Type: application/json
 }
 ```
 
+
+### 更新一个后端服务实例
+
+```
+PUT /oapi/v1/namespaces/:name/backingserviceinstances/:instance_name
+```
+*更新实例需要将status.patch设置成"Update"*
+
+```
+PUT /oapi/v1/namespaces/san/backingserviceinstances/hive-instance
+
+Authorization: Bearer ZIu0vDcm7a0_zH00_o6mFh9iivNWbR0oRPK6S3NvsT0
+Content-Type: application/json
+
+{
+  "kind": "BackingServiceInstance",
+  "apiVersion": "v1",
+  "metadata": {
+    "name": "hive-instance",
+    "namespace": "openshift",
+    "selfLink": "/oapi/v1/namespaces/openshift/backingserviceinstances/hive-instance",
+    "uid": "28a67756-4c24-11e7-a50b-00163e00009d",
+    "resourceVersion": "19001230",
+    "creationTimestamp": "2017-06-08T08:26:24Z",
+    "deletionTimestamp": "2017-06-08T08:34:01Z"
+  },
+  "spec": {
+    "provisioning": {
+      "dashboard_url": "",
+      "backingservice_name": "Hive",
+      "backingservice_spec_id": "2ef26018-003d-4b2b-b786-0481d4ee9fa3",
+      "backingservice_plan_guid": "aa7e364f-fdbf-4187-b60a-218b6fa398ed",
+      "backingservice_plan_name": "shared",
+      "parameters": {
+        "hiveStorageQuota": "1024",
+        "instance_id": "28a8bbc5-4c24-11e7-9151-00163e020112",
+        "yarnQueueQuota": "10"
+      },
+      "accesses": {
+        "2ef26018-003d-4b2b-b786-0481d4ee9fa3": [
+          "select",
+          "update",
+          "create",
+          "drop",
+          "alter",
+          "index",
+          "lock"
+        ],
+        "ae0f2324-27a8-415b-9c7f-64ab6cd88d40": [
+          "submit-app",
+          "admin-queue"
+        ],
+        "ae67d4ba-5c4e-4937-a68b-5b47cfe356d8": [
+          "read",
+          "write",
+          "execute"
+        ],
+        "d3b9a485-f038-4605-9b9b-29792f5c61d1": [
+          "submit-app",
+          "admin-queue"
+        ],
+        "d9845ade-9410-4c7f-8689-4e032c1a8450": [
+          "read",
+          "write",
+          "create",
+          "admin"
+        ]
+      }
+      "credentials": {
+        "Hive database": "28a8bbc54c2411e7915100163e020112",
+        "host": "zx-dn-03",
+        "password": "8127505b-c15c-4568-8025-fae4c0bb655f",
+        "port": "10000",
+        "uri": "jdbc:hive2://zx-dn-03:10000/28a8bbc54c2411e7915100163e020112;principal=hive/zx-dn-03@EXAMPLE.COM",
+        "username": "openshift@EXAMPLE.COM"
+      }
+    },
+    "userprovidedservice": {
+      "credentials": null
+    },
+    "binding": null,
+    "bound": 0,
+    "instance_id": "28a8bbc5-4c24-11e7-9151-00163e020112",
+    "tags": null
+  },
+  "status": {
+    "phase": "Unbound",
+    "patch":"Update",
+    "action": "_ToDelete",
+    "last_operation": null
+  }
+}
+```
+```json
+{
+  "kind": "BackingServiceInstance",
+  "apiVersion": "v1",
+  "metadata": {
+    "name": "hive-instance",
+    "namespace": "openshift",
+    "selfLink": "/oapi/v1/namespaces/openshift/backingserviceinstances/hive-instance",
+    "uid": "28a67756-4c24-11e7-a50b-00163e00009d",
+    "resourceVersion": "19001230",
+    "creationTimestamp": "2017-06-08T08:26:24Z",
+    "deletionTimestamp": "2017-06-08T08:34:01Z"
+  },
+  "spec": {
+    "provisioning": {
+      "dashboard_url": "",
+      "backingservice_name": "Hive",
+      "backingservice_spec_id": "2ef26018-003d-4b2b-b786-0481d4ee9fa3",
+      "backingservice_plan_guid": "aa7e364f-fdbf-4187-b60a-218b6fa398ed",
+      "backingservice_plan_name": "shared",
+      "parameters": {
+        "hiveStorageQuota": "1024",
+        "instance_id": "28a8bbc5-4c24-11e7-9151-00163e020112",
+        "yarnQueueQuota": "10"
+      },
+      "accesses": {
+        "2ef26018-003d-4b2b-b786-0481d4ee9fa3": [
+          "select",
+          "update",
+          "create",
+          "drop",
+          "alter",
+          "index",
+          "lock"
+        ],
+        "ae0f2324-27a8-415b-9c7f-64ab6cd88d40": [
+          "submit-app",
+          "admin-queue"
+        ],
+        "ae67d4ba-5c4e-4937-a68b-5b47cfe356d8": [
+          "read",
+          "write",
+          "execute"
+        ],
+        "d3b9a485-f038-4605-9b9b-29792f5c61d1": [
+          "submit-app",
+          "admin-queue"
+        ],
+        "d9845ade-9410-4c7f-8689-4e032c1a8450": [
+          "read",
+          "write",
+          "create",
+          "admin"
+        ]
+      }
+      "credentials": {
+        "Hive database": "28a8bbc54c2411e7915100163e020112",
+        "host": "zx-dn-03",
+        "password": "8127505b-c15c-4568-8025-fae4c0bb655f",
+        "port": "10000",
+        "uri": "jdbc:hive2://zx-dn-03:10000/28a8bbc54c2411e7915100163e020112;principal=hive/zx-dn-03@EXAMPLE.COM",
+        "username": "openshift@EXAMPLE.COM"
+      }
+    },
+    "userprovidedservice": {
+      "credentials": null
+    },
+    "binding": null,
+    "bound": 0,
+    "instance_id": "28a8bbc5-4c24-11e7-9151-00163e020112",
+    "tags": null
+  },
+  "status": {
+    "phase": "Unbound",
+    "patch":"Updating",
+    "action": "_ToDelete",
+    "last_operation": null
+  }
+}
+```
+
+
 ### 删除一个后端服务实例
-
-
 
 ```
 DELETE /oapi/v1/namespaces/:name/backingserviceinstances/:instance_name
