@@ -539,7 +539,8 @@ __request body:__
       "provisioning":
         {
           "backingservice_name":"ETCD",
-          "backingservice_plan_guid":"204F8288-F8D9-4806-8661-EB48D94504B3"
+          "backingservice_plan_guid":"204F8288-F8D9-4806-8661-EB48D94504B3",
+          "parameters":{"ETCDStorageQuota":"1024","ETCDQueueQuota":"10"}
         }
     }
 }
