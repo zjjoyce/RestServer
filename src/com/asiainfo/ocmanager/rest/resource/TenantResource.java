@@ -308,6 +308,14 @@ public class TenantResource {
 
 	}
 
+	/**
+	 * Update a service instance in specific tenant
+	 * 
+	 * @param tenantId
+	 * @param instanceName
+	 * @param reqBodyStr
+	 * @return
+	 */
 	@PUT
 	@Path("{id}/service/instance/{instanceName}")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -532,6 +540,168 @@ public class TenantResource {
 		// }
 	}
 
+	/**
+	 * Update user role in tenant
+	 *
+	 * @param tenantId
+	 * @param assignment
+	 * @return
+	 */
+	@PUT
+	@Path("{id}/user/role/assignment")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response updateRoleToUserInTenant(@PathParam("id") String tenantId, TenantUserRoleAssignment assignment) {
+
+		try {
+			// assgin to the input tenant
+			assignment.setTenantId(tenantId);
+
+			// get permission list based on role
+			List<ServiceRolePermission> pList = ServiceRolePermissionWrapper
+					.getServicePermissionByRoleId(assignment.getRoleId());
+			JsonObject accesses = new JsonObject();
+			for (ServiceRolePermission pl : pList) {
+				accesses.add(pl.getServiceId(), new JsonParser().parse(pl.getServicePermission()));
+			}
+
+			// get all service instances from df
+			String allServiceInstances = TenantResource.getTenantAllServiceInstancesFromDf(tenantId);
+			JsonElement allServiceInstancesJson = new JsonParser().parse(allServiceInstances);
+
+			JsonArray allServiceInstancesArray = allServiceInstancesJson.getAsJsonObject().getAsJsonArray("items");
+
+			// find the first OCDP service instance to pass to df
+			// this is to match df API format
+			String firstOCDPServiceInstanceName = null;
+			for (int i = 0; i < allServiceInstancesArray.size(); i++) {
+				JsonObject instance = allServiceInstancesArray.get(i).getAsJsonObject();
+				String instanceName = instance.getAsJsonObject("spec").getAsJsonObject("provisioning")
+						.get("backingservice_name").getAsString();
+				if (Constant.list.contains(instanceName.toLowerCase())) {
+					firstOCDPServiceInstanceName = instance.getAsJsonObject("metadata").get("name").getAsString();
+					break;
+				}
+			}
+
+			// if there is not OCDP service instance just add the user into the
+			// DB then return
+			if (firstOCDPServiceInstanceName == null) {
+				assignment = TURAssignmentPersistenceWrapper.assignRoleToUserInTenant(assignment);
+				return Response.ok().entity(assignment).build();
+			}
+
+			String firstOCDPServiceInstanceStr = TenantResource.getTenantServiceInstancesFromDf(tenantId,
+					firstOCDPServiceInstanceName);
+
+			// parse the update request body based on the get service instance
+			// by id response body
+			JsonElement serviceInstanceJson = new JsonParser().parse(firstOCDPServiceInstanceStr);
+			JsonObject provisioning = serviceInstanceJson.getAsJsonObject().getAsJsonObject("spec")
+					.getAsJsonObject("provisioning");
+			// add the tenant id and user name to the parameters for update
+			provisioning.getAsJsonObject("parameters").addProperty("tenant_name", tenantId);
+			provisioning.getAsJsonObject("parameters").addProperty("user_name",
+					UserPersistenceWrapper.getUserById(assignment.getUserId()).getUsername());
+
+			// add the accesses fields into the request body
+			provisioning.add("accesses", new JsonParser().parse(accesses.toString()));
+
+			// add the patch Updating into the request body
+			JsonObject status = serviceInstanceJson.getAsJsonObject().getAsJsonObject("status");
+			status.addProperty("patch", "Updating");
+
+			AdapterResponseBean responseBean = TenantResource.updateTenantServiceInstanceInDf(tenantId,
+					firstOCDPServiceInstanceName, serviceInstanceJson.toString());
+
+			if (responseBean.getResCodel() == 200) {
+				assignment = TURAssignmentPersistenceWrapper.updateRoleToUserInTenant(assignment);
+			}
+
+			return Response.ok().entity(assignment).build();
+
+		} catch (Exception e) {
+			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+		}
+
+	}
+
+	/**
+	 * Unassign role to user in tenant
+	 *
+	 * @param tenantId
+	 * @param userId
+	 * @return
+	 */
+	@DELETE
+	@Path("{id}/user/{userId}/role/assignment")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response unassignRoleFromUserInTenant(@PathParam("id") String tenantId, @PathParam("userId") String userId) {
+
+		try {
+			TenantUserRoleAssignment assignment = new TenantUserRoleAssignment();
+
+			// get all service instances from df
+			String allServiceInstances = TenantResource.getTenantAllServiceInstancesFromDf(tenantId);
+			JsonElement allServiceInstancesJson = new JsonParser().parse(allServiceInstances);
+
+			JsonArray allServiceInstancesArray = allServiceInstancesJson.getAsJsonObject().getAsJsonArray("items");
+
+			// find the first OCDP service instance to pass to df
+			// this is to match df API format
+			String firstOCDPServiceInstanceName = null;
+			for (int i = 0; i < allServiceInstancesArray.size(); i++) {
+				JsonObject instance = allServiceInstancesArray.get(i).getAsJsonObject();
+				String instanceName = instance.getAsJsonObject("spec").getAsJsonObject("provisioning")
+						.get("backingservice_name").getAsString();
+				if (Constant.list.contains(instanceName.toLowerCase())) {
+					firstOCDPServiceInstanceName = instance.getAsJsonObject("metadata").get("name").getAsString();
+					break;
+				}
+			}
+
+			// if there is not OCDP service instance just add the user into the
+			// DB then return
+			if (firstOCDPServiceInstanceName == null) {
+				assignment = TURAssignmentPersistenceWrapper.assignRoleToUserInTenant(assignment);
+				return Response.ok().entity(assignment).build();
+			}
+
+			String firstOCDPServiceInstanceStr = TenantResource.getTenantServiceInstancesFromDf(tenantId,
+					firstOCDPServiceInstanceName);
+
+			// parse the update request body based on the get service instance
+			// by id response body
+			JsonElement serviceInstanceJson = new JsonParser().parse(firstOCDPServiceInstanceStr);
+			JsonObject provisioning = serviceInstanceJson.getAsJsonObject().getAsJsonObject("spec")
+					.getAsJsonObject("provisioning");
+			// add the tenant id and user name to the parameters for update
+			provisioning.getAsJsonObject("parameters").addProperty("tenant_name", tenantId);
+			provisioning.getAsJsonObject("parameters").addProperty("user_name",
+					UserPersistenceWrapper.getUserById(userId).getUsername());
+
+			// add the patch Updating into the request body
+			JsonObject status = serviceInstanceJson.getAsJsonObject().getAsJsonObject("status");
+			status.addProperty("patch", "Updating");
+
+			AdapterResponseBean responseBean = TenantResource.updateTenantServiceInstanceInDf(tenantId,
+					firstOCDPServiceInstanceName, serviceInstanceJson.toString());
+
+			if (responseBean.getResCodel() == 200) {
+
+				TURAssignmentPersistenceWrapper.unassignRoleFromUserInTenant(tenantId, userId);
+
+			}
+
+			return Response.ok().entity(new AdapterResponseBean("delete success", userId, 200)).build();
+
+		} catch (Exception e) {
+			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+		}
+
+	}
+
 	private static String getTenantServiceInstancesFromDf(String tenantId, String InstanceName)
 			throws IOException, KeyManagementException, NoSuchAlgorithmException, KeyStoreException {
 		String url = DFPropertiesFactory.getDFProperties().get(Constant.DATAFACTORY_URL);
@@ -629,39 +799,6 @@ public class TenantResource {
 		} finally {
 			httpclient.close();
 		}
-	}
-
-	/**
-	 * Update user role in tenant
-	 *
-	 * @param tenantId
-	 * @param assignment
-	 * @return
-	 */
-	@PUT
-	@Path("{id}/user/role/assignment")
-	@Produces(MediaType.APPLICATION_JSON)
-	@Consumes(MediaType.APPLICATION_JSON)
-	public Response updateRoleToUserInTenant(@PathParam("id") String tenantId, TenantUserRoleAssignment assignment) {
-		assignment.setTenantId(tenantId);
-		assignment = TURAssignmentPersistenceWrapper.updateRoleToUserInTenant(assignment);
-		return Response.ok().entity(assignment).build();
-	}
-
-	/**
-	 * Unassign role to user in tenant
-	 *
-	 * @param tenantId
-	 * @param userId
-	 * @return
-	 */
-	@DELETE
-	@Path("{id}/user/{userId}/role/assignment")
-	@Produces(MediaType.APPLICATION_JSON)
-	@Consumes(MediaType.APPLICATION_JSON)
-	public Response unassignRoleFromUserInTenant(@PathParam("id") String tenantId, @PathParam("userId") String userId) {
-		TURAssignmentPersistenceWrapper.unassignRoleFromUserInTenant(tenantId, userId);
-		return Response.ok().entity(new AdapterResponseBean("delete success", userId, 200)).build();
 	}
 
 }
