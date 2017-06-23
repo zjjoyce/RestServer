@@ -41,12 +41,18 @@ public class YarnUtils {
 
     try {
       jsonObject = AmbariUtils.getRsUrl("http://10.247.11.9:8080/api/v1/clusters/zxjtcluster/services/YARN/components/RESOURCEMANAGER");
-      JSONObject queue = jsonObject.getJSONObject("root").getJSONObject("Queue").getJSONObject(queueName);
-      String usedMem = queue.getString("")
+      JSONObject queue = jsonObject.getJSONObject("metrics").getJSONObject("yarn").getJSONObject("Queue").getJSONObject("root").getJSONObject(queueName);
+      String availableMB = queue.getString("AvailableMB");
+      quota.setAvailable(availableMB);
 
     }catch (JSONException e){
       System.out.println(e);
     }
     return quota;
+  }
+  public static void main(String args[]){
+    YarnUtils yarnUtils = new YarnUtils();
+    Quota quota = yarnUtils.getQueueQuota("1f067157-7270-4381-a59b-360f64bc6529");
+    System.out.println(quota.getAvailable());
   }
 }
