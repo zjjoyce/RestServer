@@ -173,11 +173,9 @@ public class TenantResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response createTenant(Tenant tenant, @Context HttpServletRequest request) {
 
-		if (tenant.getName() == null) {
+		if (tenant.getName() == null || tenant.getId() == null) {
 			return Response.status(Status.BAD_REQUEST).entity("input format is not correct").build();
 		}
-		// mapping DF tenant name with adapter tenant id
-		tenant.setId(UUIDFactory.getUUID());
 
 		try {
 			String url = DFPropertiesFactory.getDFProperties().get(Constant.DATAFACTORY_URL);
