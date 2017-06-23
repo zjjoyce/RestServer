@@ -421,6 +421,7 @@ POST /ocmanager/v1/api/tenant
 __request body:__
 ```
 {
+    "id": "09367148-c72a-413f-b1de-5a23b566d808",
     "name": "createTenant001",
     "description": "create tenant 001",
     "parentId": "f7f281ee-a544-4636-9341-2db50c491b96"
