@@ -115,7 +115,7 @@ ENGINE = InnoDB;
 CREATE TABLE IF NOT EXISTS `ocmanager`.`services_roles_permission` (
   `service_id` VARCHAR(64) NOT NULL,
   `role_id` VARCHAR(64) NOT NULL,
-  `ServicePermission` MEDIUMTEXT NULL,
+  `permission` TEXT NULL,
   PRIMARY KEY (`service_id`, `role_id`),
   INDEX `fk_services_roles_permission_roles1_idx` (`role_id` ASC),
   INDEX `fk_services_roles_permission_services1_idx` (`service_id` ASC),
@@ -140,37 +140,6 @@ INSERT INTO `ocmanager`.`roles`(id, rolename, description, permission) VALUES("a
 INSERT INTO `ocmanager`.`roles`(id, rolename, description, permission) VALUES("a1149421-524a-11e7-9dbb-fa163ed7d0ae", "subsidiary.admin", "subsidiary admin create project, add users and assign role to user.", "{grant: true}");
 INSERT INTO `ocmanager`.`roles`(id, rolename, description, permission) VALUES("a12a84d0-524a-11e7-9dbb-fa163ed7d0ae", "project.admin", "project admin can add uses to the project and assign role to user.", "{grant: true}");
 INSERT INTO `ocmanager`.`roles`(id, rolename, description, permission) VALUES("a13dd087-524a-11e7-9dbb-fa163ed7d0ae", "team.member", "the user only can read the project information that he is in.", "{}");
-
-
--- -----------------------------------------------------
--- Init the ocdp services in the table `ocmanager`.`services`
--- ocdp service is hard code in the catalog, so here we also hard code
--- -----------------------------------------------------
-INSERT INTO `ocmanager`.`services` (id, servicename, description) VALUES("ae67d4ba-5c4e-4937-a68b-5b47cfe356d8", "hdfs", "A Hadoop hdfs service broker implementation");
-INSERT INTO `ocmanager`.`services` (id, servicename, description) VALUES("d9845ade-9410-4c7f-8689-4e032c1a8450", "hbase", "A Hadoop hbase service broker implementation");
-INSERT INTO `ocmanager`.`services` (id, servicename, description) VALUES("2ef26018-003d-4b2b-b786-0481d4ee9fa3", "hive", "A Hadoop hive service broker implementation");
-INSERT INTO `ocmanager`.`services` (id, servicename, description) VALUES("ae0f2324-27a8-415b-9c7f-64ab6cd88d40", "mapreduce", "A Hadoop mapreduce service broker implementation");
-INSERT INTO `ocmanager`.`services` (id, servicename, description) VALUES("d3b9a485-f038-4605-9b9b-29792f5c61d1", "Spark", "A Spark service broker implementation");
-INSERT INTO `ocmanager`.`services` (id, servicename, description) VALUES("7b738c78-d412-422b-ac3e-43a9fc72a4a7", "Kafka", "A Kafka service broker implementation");
-
--- -----------------------------------------------------
--- Init the role service permission mapping
--- -----------------------------------------------------
--- project manager permission
-INSERT INTO `ocmanager`.`services_roles_permission` (service_id, role_id, ServicePermission) VALUES("ae67d4ba-5c4e-4937-a68b-5b47cfe356d8", "a12a84d0-524a-11e7-9dbb-fa163ed7d0ae", "[read, write, execute]");
-INSERT INTO `ocmanager`.`services_roles_permission` (service_id, role_id, ServicePermission) VALUES("d9845ade-9410-4c7f-8689-4e032c1a8450", "a12a84d0-524a-11e7-9dbb-fa163ed7d0ae", "[read, write, create, admin]");
-INSERT INTO `ocmanager`.`services_roles_permission` (service_id, role_id, ServicePermission) VALUES("2ef26018-003d-4b2b-b786-0481d4ee9fa3", "a12a84d0-524a-11e7-9dbb-fa163ed7d0ae", "[select, update, create, drop, alter, index, lock]");
-INSERT INTO `ocmanager`.`services_roles_permission` (service_id, role_id, ServicePermission) VALUES("ae0f2324-27a8-415b-9c7f-64ab6cd88d40", "a12a84d0-524a-11e7-9dbb-fa163ed7d0ae", "[submit-app, admin-queue]");
-INSERT INTO `ocmanager`.`services_roles_permission` (service_id, role_id, ServicePermission) VALUES("d3b9a485-f038-4605-9b9b-29792f5c61d1", "a12a84d0-524a-11e7-9dbb-fa163ed7d0ae", "[submit-app, admin-queue]");
-INSERT INTO `ocmanager`.`services_roles_permission` (service_id, role_id, ServicePermission) VALUES("7b738c78-d412-422b-ac3e-43a9fc72a4a7", "a12a84d0-524a-11e7-9dbb-fa163ed7d0ae", "[publish, consume, configure, describe, create, delete, kafka_admin]");
-
--- team member permission
-INSERT INTO `ocmanager`.`services_roles_permission` (service_id, role_id, ServicePermission) VALUES("ae67d4ba-5c4e-4937-a68b-5b47cfe356d8", "a13dd087-524a-11e7-9dbb-fa163ed7d0ae", "[read, write, execute]");
-INSERT INTO `ocmanager`.`services_roles_permission` (service_id, role_id, ServicePermission) VALUES("d9845ade-9410-4c7f-8689-4e032c1a8450", "a13dd087-524a-11e7-9dbb-fa163ed7d0ae", "[read, write, create, admin]");
-INSERT INTO `ocmanager`.`services_roles_permission` (service_id, role_id, ServicePermission) VALUES("2ef26018-003d-4b2b-b786-0481d4ee9fa3", "a13dd087-524a-11e7-9dbb-fa163ed7d0ae", "[select, update, create, drop, alter, index, lock]");
-INSERT INTO `ocmanager`.`services_roles_permission` (service_id, role_id, ServicePermission) VALUES("ae0f2324-27a8-415b-9c7f-64ab6cd88d40", "a13dd087-524a-11e7-9dbb-fa163ed7d0ae", "[submit-app, admin-queue]");
-INSERT INTO `ocmanager`.`services_roles_permission` (service_id, role_id, ServicePermission) VALUES("d3b9a485-f038-4605-9b9b-29792f5c61d1", "a13dd087-524a-11e7-9dbb-fa163ed7d0ae", "[submit-app, admin-queue]");
-INSERT INTO `ocmanager`.`services_roles_permission` (service_id, role_id, ServicePermission) VALUES("7b738c78-d412-422b-ac3e-43a9fc72a4a7", "a13dd087-524a-11e7-9dbb-fa163ed7d0ae", "[publish, consume, configure, describe, create, delete, kafka_admin]");
 
 
 -- -----------------------------------------------------

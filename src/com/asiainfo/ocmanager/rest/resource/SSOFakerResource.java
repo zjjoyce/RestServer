@@ -9,7 +9,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import com.asiainfo.ocmanager.rest.bean.AdapterResponseBean;
 import com.asiainfo.ocmanager.rest.bean.SSOFakerUserBean;
 
 /**
@@ -31,20 +30,19 @@ public class SSOFakerResource {
 	@Path("user")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getUserName(@Context HttpServletRequest request) {
-		String http_x_proxy_cas_loginname = request.getHeader("http_x_proxy_cas_loginname");
-		String http_x_proxy_cas_username = request.getHeader("http_x_proxy_cas_username");
-		http_x_proxy_cas_username = http_x_proxy_cas_username == null ? "" : http_x_proxy_cas_username;
-		String http_x_proxy_cas_email = request.getHeader("http_x_proxy_cas_email");
+		String http_x_proxy_cas_loginname = request.getHeader("http-x-proxy-cas-loginname");
+		String http_x_proxy_cas_username = request.getHeader("http-x-proxy-cas-username");
+		String http_x_proxy_cas_email = request.getHeader("http-x-proxy-cas-email");
 		http_x_proxy_cas_email = http_x_proxy_cas_email == null ? "" : http_x_proxy_cas_email;
-		String http_x_proxy_cas_userid = request.getHeader("http_x_proxy_cas_userid");
+		String http_x_proxy_cas_userid = request.getHeader("http-x-proxy-cas-userid");
 		http_x_proxy_cas_userid = http_x_proxy_cas_userid == null ? "" : http_x_proxy_cas_userid;
-		String http_x_proxy_cas_mobile = request.getHeader("http_x_proxy_cas_mobile");
+		String http_x_proxy_cas_mobile = request.getHeader("http-x-proxy-cas-mobile");
 		http_x_proxy_cas_mobile = http_x_proxy_cas_mobile == null ? "" : http_x_proxy_cas_mobile;
 
 		// make sure the user name is set
-		if (http_x_proxy_cas_loginname == null) {
+		if (http_x_proxy_cas_loginname == null || http_x_proxy_cas_username == null) {
 			return Response.status(Status.BAD_REQUEST)
-					.entity(new AdapterResponseBean("Failed", "Can not get sso user information, please make sure the user info is set.", 200)).build();
+					.entity("Can not get sso user information, please make sure the user info is set.").build();
 		} else {
 			return Response.ok().entity(new SSOFakerUserBean(http_x_proxy_cas_loginname, http_x_proxy_cas_username,
 					http_x_proxy_cas_email, http_x_proxy_cas_userid, http_x_proxy_cas_mobile)).build();
