@@ -113,10 +113,8 @@ public class TenantResource {
 	 */
 	@GET
 	@Path("{id}/users")
-	public Response getTenantUsers(@PathParam("id") String tenantId, @Context HttpServletRequest request) {
-		// TODO how to get the request header info following comment code can do
-		// this
-		// Enumeration<String> aa = request.getHeaderNames();
+	public Response getTenantUsers(@PathParam("id") String tenantId) {
+
 		List<UserRoleView> usersRoles = UserRoleViewPersistenceWrapper.getUsersInTenant(tenantId);
 		return Response.ok().entity(usersRoles).build();
 	}
@@ -267,10 +265,10 @@ public class TenantResource {
 				try {
 					int statusCode = response2.getStatusLine().getStatusCode();
 					String bodyStr = EntityUtils.toString(response2.getEntity());
+					ServiceInstance serviceInstance = new ServiceInstance();
 					if (statusCode == 201) {
 						JsonElement resBodyJson = new JsonParser().parse(bodyStr);
 						JsonObject resBodyJsonObj = resBodyJson.getAsJsonObject();
-						ServiceInstance serviceInstance = new ServiceInstance();
 
 						serviceInstance.setId(resBodyJsonObj.getAsJsonObject("metadata").get("uid").getAsString());
 						serviceInstance
@@ -291,6 +289,57 @@ public class TenantResource {
 						}
 
 						ServiceInstancePersistenceWrapper.createServiceInstance(serviceInstance);
+
+						// only the OCDP service need to assign the permission
+						if (Constant.list.contains(serviceInstance.getServiceTypeName().toLowerCase())) {
+							List<UserRoleView> users = UserRoleViewPersistenceWrapper.getUsersInTenant(tenantId);
+
+							for (UserRoleView u : users) {
+								TenantUserRoleAssignment assignment = new TenantUserRoleAssignment();
+								// assgin to the input tenant
+								assignment.setTenantId(tenantId);
+								assignment.setRoleId(u.getRoleId());
+								assignment.setUserId(u.getUserId());
+
+								// get permission list based on role
+								List<ServiceRolePermission> pList = ServiceRolePermissionWrapper
+										.getServicePermissionByRoleId(assignment.getRoleId());
+								JsonObject accesses = new JsonObject();
+								for (ServiceRolePermission pl : pList) {
+									accesses.add(pl.getServiceId(), new JsonParser().parse(pl.getServicePermission()));
+								}
+
+								String curOCDPServiceInstanceStr = TenantResource
+										.getTenantServiceInstancesFromDf(tenantId, serviceInstance.getInstanceName());
+								// parse the update request body based on the
+								// get service instance
+								// by id response body
+								JsonElement serviceInstanceJson = new JsonParser().parse(curOCDPServiceInstanceStr);
+								JsonObject provisioning = serviceInstanceJson.getAsJsonObject().getAsJsonObject("spec")
+										.getAsJsonObject("provisioning");
+								// add the tenant id and user name to the
+								// parameters for update
+								provisioning.getAsJsonObject("parameters").addProperty("tenant_name", tenantId);
+								provisioning.getAsJsonObject("parameters").addProperty("user_name",
+										UserPersistenceWrapper.getUserById(assignment.getUserId()).getUsername());
+
+								// add the accesses fields into the request body
+								provisioning.add("accesses", new JsonParser().parse(accesses.toString()));
+
+								// add the patch Updating into the request body
+								JsonObject status = serviceInstanceJson.getAsJsonObject().getAsJsonObject("status");
+								status.addProperty("patch", "Updating");
+
+								// TODO before call the update should check the status is Unbound if it is Provisioning
+								// the update will failed
+								AdapterResponseBean responseBean = TenantResource.updateTenantServiceInstanceInDf(
+										tenantId, serviceInstance.getInstanceName(), serviceInstanceJson.toString());
+								
+								System.out.println(responseBean);
+								
+							}
+						}
+
 					}
 
 					return Response.ok().entity(bodyStr).build();
