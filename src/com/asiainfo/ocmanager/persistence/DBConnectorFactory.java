@@ -11,7 +11,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 
-import com.asiainfo.ocmanager.rest.utils.DFPropertiesFactory;
+import com.asiainfo.ocmanager.rest.utils.DFPropertiesFoundry;
 
 /**
  * 
@@ -30,7 +30,7 @@ public class DBConnectorFactory {
 			InputStream inputStream = Resources.getResourceAsStream(resource);
 			// we deployed in tomcat the path is: <tomcat home>/webapps/ocmanager/
 			// it will get <tomcat home>/webapps/ocmanager/classes/
-			String currentClassPath = new DFPropertiesFactory().getClass().getResource("/").getPath();
+			String currentClassPath = new DFPropertiesFoundry().getClass().getResource("/").getPath();
 			// remove classes/
 			// the path will be <tomcat home>/webapps/ocmanager/
 			String propertiesFilePath = currentClassPath.substring(0, currentClassPath.length() - 8)
