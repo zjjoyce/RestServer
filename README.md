@@ -49,10 +49,10 @@ jdbc.username=<the user create the ocmanager scheame>
 jdbc.password=<the user password create the ocmanager scheame>
 ```
 
-10. Congifure the df properties, go to __<TOMCAT_HOME>/webapps/ocmanager/WEB-INF/conf__ , edit the dataFactory.properties
+10. Congifure the df properties, go to __<TOMCAT_HOME>/webapps/ocmanager/WEB-INF/conf__ , edit the dataFoundry.properties
 ```
-dataFactory.url=https://<df rest api server IP>:8443
-dataFactory.token=<df admin token>
+dataFoundry.url=https://<df rest server IP>:<df rest server api port>
+dataFoundry.token=<df admin token>
 ```
 
 11. Then restart the tomcat server
