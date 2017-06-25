@@ -1,5 +1,7 @@
 package com.asiainfo.ocmanager.rest.resource;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -9,8 +11,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import com.asiainfo.ocmanager.persistence.model.UserRoleView;
 import com.asiainfo.ocmanager.rest.bean.AdapterResponseBean;
 import com.asiainfo.ocmanager.rest.bean.SSOFakerUserBean;
+import com.asiainfo.ocmanager.rest.resource.utils.UserRoleViewPersistenceWrapper;
 
 /**
  * 
@@ -43,11 +47,20 @@ public class SSOFakerResource {
 
 		// make sure the user name is set
 		if (http_x_proxy_cas_loginname == null) {
-			return Response.status(Status.BAD_REQUEST)
-					.entity(new AdapterResponseBean("Failed", "Can not get sso user information, please make sure the user info is set.", 200)).build();
+			return Response.status(Status.BAD_REQUEST).entity(new AdapterResponseBean("Failed",
+					"Can not get sso user information, please make sure the user info is set.", 200)).build();
 		} else {
+
+			// our system only has one system admin, so hard code here
+			// if based on the system admin role id can return results, it means
+			// the user is system admin
+			List<UserRoleView> urses = UserRoleViewPersistenceWrapper
+					.getTURBasedOnUserNameAndRoleId(http_x_proxy_cas_loginname, "a10170cb-524a-11e7-9dbb-fa163ed7d0ae");
+
+			boolean isAdmin = urses.size() == 0 ? false : true;
+
 			return Response.ok().entity(new SSOFakerUserBean(http_x_proxy_cas_loginname, http_x_proxy_cas_username,
-					http_x_proxy_cas_email, http_x_proxy_cas_userid, http_x_proxy_cas_mobile)).build();
+					http_x_proxy_cas_email, http_x_proxy_cas_userid, http_x_proxy_cas_mobile, isAdmin)).build();
 		}
 	}
 

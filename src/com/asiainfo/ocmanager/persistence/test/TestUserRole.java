@@ -65,6 +65,21 @@ public class TestUserRole {
 			}
 			session.commit();
 			
+			
+			System.out.println("======User Name And Role Id======");
+			List<UserRoleView> urs4 = mapper.selectTURBasedOnUserNameAndRoleId("u1", "r1");
+
+			for (UserRoleView ur : urs4) {
+				System.out.println(ur.getUserId());
+				System.out.println(ur.getUserName());
+				System.out.println(ur.getUserDescription());
+				System.out.println(ur.getRoleId());
+				System.out.println(ur.getRoleName());
+				System.out.println(ur.getTenantId());
+				System.out.println(ur.getTenantName());
+			}
+			session.commit();
+			
 		} catch (Exception e) {
 			session.rollback();
 		} finally {

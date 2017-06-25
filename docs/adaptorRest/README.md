@@ -948,6 +948,7 @@ __response:__
   "http_x_proxy_cas_loginname": "user1",
   "http_x_proxy_cas_mobile": "",
   "http_x_proxy_cas_userid": "",
-  "http_x_proxy_cas_username": "user1"
+  "http_x_proxy_cas_username": "user1",
+  "admin": false,
 }
 ```
