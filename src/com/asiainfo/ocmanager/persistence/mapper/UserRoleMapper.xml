@@ -45,19 +45,38 @@
 		  tenants_users_roles_assignment as TUR, users as U, roles as R, tenants as T where
 		  TUR.user_id=U.id and TUR.role_id=R.id and TUR.tenant_id = T.id and TUR.user_id=#{userId};
 	</select>
-	   <!-- select the role and tenant info based on user name -->
-    <select id="selectTenantAndRoleBasedOnUserName" parameterType="java.lang.String"
-        resultType="com.asiainfo.ocmanager.persistence.model.UserRoleView">
-        select
-          U.id as "userId",
-          U.username as "userName",
-          U.description as "userDescription",
-          R.id as "roleId",
-          R.rolename as "roleName",
-          T.id as "tenantId",
-          T.name as "tenantName"
-        from
-          tenants_users_roles_assignment as TUR, users as U, roles as R, tenants as T where
-          TUR.user_id=U.id and TUR.role_id=R.id and TUR.tenant_id = T.id and U.username=#{userName};
-    </select>
+	<!-- select the role and tenant info based on user name -->
+	<select id="selectTenantAndRoleBasedOnUserName" parameterType="java.lang.String"
+		resultType="com.asiainfo.ocmanager.persistence.model.UserRoleView">
+		select
+			U.id as "userId",
+			U.username as "userName",
+			U.description as "userDescription",
+			R.id as "roleId",
+			R.rolename as "roleName",
+			T.id as "tenantId",
+			T.name as "tenantName"
+		from
+			tenants_users_roles_assignment as TUR, users as U, roles as R, tenants as T where
+			TUR.user_id=U.id and TUR.role_id=R.id and TUR.tenant_id = T.id and
+			U.username=#{userName};
+	</select>
+	<!-- select the user, role and tenant info based on user name and role -->
+	<!-- the results will be more -->
+	<select id="selectTURBasedOnUserNameAndRoleId" parameterType="java.lang.String"
+		resultType="com.asiainfo.ocmanager.persistence.model.UserRoleView">
+		select
+			U.id as "userId",
+			U.username as "userName",
+			U.description as "userDescription",
+			R.id as "roleId",
+			R.rolename as "roleName",
+			T.id as "tenantId",
+			T.name as "tenantName"
+		from
+			tenants_users_roles_assignment as TUR, users as U, roles as R, tenants as T where
+			TUR.user_id=U.id and TUR.role_id=R.id and TUR.tenant_id = T.id and
+			U.username=#{userName} and R.id=#{roleId};
+		;
+	</select>
 </mapper>
