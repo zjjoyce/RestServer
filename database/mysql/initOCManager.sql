@@ -172,6 +172,10 @@ INSERT INTO `ocmanager`.`services_roles_permission` (service_id, role_id, Servic
 INSERT INTO `ocmanager`.`services_roles_permission` (service_id, role_id, ServicePermission) VALUES("d3b9a485-f038-4605-9b9b-29792f5c61d1", "a13dd087-524a-11e7-9dbb-fa163ed7d0ae", "[submit-app, admin-queue]");
 INSERT INTO `ocmanager`.`services_roles_permission` (service_id, role_id, ServicePermission) VALUES("7b738c78-d412-422b-ac3e-43a9fc72a4a7", "a13dd087-524a-11e7-9dbb-fa163ed7d0ae", "[publish, consume, configure, describe, create, delete, kafka_admin]");
 
+-- -----------------------------------------------------
+-- Init the admin user into the table `ocmanager`.`users`
+-- -----------------------------------------------------
+INSERT INTO `ocmanager`.`users` (id, username, password, email, description) VALUES("2ef26018-003d-4b2b-b786-0481d4ee9fa8", "admin", "admin", "admin@admin.com", "System Admin User");
 
 -- -----------------------------------------------------
 -- Init the services type into the table `ocmanager`.`services`

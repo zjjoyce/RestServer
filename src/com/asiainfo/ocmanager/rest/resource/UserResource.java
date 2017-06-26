@@ -64,7 +64,6 @@ public class UserResource {
 	 * @return new user info
 	 */
 	@POST
-	@PageAuth(requiredPermission = "CreateUser")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response createUser(User user) {
@@ -80,7 +79,6 @@ public class UserResource {
 	 * @return updated user info
 	 */
 	@PUT
-	@PageAuth(requiredPermission = "UpdateUser")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response updateUser(User user) {
@@ -95,7 +93,6 @@ public class UserResource {
 	 *            user id
 	 */
 	@DELETE
-	@PageAuth(requiredPermission = "DeleteUser")
 	@Path("{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response deleteUser(@PathParam("id") String userId) {
@@ -104,7 +101,7 @@ public class UserResource {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param userId
 	 * @return
 	 */
