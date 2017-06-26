@@ -2388,3 +2388,167 @@ Content-Type: application/json
   }
 }
 ```
+
+### 绑定一个后端服务实例
+
+```
+POST /oapi/v1/namespaces/:names/backingserviceinstances/:instance_name/binding
+```
+
+```
+POST /oapi/v1/namespaces/san/backingserviceinstances/hive-instance/binding
+
+Authorization: Bearer ZIu0vDcm7a0_zH00_o6mFh9iivNWbR0oRPK6S3NvsT0
+Content-Type: application/json
+
+{
+    "kind":"BindingRequestOptions",
+    "apiVersion":"v1",
+    "metadata":{
+        "name":"hive-instance"
+    },
+    "resourceName":"user001",
+    "bindKind":"HadoopUser"
+}
+```
+```json
+{
+  "kind": "BackingServiceInstance",
+  "apiVersion": "v1",
+  "metadata": {
+    "name": "hive-instance",
+    "namespace": "san",
+    "selfLink": "/oapi/v1/namespaces/san/backingserviceinstances/hive-instance/binding",
+    "uid": "b8569bae-50d4-11e7-a50b-00163e00009d",
+    "resourceVersion": "21935506",
+    "creationTimestamp": "2017-06-14T07:40:21Z",
+    "annotations": {
+      "HadoopUser": "user001"
+    }
+  },
+  "spec": {
+    "provisioning": {
+      "dashboard_url": "",
+      "backingservice_name": "Hive",
+      "backingservice_spec_id": "2ef26018-003d-4b2b-b786-0481d4ee9fa3",
+      "backingservice_plan_guid": "aa7e364f-fdbf-4187-b60a-218b6fa398ed",
+      "backingservice_plan_name": "shared",
+      "parameters": {
+        "hiveStorageQuota": "1024",
+        "instance_id": "b8559a4f-50d4-11e7-a2eb-00163e0203d4",
+        "yarnQueueQuota": "10"
+      },
+      "credentials": {
+        "Hive database": "b8559a4f50d411e7a2eb00163e0203d4",
+        "host": "zx-dn-03",
+        "password": "23f36ccc-ce3b-49bd-9619-e7298487fd3a",
+        "port": "10000",
+        "uri": "jdbc:hive2://zx-dn-03:10000/b8559a4f50d411e7a2eb00163e0203d4;principal=hive/zx-dn-03@EXAMPLE.COM",
+        "username": "like@EXAMPLE.COM"
+      }
+    },
+    "userprovidedservice": {
+      "credentials": null
+    },
+    "binding": null,
+    "bound": 0,
+    "instance_id": "b8559a4f-50d4-11e7-a2eb-00163e0203d4",
+    "tags": null
+  },
+  "status": {
+    "phase": "Unbound",
+    "action": "_ToBind",
+    "last_operation": null
+  }
+}
+```
+
+### 解绑一个后端服务实例
+
+```
+PUT /oapi/v1/namespaces/:name/backingserviceinstances/:instance_name/binding
+```
+
+```
+PUT /oapi/v1/namespaces/san/backingserviceinstances/hive-instance/binding
+
+Authorization: Bearer ZIu0vDcm7a0_zH00_o6mFh9iivNWbR0oRPK6S3NvsT0
+Content-Type: application/json
+
+{
+    "kind":"BindingRequestOptions",
+    "apiVersion":"v1",
+    "metadata":{
+        "name":"hive-instance"
+    },
+    "resourceName":"user001",
+    "bindKind":"HadoopUser"
+}
+```
+
+```json
+{
+  "kind": "BackingServiceInstance",
+  "apiVersion": "v1",
+  "metadata": {
+    "name": "hive20170614",
+    "namespace": "san",
+    "selfLink": "/oapi/v1/namespaces/san/backingserviceinstances/hive-instance/binding",
+    "uid": "b8569bae-50d4-11e7-a50b-00163e00009d",
+    "resourceVersion": "21935761",
+    "creationTimestamp": "2017-06-14T07:40:21Z",
+    "annotations": {
+      "HadoopUser": "user001"
+    }
+  },
+  "spec": {
+    "provisioning": {
+      "dashboard_url": "",
+      "backingservice_name": "Hive",
+      "backingservice_spec_id": "2ef26018-003d-4b2b-b786-0481d4ee9fa3",
+      "backingservice_plan_guid": "aa7e364f-fdbf-4187-b60a-218b6fa398ed",
+      "backingservice_plan_name": "shared",
+      "parameters": {
+        "hiveStorageQuota": "1024",
+        "instance_id": "b8559a4f-50d4-11e7-a2eb-00163e0203d4",
+        "yarnQueueQuota": "10"
+      },
+      "credentials": {
+        "Hive database": "b8559a4f50d411e7a2eb00163e0203d4",
+        "host": "zx-dn-03",
+        "password": "23f36ccc-ce3b-49bd-9619-e7298487fd3a",
+        "port": "10000",
+        "uri": "jdbc:hive2://zx-dn-03:10000/b8559a4f50d411e7a2eb00163e0203d4;principal=hive/zx-dn-03@EXAMPLE.COM",
+        "username": "like@EXAMPLE.COM"
+      }
+    },
+    "userprovidedservice": {
+      "credentials": null
+    },
+    "binding": [
+      {
+        "bound_time": "2017-06-26T09:05:52Z",
+        "bind_uuid": "a5d0e728-5a4e-11e7-ad90-00163e0203d4",
+        "bind_hadoop_user":"user001",
+        "credentials": {
+          "Host": "zx-dn-03",
+          "Name": "b8559a4f50d411e7a2eb00163e0203d4",
+          "Password": "23f36ccc-ce3b-49bd-9619-e7298487fd3a",
+          "Port": "10000",
+          "Uri": "jdbc:hive2://zx-dn-03:10000/b8559a4f50d411e7a2eb00163e0203d4;principal=hive/zx-dn-03@EXAMPLE.COM",
+          "Username": "like@EXAMPLE.COM@EXAMPLE.COM",
+          "Vhost": ""
+        }
+      }
+    ],
+    "bound": 1,
+    "instance_id": "b8559a4f-50d4-11e7-a2eb-00163e0203d4",
+    "tags": null
+  },
+  "status": {
+    "phase": "Bound",
+    "action": "_ToUnbind",
+    "last_operation": null
+  }
+}
+```
