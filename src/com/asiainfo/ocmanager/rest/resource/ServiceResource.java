@@ -116,7 +116,6 @@ public class ServiceResource {
 	 * @return service
 	 */
 	@POST
-	@PageAuth(requiredPermission = "AddService")
 	@Path("/broker")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response addServiceBroker(String reqBodyStr) {
@@ -214,7 +213,6 @@ public class ServiceResource {
 	 * @return service
 	 */
 	@DELETE
-	@PageAuth(requiredPermission = "DeleteService")
 	@Path("/broker/{name}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response deleteServiceBroker(@PathParam("name") String serviceBrokerName) {
@@ -250,8 +248,8 @@ public class ServiceResource {
 			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
 		}
 	}
-	
-	
+
+
 	/**
 	 * call data foundry rest api
 	 *

@@ -139,7 +139,7 @@ public class TenantResource {
 
 	/**
 	 * get the tenant service instance info which include the access info
-	 * 
+	 *
 	 * @param tenantId
 	 * @param InstanceName
 	 * @return
@@ -334,9 +334,9 @@ public class TenantResource {
 								// the update will failed
 								AdapterResponseBean responseBean = TenantResource.updateTenantServiceInstanceInDf(
 										tenantId, serviceInstance.getInstanceName(), serviceInstanceJson.toString());
-								
+
 								System.out.println(responseBean);
-								
+
 							}
 						}
 
@@ -357,7 +357,7 @@ public class TenantResource {
 
 	/**
 	 * Update a service instance in specific tenant
-	 * 
+	 *
 	 * @param tenantId
 	 * @param instanceName
 	 * @param reqBodyStr
@@ -495,7 +495,6 @@ public class TenantResource {
 	 * @return
 	 */
 	@POST
-	@PageAuth(requiredPermission = "Grant")
 	@Path("{id}/user/role/assignment")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
