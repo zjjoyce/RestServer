@@ -1,7 +1,5 @@
 package com.asiainfo.ocmanager.persistence.test;
 
-import java.util.List;
-
 import org.apache.ibatis.session.SqlSession;
 
 import com.asiainfo.ocmanager.persistence.mapper.ServiceRolePermissionMapper;
@@ -12,13 +10,13 @@ public class TestServiceRolePermission {
 		SqlSession session = TestDBConnectorFactory.getSession();
 		try {
 			ServiceRolePermissionMapper mapper = session.getMapper(ServiceRolePermissionMapper.class);
-			List<ServiceRolePermission> permissionList = mapper.selectServicePermissionByRoleId("a12a84d0-524a-11e7-9dbb-fa163ed7d0ae");
+			ServiceRolePermission permission = mapper.selectPermissionByServiceNameRoleId("hdfs", "a12a84d0-524a-11e7-9dbb-fa163ed7d0ae");
 
-			for (ServiceRolePermission pl : permissionList) {
-				System.out.println(pl.getRoleId());
-				System.out.println(pl.getServiceId());
-				System.out.println(pl.getServicePermission());
-			}
+			
+				System.out.println(permission.getRoleId());
+				System.out.println(permission.getServiceName());
+				System.out.println(permission.getServicePermission());
+			
 
 			session.commit();
 		} catch (Exception e) {

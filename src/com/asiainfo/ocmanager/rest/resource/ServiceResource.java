@@ -16,7 +16,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import com.asiainfo.ocmanager.auth.PageAuth;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
@@ -67,7 +66,7 @@ public class ServiceResource {
 			JsonObject servicesFromDfJson = new JsonParser().parse(servicesFromDf).getAsJsonObject();
 			JsonArray items = servicesFromDfJson.getAsJsonArray("items");
 
-			if (items != null || items.size() != 0) {
+			if (items != null) {
 				for (int i = 0; i < items.size(); i++) {
 					String name = items.get(i).getAsJsonObject().getAsJsonObject("spec").get("name").getAsString();
 					String id = items.get(i).getAsJsonObject().getAsJsonObject("spec").get("id").getAsString();
@@ -141,7 +140,7 @@ public class ServiceResource {
 				CloseableHttpResponse response2 = httpclient.execute(httpPost);
 
 				try {
-					int statusCode = response2.getStatusLine().getStatusCode();
+//					int statusCode = response2.getStatusLine().getStatusCode();
 					String bodyStr = EntityUtils.toString(response2.getEntity());
 					// if (statusCode == 201) {
 					// // TODO should call df service api and compare with

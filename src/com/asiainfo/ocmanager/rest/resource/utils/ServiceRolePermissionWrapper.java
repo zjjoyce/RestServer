@@ -1,14 +1,9 @@
 package com.asiainfo.ocmanager.rest.resource.utils;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.ibatis.session.SqlSession;
 
 import com.asiainfo.ocmanager.persistence.DBConnectorFactory;
-import com.asiainfo.ocmanager.persistence.mapper.RoleMapper;
 import com.asiainfo.ocmanager.persistence.mapper.ServiceRolePermissionMapper;
-import com.asiainfo.ocmanager.persistence.model.Role;
 import com.asiainfo.ocmanager.persistence.model.ServiceRolePermission;
 
 /**
@@ -22,12 +17,12 @@ public class ServiceRolePermissionWrapper {
 	 * 
 	 * @return
 	 */
-	public static List<ServiceRolePermission> getServicePermissionByRoleId(String roleId) {
+	public static ServiceRolePermission getServicePermissionByRoleId(String serviceName, String roleId) {
 		SqlSession session = DBConnectorFactory.getSession();
-		List<ServiceRolePermission> permissionList = new ArrayList<ServiceRolePermission>();
+		ServiceRolePermission permission = null;
 		try {
 			ServiceRolePermissionMapper mapper = session.getMapper(ServiceRolePermissionMapper.class);
-			permissionList = mapper.selectServicePermissionByRoleId(roleId);
+			permission = mapper.selectPermissionByServiceNameRoleId(serviceName, roleId);
 
 			session.commit();
 		} catch (Exception e) {
@@ -36,7 +31,7 @@ public class ServiceRolePermissionWrapper {
 			session.close();
 		}
 
-		return permissionList;
+		return permission;
 	}
 
 }
