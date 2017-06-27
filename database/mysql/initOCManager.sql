@@ -132,6 +132,21 @@ CREATE TABLE IF NOT EXISTS `ocmanager`.`services_roles_permission` (
 ENGINE = InnoDB;
 
 
+-- -----------------------------------------------------
+-- Table `ocmanager`.`dashboard`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ocmanager`.`dashboard` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(64) NOT NULL,
+  `description` MEDIUMTEXT NULL,
+  `imageUrl` MEDIUMTEXT NOT NULL,
+  `href` MEDIUMTEXT NOT NULL,
+  `blank` TINYINT NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `name_UNIQUE` (`name` ASC))
+ENGINE = InnoDB;
+
+
 
 -- -----------------------------------------------------
 -- Init the 4 roles into the table `ocmanager`.`roles`

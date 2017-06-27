@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.asiainfo.ocmanager.persistence.mapper.DashboardMapper">
+    <!-- get all dashboard links -->
+    <select id="selectAllLinks" resultType="com.asiainfo.ocmanager.persistence.model.Dashboard">
+        select * from dashboard
+    </select>
+        <!-- get link by name -->
+    <select id="selectLinkByName" parameterType="java.lang.String"
+        resultType="com.asiainfo.ocmanager.persistence.model.Dashboard">
+        select * from dashboard where name=#{name}
+    </select>
+    <!-- create dashboard link -->
+    <insert id="insertLink" keyProperty="id"
+        parameterType="com.asiainfo.ocmanager.persistence.model.Dashboard">
+        insert into dashboard (name, description, imageUrl, href, blank)
+        values (#{name}, #{description}, #{imageUrl}, #{href}, #{blank})
+    </insert>
+    <!-- update dashboard link -->
+    <update id="updateLink"
+        parameterType="com.asiainfo.ocmanager.persistence.model.Dashboard">
+        update dashboard set
+            name = #{name},
+            description = #{description},
+            imageUrl = #{imageUrl},
+            href = #{href},
+            blank = #{blank}
+        where id = #{id}
+    </update>
+    <!-- delete dashboard link -->
+    <delete id="deleteLink">
+        delete from dashboard where id = #{id}
+    </delete>
+</mapper>
