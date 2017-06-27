@@ -103,10 +103,13 @@ public class ServiceResource {
 	@Path("{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getServiceById(@PathParam("id") String serviceId) {
+		try {
+			Service service = ServicePersistenceWrapper.getServiceById(serviceId);
 
-		Service service = ServicePersistenceWrapper.getServiceById(serviceId);
-
-		return Response.ok().entity(service == null ? new Service() : service).build();
+			return Response.ok().entity(service == null ? new Service() : service).build();
+		} catch (Exception e) {
+			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+		}
 	}
 
 	/**

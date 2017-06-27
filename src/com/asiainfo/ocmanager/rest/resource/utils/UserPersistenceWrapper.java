@@ -34,6 +34,7 @@ public class UserPersistenceWrapper {
 
 		} catch (Exception e) {
 			session.rollback();
+			throw e;
 		} finally {
 			session.close();
 		}
@@ -57,6 +58,7 @@ public class UserPersistenceWrapper {
 
 		} catch (Exception e) {
 			session.rollback();
+			throw e;
 		} finally {
 			session.close();
 		}
@@ -82,6 +84,7 @@ public class UserPersistenceWrapper {
 
 		} catch (Exception e) {
 			session.rollback();
+			throw e;
 		} finally {
 			session.close();
 		}
@@ -105,6 +108,7 @@ public class UserPersistenceWrapper {
 
 		} catch (Exception e) {
 			session.rollback();
+			throw e;
 		} finally {
 			session.close();
 		}
@@ -126,6 +130,7 @@ public class UserPersistenceWrapper {
 
 		} catch (Exception e) {
 			session.rollback();
+			throw e;
 		} finally {
 			session.close();
 		}
