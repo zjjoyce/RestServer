@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.DELETE;
@@ -62,6 +63,12 @@ public class ServiceResource {
 			// this is not a good solution should be enhance in future
 			List<Service> servicesInDB = ServicePersistenceWrapper.getAllServices();
 
+			// get all the services in the adapter db
+			List<String> dbServiceList = new ArrayList<String>();
+			for (Service s : servicesInDB) {
+				dbServiceList.add(s.getId());
+			}
+
 			String servicesFromDf = ServiceResource.callDFToGetAllServices();
 			JsonObject servicesFromDfJson = new JsonParser().parse(servicesFromDf).getAsJsonObject();
 			JsonArray items = servicesFromDfJson.getAsJsonArray("items");
@@ -76,10 +83,8 @@ public class ServiceResource {
 					if (servicesInDB.size() == 0) {
 						ServicePersistenceWrapper.addService(new Service(id, name, description));
 					} else {
-						for (Service s : servicesInDB) {
-							if (!s.getId().equals(id)) {
-								ServicePersistenceWrapper.addService(new Service(id, name, description));
-							}
+						if (!dbServiceList.contains(id)) {
+							ServicePersistenceWrapper.addService(new Service(id, name, description));
 						}
 					}
 
@@ -143,7 +148,8 @@ public class ServiceResource {
 				CloseableHttpResponse response2 = httpclient.execute(httpPost);
 
 				try {
-//					int statusCode = response2.getStatusLine().getStatusCode();
+					// int statusCode =
+					// response2.getStatusLine().getStatusCode();
 					String bodyStr = EntityUtils.toString(response2.getEntity());
 					// if (statusCode == 201) {
 					// // TODO should call df service api and compare with
@@ -250,7 +256,6 @@ public class ServiceResource {
 			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
 		}
 	}
-
 
 	/**
 	 * call data foundry rest api
