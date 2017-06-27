@@ -18,5 +18,5 @@ public interface ServiceRolePermissionMapper {
 	 * @param roleId
 	 * @return
 	 */
-	public List<ServiceRolePermission> selectServicePermissionByRoleId(@Param("roleId") String roleId);
+	public ServiceRolePermission selectPermissionByServiceNameRoleId(@Param("serviceName") String serviceName, @Param("roleId") String roleId);
 }

@@ -13,7 +13,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.asiainfo.ocmanager.auth.PageAuth;
 import com.asiainfo.ocmanager.persistence.model.User;
 import com.asiainfo.ocmanager.persistence.model.UserRoleView;
 import com.asiainfo.ocmanager.rest.bean.AdapterResponseBean;

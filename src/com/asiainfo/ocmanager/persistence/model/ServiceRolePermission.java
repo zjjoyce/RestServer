@@ -7,16 +7,16 @@ package com.asiainfo.ocmanager.persistence.model;
  */
 public class ServiceRolePermission {
 
-	private String serviceId;
+	private String serviceName;
 	private String roleId;
 	private String ServicePermission;
 
-	public String getServiceId() {
-		return serviceId;
+	public String getServiceName() {
+		return serviceName;
 	}
 
-	public void setServiceId(String serviceId) {
-		this.serviceId = serviceId;
+	public void setServiceName(String serviceName) {
+		this.serviceName = serviceName;
 	}
 
 	public String getRoleId() {
