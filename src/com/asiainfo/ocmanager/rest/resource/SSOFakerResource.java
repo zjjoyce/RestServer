@@ -35,32 +35,41 @@ public class SSOFakerResource {
 	@Path("user")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getUserName(@Context HttpServletRequest request) {
-		String http_x_proxy_cas_loginname = request.getHeader("http_x_proxy_cas_loginname");
-		String http_x_proxy_cas_username = request.getHeader("http_x_proxy_cas_username");
-		http_x_proxy_cas_username = http_x_proxy_cas_username == null ? "" : http_x_proxy_cas_username;
-		String http_x_proxy_cas_email = request.getHeader("http_x_proxy_cas_email");
-		http_x_proxy_cas_email = http_x_proxy_cas_email == null ? "" : http_x_proxy_cas_email;
-		String http_x_proxy_cas_userid = request.getHeader("http_x_proxy_cas_userid");
-		http_x_proxy_cas_userid = http_x_proxy_cas_userid == null ? "" : http_x_proxy_cas_userid;
-		String http_x_proxy_cas_mobile = request.getHeader("http_x_proxy_cas_mobile");
-		http_x_proxy_cas_mobile = http_x_proxy_cas_mobile == null ? "" : http_x_proxy_cas_mobile;
+		try {
+			String http_x_proxy_cas_loginname = request.getHeader("http_x_proxy_cas_loginname");
+			String http_x_proxy_cas_username = request.getHeader("http_x_proxy_cas_username");
+			http_x_proxy_cas_username = http_x_proxy_cas_username == null ? "" : http_x_proxy_cas_username;
+			String http_x_proxy_cas_email = request.getHeader("http_x_proxy_cas_email");
+			http_x_proxy_cas_email = http_x_proxy_cas_email == null ? "" : http_x_proxy_cas_email;
+			String http_x_proxy_cas_userid = request.getHeader("http_x_proxy_cas_userid");
+			http_x_proxy_cas_userid = http_x_proxy_cas_userid == null ? "" : http_x_proxy_cas_userid;
+			String http_x_proxy_cas_mobile = request.getHeader("http_x_proxy_cas_mobile");
+			http_x_proxy_cas_mobile = http_x_proxy_cas_mobile == null ? "" : http_x_proxy_cas_mobile;
 
-		// make sure the user name is set
-		if (http_x_proxy_cas_loginname == null) {
-			return Response.status(Status.BAD_REQUEST).entity(new AdapterResponseBean("Failed",
-					"Can not get sso user information, please make sure the user info is set.", 200)).build();
-		} else {
+			// make sure the user name is set
+			if (http_x_proxy_cas_loginname == null) {
+				return Response.status(Status.BAD_REQUEST)
+						.entity(new AdapterResponseBean("Failed",
+								"Can not get sso user information, please make sure the user info is set.", 200))
+						.build();
+			} else {
 
-			// our system only has one system admin, so hard code here
-			// if based on the system admin role id can return results, it means
-			// the user is system admin
-			List<UserRoleView> urses = UserRoleViewPersistenceWrapper
-					.getTURBasedOnUserNameAndRoleId(http_x_proxy_cas_loginname, "a10170cb-524a-11e7-9dbb-fa163ed7d0ae");
+				// our system only has one system admin, so hard code here
+				// if based on the system admin role id can return results, it
+				// means
+				// the user is system admin
+				List<UserRoleView> urses = UserRoleViewPersistenceWrapper.getTURBasedOnUserNameAndRoleId(
+						http_x_proxy_cas_loginname, "a10170cb-524a-11e7-9dbb-fa163ed7d0ae");
 
-			boolean isAdmin = urses.size() == 0 ? false : true;
+				boolean isAdmin = urses.size() == 0 ? false : true;
 
-			return Response.ok().entity(new SSOFakerUserBean(http_x_proxy_cas_loginname, http_x_proxy_cas_username,
-					http_x_proxy_cas_email, http_x_proxy_cas_userid, http_x_proxy_cas_mobile, isAdmin)).build();
+				return Response.ok()
+						.entity(new SSOFakerUserBean(http_x_proxy_cas_loginname, http_x_proxy_cas_username,
+								http_x_proxy_cas_email, http_x_proxy_cas_userid, http_x_proxy_cas_mobile, isAdmin))
+						.build();
+			}
+		} catch (Exception e) {
+			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
 		}
 	}
 

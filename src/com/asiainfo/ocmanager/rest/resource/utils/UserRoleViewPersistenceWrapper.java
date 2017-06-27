@@ -30,6 +30,7 @@ public class UserRoleViewPersistenceWrapper {
 			session.commit();
 		} catch (Exception e) {
 			session.rollback();
+			throw e;
 		} finally {
 			session.close();
 		}
@@ -51,6 +52,7 @@ public class UserRoleViewPersistenceWrapper {
 			session.commit();
 		} catch (Exception e) {
 			session.rollback();
+			throw e;
 		} finally {
 			session.close();
 		}
@@ -71,6 +73,7 @@ public class UserRoleViewPersistenceWrapper {
 			session.commit();
 		} catch (Exception e) {
 			session.rollback();
+			throw e;
 		} finally {
 			session.close();
 		}
@@ -91,6 +94,7 @@ public class UserRoleViewPersistenceWrapper {
 			session.commit();
 		} catch (Exception e) {
 			session.rollback();
+			throw e;
 		} finally {
 			session.close();
 		}
@@ -113,6 +117,7 @@ public class UserRoleViewPersistenceWrapper {
 			session.commit();
 		} catch (Exception e) {
 			session.rollback();
+			throw e;
 		} finally {
 			session.close();
 		}

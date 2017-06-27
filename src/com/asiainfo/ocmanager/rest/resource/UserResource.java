@@ -12,6 +12,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import com.asiainfo.ocmanager.persistence.model.User;
 import com.asiainfo.ocmanager.persistence.model.UserRoleView;
@@ -36,8 +37,12 @@ public class UserResource {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getUsers() {
-		List<User> users = UserPersistenceWrapper.getUsers();
-		return Response.ok().entity(users).build();
+		try {
+			List<User> users = UserPersistenceWrapper.getUsers();
+			return Response.ok().entity(users).build();
+		} catch (Exception e) {
+			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+		}
 	}
 
 	/**
@@ -51,8 +56,12 @@ public class UserResource {
 	@Path("{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getUserById(@PathParam("id") String userId) {
-		User user = UserPersistenceWrapper.getUserById(userId);
-		return Response.ok().entity(user == null ? new User() : user).build();
+		try {
+			User user = UserPersistenceWrapper.getUserById(userId);
+			return Response.ok().entity(user == null ? new User() : user).build();
+		} catch (Exception e) {
+			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+		}
 	}
 
 	/**
@@ -66,8 +75,12 @@ public class UserResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response createUser(User user) {
-		user = UserPersistenceWrapper.createUser(user);
-		return Response.ok().entity(user).build();
+		try {
+			user = UserPersistenceWrapper.createUser(user);
+			return Response.ok().entity(user).build();
+		} catch (Exception e) {
+			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+		}
 	}
 
 	/**
@@ -81,8 +94,12 @@ public class UserResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response updateUser(User user) {
-		user = UserPersistenceWrapper.updateUser(user);
-		return Response.ok().entity(user).build();
+		try {
+			user = UserPersistenceWrapper.updateUser(user);
+			return Response.ok().entity(user).build();
+		} catch (Exception e) {
+			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+		}
 	}
 
 	/**
@@ -95,8 +112,12 @@ public class UserResource {
 	@Path("{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response deleteUser(@PathParam("id") String userId) {
-		UserPersistenceWrapper.deleteUser(userId);
-		return Response.ok().entity(new AdapterResponseBean("delete success", userId, 200)).build();
+		try {
+			UserPersistenceWrapper.deleteUser(userId);
+			return Response.ok().entity(new AdapterResponseBean("delete success", userId, 200)).build();
+		} catch (Exception e) {
+			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+		}
 	}
 
 	/**
@@ -108,15 +129,23 @@ public class UserResource {
 	@Path("id/{id}/tenants")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getTenantAndRoleById(@PathParam("id") String userId) {
-		List<UserRoleView> turs = UserRoleViewPersistenceWrapper.getTenantAndRoleBasedOnUserId(userId);
-		return Response.ok().entity(turs).build();
+		try {
+			List<UserRoleView> turs = UserRoleViewPersistenceWrapper.getTenantAndRoleBasedOnUserId(userId);
+			return Response.ok().entity(turs).build();
+		} catch (Exception e) {
+			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+		}
 	}
 
 	@GET
 	@Path("name/{name}/tenants")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getTenantAndRoleByName(@PathParam("name") String userName) {
-		List<UserRoleView> turs = UserRoleViewPersistenceWrapper.getTenantAndRoleBasedOnUserName(userName);
-		return Response.ok().entity(turs).build();
+		try {
+			List<UserRoleView> turs = UserRoleViewPersistenceWrapper.getTenantAndRoleBasedOnUserName(userName);
+			return Response.ok().entity(turs).build();
+		} catch (Exception e) {
+			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+		}
 	}
 }

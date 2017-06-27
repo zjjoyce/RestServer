@@ -38,6 +38,7 @@ public class TenantPersistenceWrapper {
 			session.commit();
 		} catch (Exception e) {
 			session.rollback();
+			throw e;
 		} finally {
 			session.close();
 		}
@@ -58,6 +59,7 @@ public class TenantPersistenceWrapper {
 			session.commit();
 		} catch (Exception e) {
 			session.rollback();
+			throw e;
 		} finally {
 			session.close();
 		}
@@ -79,6 +81,7 @@ public class TenantPersistenceWrapper {
 			session.commit();
 		} catch (Exception e) {
 			session.rollback();
+			throw e;
 		} finally {
 			session.close();
 		}
@@ -99,6 +102,7 @@ public class TenantPersistenceWrapper {
 			session.commit();
 		} catch (Exception e) {
 			session.rollback();
+			throw e;
 		} finally {
 			session.close();
 		}
@@ -121,6 +125,7 @@ public class TenantPersistenceWrapper {
 			session.commit();
 		} catch (Exception e) {
 			session.rollback();
+			throw e;
 		} finally {
 			session.close();
 		}

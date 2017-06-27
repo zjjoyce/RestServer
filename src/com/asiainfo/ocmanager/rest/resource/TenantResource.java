@@ -68,8 +68,12 @@ public class TenantResource {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getAllTenants() {
-		List<Tenant> tenants = TenantPersistenceWrapper.getAllTenants();
-		return Response.ok().entity(tenants).build();
+		try {
+			List<Tenant> tenants = TenantPersistenceWrapper.getAllTenants();
+			return Response.ok().entity(tenants).build();
+		} catch (Exception e) {
+			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+		}
 	}
 
 	/**
@@ -83,8 +87,12 @@ public class TenantResource {
 	@Path("{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getTenantById(@PathParam("id") String tenantId) {
-		Tenant tenant = TenantPersistenceWrapper.getTenantById(tenantId);
-		return Response.ok().entity(tenant).build();
+		try {
+			Tenant tenant = TenantPersistenceWrapper.getTenantById(tenantId);
+			return Response.ok().entity(tenant).build();
+		} catch (Exception e) {
+			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+		}
 	}
 
 	/**
@@ -98,8 +106,12 @@ public class TenantResource {
 	@Path("{id}/children")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getChildrenTenants(@PathParam("id") String parentTenantId) {
-		List<Tenant> tenants = TenantPersistenceWrapper.getChildrenTenants(parentTenantId);
-		return Response.ok().entity(tenants).build();
+		try {
+			List<Tenant> tenants = TenantPersistenceWrapper.getChildrenTenants(parentTenantId);
+			return Response.ok().entity(tenants).build();
+		} catch (Exception e) {
+			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+		}
 	}
 
 	/**
@@ -112,9 +124,12 @@ public class TenantResource {
 	@GET
 	@Path("{id}/users")
 	public Response getTenantUsers(@PathParam("id") String tenantId) {
-
-		List<UserRoleView> usersRoles = UserRoleViewPersistenceWrapper.getUsersInTenant(tenantId);
-		return Response.ok().entity(usersRoles).build();
+		try {
+			List<UserRoleView> usersRoles = UserRoleViewPersistenceWrapper.getUsersInTenant(tenantId);
+			return Response.ok().entity(usersRoles).build();
+		} catch (Exception e) {
+			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+		}
 	}
 
 	/**
@@ -128,11 +143,13 @@ public class TenantResource {
 	@Path("{id}/service/instances")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getTenantServiceInstances(@PathParam("id") String tenantId) {
-
-		List<ServiceInstance> serviceInstances = ServiceInstancePersistenceWrapper
-				.getServiceInstancesInTenant(tenantId);
-		return Response.ok().entity(serviceInstances).build();
-
+		try {
+			List<ServiceInstance> serviceInstances = ServiceInstancePersistenceWrapper
+					.getServiceInstancesInTenant(tenantId);
+			return Response.ok().entity(serviceInstances).build();
+		} catch (Exception e) {
+			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+		}
 	}
 
 	/**
@@ -148,9 +165,7 @@ public class TenantResource {
 	public Response getTenantServiceInstanceAccessInfo(@PathParam("tenantId") String tenantId,
 			@PathParam("InstanceName") String InstanceName) {
 		try {
-
 			return Response.ok().entity(TenantResource.getTenantServiceInstancesFromDf(tenantId, InstanceName)).build();
-
 		} catch (Exception e) {
 			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
 		}
@@ -552,7 +567,7 @@ public class TenantResource {
 						.get("backingservice_name").getAsString();
 
 				String phase = instance.getAsJsonObject("status").get("phase").getAsString();
-				if (phase.equals("Unbound")) {
+				if (!phase.equals("Provisioning")) {
 					// Because the Provisioning will make the update failed
 					if (Constant.list.contains(serviceName.toLowerCase())) {
 						// get service instance name
@@ -724,9 +739,6 @@ public class TenantResource {
 	public Response unassignRoleFromUserInTenant(@PathParam("id") String tenantId, @PathParam("userId") String userId) {
 
 		try {
-			// assgin to the input tenant
-			// assignment.setTenantId(tenantId);
-
 			// get all service instances from df
 			String allServiceInstances = TenantResource.getTenantAllServiceInstancesFromDf(tenantId);
 			JsonElement allServiceInstancesJson = new JsonParser().parse(allServiceInstances);
@@ -751,41 +763,6 @@ public class TenantResource {
 					if (bindingRes.getResCodel() == 200) {
 						System.out.println("unassigned the permission");
 					}
-
-					// String OCDPServiceInstanceStr =
-					// TenantResource.getTenantServiceInstancesFromDf(tenantId,
-					// instanceName);
-					//
-					// // parse the update request body based on the get service
-					// // instance
-					// // by id response body
-					// JsonElement OCDPServiceInstanceJson = new
-					// JsonParser().parse(OCDPServiceInstanceStr);
-					// // get the provisioning json
-					// JsonObject provisioning =
-					// OCDPServiceInstanceJson.getAsJsonObject().getAsJsonObject("spec")
-					// .getAsJsonObject("provisioning");
-					// // add the user name to the parameters for update
-					// provisioning.getAsJsonObject("parameters").addProperty("user_name",
-					// UserPersistenceWrapper.getUserById(userId).getUsername());
-					//
-					// // add the accesses fields into the request body
-					// provisioning.getAsJsonObject("parameters").addProperty("accesses",
-					// "");
-					//
-					// // add the patch Updating into the request body
-					// JsonObject status =
-					// OCDPServiceInstanceJson.getAsJsonObject().getAsJsonObject("status");
-					// status.addProperty("patch", "Updating");
-					//
-					// AdapterResponseBean responseBean =
-					// TenantResource.updateTenantServiceInstanceInDf(tenantId,
-					// instanceName, OCDPServiceInstanceJson.toString());
-					//
-
-					// if (responseBean.getResCodel() == 200) {
-					// System.out.println("service deleted");
-					// }
 				}
 			}
 
