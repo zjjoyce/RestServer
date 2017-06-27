@@ -28,7 +28,8 @@ public class DBConnectorFactory {
 		try {
 			String resource = "com/asiainfo/ocmanager/persistence/configuration.xml";
 			InputStream inputStream = Resources.getResourceAsStream(resource);
-			// we deployed in tomcat the path is: <tomcat home>/webapps/ocmanager/
+			// we deployed in tomcat the path is: <tomcat
+			// home>/webapps/ocmanager/
 			// it will get <tomcat home>/webapps/ocmanager/classes/
 			String currentClassPath = new DFPropertiesFoundry().getClass().getResource("/").getPath();
 			// remove classes/
@@ -39,7 +40,7 @@ public class DBConnectorFactory {
 			InputStream propInputStream = new FileInputStream(new File(propertiesFilePath));
 			Properties prop = new Properties();
 			prop.load(propInputStream);
-			
+
 			sessionFactory = new SqlSessionFactoryBuilder().build(inputStream, prop);
 		} catch (IOException e) {
 			e.printStackTrace();

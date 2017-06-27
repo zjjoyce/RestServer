@@ -952,3 +952,106 @@ __response:__
   "admin": false,
 }
 ```
+
+
+### Dashboard Links APIs
+1. 添加多租户平台首页连接
+```
+POST /ocmanager/v1/api/dashboard/link
+```
+
+__request body:__
+```
+{
+  "blank": true,
+  "description": "管理入口",
+  "href": "#/console/tenant",
+  "imageUrl": "home_tenant",
+  "name": "多租户管理平台"
+}
+```
+
+
+__response:__
+```
+{
+  "message": "Add successfully",
+  "resCodel": 200,
+  "status": "successful"
+}
+``` 
+
+2. 获取多租户平台首页所有连接
+```
+GET /ocmanager/v1/api/dashboard/link
+```
+__response:__
+```
+[
+  {
+    "blank": true,
+    "description": "管理入口",
+    "href": "#/console/tenant",
+    "id": 15,
+    "imageUrl": "home_tenant",
+    "name": "多租户管理平台"
+  },
+  ...
+]
+```
+
+3. 获取多租户平台首页连接通过连接名
+```
+GET /ocmanager/v1/api/dashboard/link/{name}
+```
+__response:__
+```
+{
+  "blank": true,
+  "description": "管理入口",
+  "href": "#/console/tenant",
+  "id": 15,
+  "imageUrl": "home_tenant",
+  "name": "多租户管理平台"
+}
+```
+
+4. 更新多租户平台首页连接通过id
+```
+PUT /ocmanager/v1/api/dashboard/link/{id}
+```
+
+__request body:__
+```
+{
+  "blank": false,
+  "description": "管理入口_change",
+  "href": "#/console/tenant/change",
+  "imageUrl": "home_tenant_change",
+  "name": "多租户管理平台_change"
+}
+```
+
+
+__response:__
+```
+{
+  "message": "Update successfully",
+  "resCodel": 200,
+  "status": "successful"
+}
+``` 
+
+5. 获取多租户平台首页连接通过连接名
+```
+DELETE /ocmanager/v1/api/dashboard/link/{id}
+```
+__response:__
+```
+{
+  "message": "Delete successfully",
+  "resCodel": 200,
+  "status": "successful"
+}
+```
+
