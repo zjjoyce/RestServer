@@ -16,6 +16,7 @@ __response:__
         "email": "user1@.com",
         "id": "085571dc-7a94-44aa-8963-99c328b5527a",
         "password": "password",
+        "phone": "123",
         "username": "user1"
     },
     ...
@@ -33,6 +34,7 @@ __response:__
     "email": "user1@.com",
     "id": "085571dc-7a94-44aa-8963-99c328b5527a",
     "password": "password",
+    "phone": "123",
     "username": "user1"
 }
 ```
@@ -47,7 +49,8 @@ __request body:__
     "username": "createUser1",
     "email": "createUser1@com",
     "description": "createUser1 description",
-    "password": "createUser1 password"
+    "password": "createUser1 password",
+    "phone": "123"
 }
 ```
 
@@ -58,7 +61,8 @@ __response:__
   "email": "createUser1@com",
   "id": "8dc8f0dd-a6c0-434f-ad0a-095201caa8ef",
   "password": "createUser1 password",
-  "username": "createUser1"
+  "username": "createUser1",
+  "phone": "123",
 }
 ```
 
@@ -66,7 +70,7 @@ __response:__
 
 4. 更新用户
 ```
-PUT /ocmanager/v1/api/user/{id}
+PUT /ocmanager/v1/api/user
 ```
 
 __request body:__
@@ -76,7 +80,8 @@ __request body:__
     "email": "createUser2@comUpdate",
     "id": "a02a11e8-c762-426f-8db9-3c204d87b2dc",
     "description": "createUser2 descriptionUpdate",
-    "password": "createUser2 passwordUpdate"
+    "password": "createUser2 passwordUpdate",
+    "phone": "123"
 }
 ```
 
@@ -88,7 +93,8 @@ __response:__
   "email": "createUser2@comUpdate",
   "id": "a02a11e8-c762-426f-8db9-3c204d87b2dc",
   "password": "createUser2 passwordUpdate",
-  "username": "createUser2Update"
+  "username": "createUser2Update",
+  "phone": "123"
 }
 ```
 
@@ -496,12 +502,14 @@ __response:__
     "name": "ChildTenant",
     "parentId": "f7f281ee-a544-4636-9341-2db50c491b96",
     "level": 2,
+    "dacpTeamCode": 2
   },
   {
     "description": "root tenant",
     "id": "f7f281ee-a544-4636-9341-2db50c491b96",
     "name": "rootTenant",
-    "level": 1
+    "level": 1,
+    "dacpTeamCode": 1
   }
   ...
 ]
@@ -519,7 +527,8 @@ __response:__
   "id": "5a6c16a9-0c85-42da-aec3-8ac1f5532fe1",
   "name": "ChildTenant",
   "parentId": "f7f281ee-a544-4636-9341-2db50c491b96",
-  "level": 2
+  "level": 2,
+  "dacpTeamCode": 2
 }
 
 ```
@@ -536,7 +545,8 @@ __response:__
     "id": "5a6c16a9-0c85-42da-aec3-8ac1f5532fe1",
     "name": "ChildTenant",
     "parentId": "f7f281ee-a544-4636-9341-2db50c491b96",
-    "level": 2
+    "level": 2,
+    "dacpTeamCode": 2
   }
   ...
 ]
@@ -709,12 +719,16 @@ __response:__
 ```
 [
   {
-    "roleId": "r1Id",
+    "roleId": "r1",
     "roleName": "r1",
-    "userDescription": "u2 description",
-    "userId": "u2Id",
-    "userName": "u2"
-  },
+    "tenantId": "t1",
+    "userDescription": "u1 description",
+    "userEmail": "a@163.com",
+    "userId": "u1",
+    "userName": "u1",
+    "userPassword": "passw0rd",
+    "userPhone": "123"
+  },,
   ...
 ]
 ```

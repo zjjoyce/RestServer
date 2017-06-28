@@ -10,17 +10,19 @@ public class User {
 	private String username;
 	private String password;
 	private String email;
+	private String phone;
 	private String description;
 
 	public User() {
 
 	}
 
-	public User(String id, String username, String password, String email, String description) {
+	public User(String id, String username, String password, String email, String phone, String description) {
 		this.id = id;
 		this.username = username;
 		this.password = password;
 		this.email = email;
+		this.phone = phone;
 		this.description = description;
 	}
 
@@ -62,6 +64,14 @@ public class User {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public String getPhone() {
+		return phone;
+	}
+
+	public void setPhone(String phone) {
+		this.phone = phone;
 	}
 
 }

@@ -210,7 +210,7 @@ public class TenantResource {
 			for (Tenant t : allRootTenants) {
 				allRootTenantsId.add(t.getId());
 			}
-			TenantPersistenceWrapper.createTenant(tenant);
+			
 			String url = DFPropertiesFoundry.getDFProperties().get(Constant.DATAFOUNDRY_URL);
 			String token = DFPropertiesFoundry.getDFProperties().get(Constant.DATAFOUNDRY_TOKEN);
 			String dfRestUrl = url + "/oapi/v1/projectrequests";
