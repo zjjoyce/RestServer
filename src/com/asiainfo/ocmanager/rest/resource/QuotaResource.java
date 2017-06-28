@@ -124,10 +124,10 @@ public class QuotaResource {
    * @return Quota object
    */
   @GET
-  @Path("greenplum/{serviceInstanceId}")
+  @Path("greenplum/{serviceInstanceId}/{usrname}/{password}")
   @Produces(MediaType.APPLICATION_JSON)
-  public Response getGpQuota(@PathParam("serviceInstanceId") String instanceId) {
-    Map quota = quotaQuery.getGpQuota(instanceId);
+  public Response getGpQuota(@PathParam("serviceInstanceId") String instanceId,@PathParam("usrname")  String username,@PathParam("password")  String password) {
+    Map quota = quotaQuery.getGpQuota(instanceId,username,password);
     return Response.ok().entity(quota).build();
   }
 
