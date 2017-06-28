@@ -12,6 +12,7 @@ public class Tenant {
 	private String description;
 	private String parentId;
 	private int level;
+	private int dacpTeamCode;
 
 	public Tenant() {
 
@@ -64,4 +65,13 @@ public class Tenant {
 	public void setLevel(int level) {
 		this.level = level;
 	}
+
+	public int getDacpTeamCode() {
+		return dacpTeamCode;
+	}
+
+	public void setDacpTeamCode(int dacpTeamCode) {
+		this.dacpTeamCode = dacpTeamCode;
+	}
+
 }

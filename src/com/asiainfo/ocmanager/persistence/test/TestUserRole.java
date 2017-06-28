@@ -19,6 +19,9 @@ public class TestUserRole {
 				System.out.println(ur.getUserId());
 				System.out.println(ur.getUserName());
 				System.out.println(ur.getUserDescription());
+				System.out.println(ur.getUserEmail());
+				System.out.println(ur.getUserPassword());
+				System.out.println(ur.getUserPhone());
 				System.out.println(ur.getRoleId());
 				System.out.println(ur.getRoleName());
 				System.out.println(ur.getTenantId());

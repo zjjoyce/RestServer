@@ -9,6 +9,9 @@
 		  U.id as "userId",
 		  U.username as "userName",
 		  U.description as "userDescription",
+          U.email as "userEmail",
+          U.password as "userPassword",
+          U.phone as "userPhone",
 		  R.id as "roleId",
 		  R.rolename as "roleName",
 		  TUR.tenant_id as "tenantId"

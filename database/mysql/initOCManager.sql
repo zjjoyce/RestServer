@@ -13,7 +13,9 @@ CREATE TABLE IF NOT EXISTS `ocmanager`.`tenants` (
   `description` MEDIUMTEXT NULL,
   `parentId` VARCHAR(64) NULL,
   `level` INT NOT NULL,
-  PRIMARY KEY (`id`))
+  `dacpTeamCode` INT NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `dacpTeamCode_UNIQUE` (`dacpTeamCode` ASC))
 ENGINE = InnoDB;
 
 
@@ -25,6 +27,7 @@ CREATE TABLE IF NOT EXISTS `ocmanager`.`users` (
   `username` VARCHAR(64) NOT NULL,
   `password` VARCHAR(64) NULL,
   `email` VARCHAR(64) NULL,
+  `phone` VARCHAR(64) NULL,
   `description` MEDIUMTEXT NULL,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `username_UNIQUE` (`username` ASC))
