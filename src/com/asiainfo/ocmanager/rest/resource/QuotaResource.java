@@ -84,10 +84,10 @@ public class QuotaResource {
    * @return Quota object
    */
   @GET
-  @Path("mapreduce/{serviceInstanceId}")
+  @Path("mapreduce/{queuename}")
   @Produces(MediaType.APPLICATION_JSON)
-  public Response getYarnQuota(@PathParam("serviceInstanceId") String instanceId) {
-    Map quota = quotaQuery.getMrQuota(instanceId);
+  public Response getYarnQuota(@PathParam("queuename") String queuename) {
+    Map quota = quotaQuery.getMrQuota(queuename);
     return Response.ok().entity(quota).build();
   }
 
@@ -97,10 +97,10 @@ public class QuotaResource {
    * @return Quota object
    */
   @GET
-  @Path("hbase/{serviceInstanceId}")
+  @Path("hbase/{namespace}")
   @Produces(MediaType.APPLICATION_JSON)
-  public Response getHbaseQuota(@PathParam("serviceInstanceId") String instanceId) {
-    Map  quota = quotaQuery.getHbaseQuota(instanceId);
+  public Response getHbaseQuota(@PathParam("namespace") String namespace) {
+    Map  quota = quotaQuery.getHbaseQuota(namespace);
     return Response.ok().entity(quota).build();
   }
 

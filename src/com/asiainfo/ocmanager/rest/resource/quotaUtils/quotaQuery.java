@@ -32,41 +32,43 @@ import java.util.Properties;
 public class quotaQuery {
 
 
-  /**
-   *
-   * @param Path
-   * @return Hdfs Quota
-   */
-  public static Map getHdfsQuota(String Path) {
-    Map result = new HashMap();
-        /*
-        todo :move Hdfs quota code to here
-         */
+	/**
+	 *
+	 * @param path
+     * @return Hdfs Quota
+	 */
+    public static Map<String,List<Quota>> getHdfsQuota(String path) {
+        Map<String,List<Quota>> result = new HashMap<String,List<Quota>>();
+	        /*
+	        todo :move Hdfs quota code to here
+	         */
+        List<Quota> dfsquota = HdfsUtil.getHDFSData(path);
+        result.put("items", dfsquota);
+	    /*Quota hdfsQuota = new Quota("hdfsQuota","100","20","180","hive service instance db used space");
+	    List<Quota> items = new ArrayList<Quota>();
+	    items.add(hdfsQuota);
+	    result.put("items",items);*/
+        return result;
+    }
 
-    Quota hdfsQuota = new Quota("hdfsQuota","100","20","180","hive service instance db used space");
-    List<Quota> items = new ArrayList<Quota>();
-    items.add(hdfsQuota);
-    result.put("items",items);
-    return result;
-  }
-
-  /**
-   *
-   * @param serviceInstanceId
-   * @return Yarn Quota
-   */
-  public static Map getMrQuota(String serviceInstanceId) {
-    Map result = new HashMap();
+    /**
+     *
+     * @param queuename
+     * @return Yarn Quota
+     */
+    public static Map<String,List<Quota>> getMrQuota(String queuename) {
+        Map<String,List<Quota>> result = new HashMap<String,List<Quota>>();
         /*
         todo :move mapreduce quota code to here
          */
-
-    Quota queueQuota= new Quota("queueQuota","100","10","190","mr service instance queue used memory");
-    List<Quota> items = new ArrayList<Quota>();
-    items.add(queueQuota);
-    result.put("items",items);
-    return result;
-  }
+        List<Quota> mrquota = YarnUtil.getYarnData(queuename);
+        result.put("items", mrquota);
+      /*Quota queueQuota= new Quota("queueQuota","100","10","190","mr service instance queue used memory");
+      List<Quota> items = new ArrayList<Quota>();
+      items.add(queueQuota);
+      result.put("items",items);*/
+        return result;
+    }
 
   /**
    *
@@ -86,25 +88,28 @@ public class quotaQuery {
     return result;
   }
 
-  /**
-   *
-   * @param serviceInstanceId
-   * @return Hbase Quota
-   */
-  public static Map getHbaseQuota(String serviceInstanceId) {
-    Map result = new HashMap();
-        /*
-        todo :move Hbase quota code to here
-         */
 
-    Quota regionQuota= new Quota("regionQuota","100","10","190","hbase region num quota");
-    Quota tableQuota = new Quota("tableQuota","100","20","180","hbase table num quota");
-    List<Quota> items = new ArrayList<Quota>();
-    items.add(regionQuota);
-    items.add(tableQuota);
-    result.put("items",items);
-    return result;
-  }
+    /**
+     *
+     * @param namespace
+     * @return Hbase Quota
+     */
+    public static Map<String,List<Quota>> getHbaseQuota(String namespace) {
+        Map<String,List<Quota>> result = new HashMap<String,List<Quota>>();
+	    /*
+	    todo :move Hbase quota code to here
+	     */
+        List<Quota> hbasequota = HbaseUtil.getHbaseData(namespace);
+        result.put("items", hbasequota);
+	    /*Quota regionQuota= new Quota("regionQuota","100","10","190","hbase region num quota");
+	    Quota tableQuota = new Quota("tableQuota","100","20","180","hbase table num quota");
+	    List<Quota> items = new ArrayList<Quota>();
+	    items.add(regionQuota);
+	    items.add(tableQuota);
+	    result.put("items",items);*/
+        return result;
+    }
+
 
   /**
    *
