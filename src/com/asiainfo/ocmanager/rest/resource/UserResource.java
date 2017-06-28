@@ -14,6 +14,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.log4j.Logger;
+
 import com.asiainfo.ocmanager.persistence.model.User;
 import com.asiainfo.ocmanager.persistence.model.UserRoleView;
 import com.asiainfo.ocmanager.rest.bean.AdapterResponseBean;
@@ -29,6 +31,8 @@ import com.asiainfo.ocmanager.rest.resource.utils.UserRoleViewPersistenceWrapper
 @Path("/user")
 public class UserResource {
 
+	private static Logger logger = Logger.getLogger(TenantResource.class);
+
 	/**
 	 * Get All OCManager users
 	 *
@@ -41,6 +45,8 @@ public class UserResource {
 			List<User> users = UserPersistenceWrapper.getUsers();
 			return Response.ok().entity(users).build();
 		} catch (Exception e) {
+			// system out the exception into the console log
+			logger.info(e.getMessage());
 			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
 		}
 	}
@@ -60,6 +66,8 @@ public class UserResource {
 			User user = UserPersistenceWrapper.getUserById(userId);
 			return Response.ok().entity(user == null ? new User() : user).build();
 		} catch (Exception e) {
+			// system out the exception into the console log
+			logger.info(e.getMessage());
 			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
 		}
 	}
@@ -79,6 +87,8 @@ public class UserResource {
 			user = UserPersistenceWrapper.createUser(user);
 			return Response.ok().entity(user).build();
 		} catch (Exception e) {
+			// system out the exception into the console log
+			logger.info(e.getMessage());
 			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
 		}
 	}
@@ -98,6 +108,8 @@ public class UserResource {
 			user = UserPersistenceWrapper.updateUser(user);
 			return Response.ok().entity(user).build();
 		} catch (Exception e) {
+			// system out the exception into the console log
+			logger.info(e.getMessage());
 			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
 		}
 	}
@@ -116,6 +128,8 @@ public class UserResource {
 			UserPersistenceWrapper.deleteUser(userId);
 			return Response.ok().entity(new AdapterResponseBean("delete success", userId, 200)).build();
 		} catch (Exception e) {
+			// system out the exception into the console log
+			logger.info(e.getMessage());
 			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
 		}
 	}
@@ -133,6 +147,8 @@ public class UserResource {
 			List<UserRoleView> turs = UserRoleViewPersistenceWrapper.getTenantAndRoleBasedOnUserId(userId);
 			return Response.ok().entity(turs).build();
 		} catch (Exception e) {
+			// system out the exception into the console log
+			logger.info(e.getMessage());
 			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
 		}
 	}
@@ -145,6 +161,8 @@ public class UserResource {
 			List<UserRoleView> turs = UserRoleViewPersistenceWrapper.getTenantAndRoleBasedOnUserName(userName);
 			return Response.ok().entity(turs).build();
 		} catch (Exception e) {
+			// system out the exception into the console log
+			logger.info(e.getMessage());
 			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
 		}
 	}

@@ -31,6 +31,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.apache.log4j.Logger;
 
 import com.asiainfo.ocmanager.persistence.model.ServiceInstance;
 import com.asiainfo.ocmanager.persistence.model.ServiceRolePermission;
@@ -61,6 +62,8 @@ import com.google.gson.JsonParser;
 @Path("/tenant")
 public class TenantResource {
 
+	private static Logger logger = Logger.getLogger(TenantResource.class);
+
 	/**
 	 * Get All OCManager tenants
 	 *
@@ -73,6 +76,8 @@ public class TenantResource {
 			List<Tenant> tenants = TenantPersistenceWrapper.getAllTenants();
 			return Response.ok().entity(tenants).build();
 		} catch (Exception e) {
+			// system out the exception into the console log
+			logger.info(e.getMessage());
 			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
 		}
 	}
@@ -92,6 +97,8 @@ public class TenantResource {
 			Tenant tenant = TenantPersistenceWrapper.getTenantById(tenantId);
 			return Response.ok().entity(tenant).build();
 		} catch (Exception e) {
+			// system out the exception into the console log
+			logger.info(e.getMessage());
 			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
 		}
 	}
@@ -111,6 +118,8 @@ public class TenantResource {
 			List<Tenant> tenants = TenantPersistenceWrapper.getChildrenTenants(parentTenantId);
 			return Response.ok().entity(tenants).build();
 		} catch (Exception e) {
+			// system out the exception into the console log
+			logger.info(e.getMessage());
 			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
 		}
 	}
@@ -129,6 +138,8 @@ public class TenantResource {
 			List<UserRoleView> usersRoles = UserRoleViewPersistenceWrapper.getUsersInTenant(tenantId);
 			return Response.ok().entity(usersRoles).build();
 		} catch (Exception e) {
+			// system out the exception into the console log
+			logger.info(e.getMessage());
 			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
 		}
 	}
@@ -149,6 +160,8 @@ public class TenantResource {
 					.getServiceInstancesInTenant(tenantId);
 			return Response.ok().entity(serviceInstances).build();
 		} catch (Exception e) {
+			// system out the exception into the console log
+			logger.info(e.getMessage());
 			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
 		}
 	}
@@ -168,6 +181,8 @@ public class TenantResource {
 		try {
 			return Response.ok().entity(TenantResource.getTenantServiceInstancesFromDf(tenantId, InstanceName)).build();
 		} catch (Exception e) {
+			// system out the exception into the console log
+			logger.info(e.getMessage());
 			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
 		}
 
@@ -195,7 +210,7 @@ public class TenantResource {
 			for (Tenant t : allRootTenants) {
 				allRootTenantsId.add(t.getId());
 			}
-
+			TenantPersistenceWrapper.createTenant(tenant);
 			String url = DFPropertiesFoundry.getDFProperties().get(Constant.DATAFOUNDRY_URL);
 			String token = DFPropertiesFoundry.getDFProperties().get(Constant.DATAFOUNDRY_TOKEN);
 			String dfRestUrl = url + "/oapi/v1/projectrequests";
@@ -253,6 +268,8 @@ public class TenantResource {
 				httpclient.close();
 			}
 		} catch (Exception e) {
+			// system out the exception into the console log
+			logger.info(e.getMessage());
 			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
 		}
 	}
@@ -391,7 +408,7 @@ public class TenantResource {
 										instanceName, OCDPServiceInstanceJson.toString());
 
 								if (updateRes.getResCodel() == 200) {
-									System.out.println("service updated");
+									logger.info("service updated");
 								}
 
 								// call the df binding to generate the OCDP
@@ -399,7 +416,7 @@ public class TenantResource {
 								AdapterResponseBean bindingRes = TenantResource.generateOCDPServiceCredentials(tenantId,
 										instanceName, u.getUserName());
 								if (bindingRes.getResCodel() == 200) {
-									System.out.println("service binding");
+									logger.info("service binding");
 								}
 
 							}
@@ -416,6 +433,8 @@ public class TenantResource {
 				httpclient.close();
 			}
 		} catch (Exception e) {
+			// system out the exception into the console log
+			logger.info(e.getMessage());
 			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
 		}
 
@@ -441,6 +460,8 @@ public class TenantResource {
 					reqBodyStr);
 			return Response.ok().entity(responseBean.getMessage()).build();
 		} catch (Exception e) {
+			// system out the exception into the console log
+			logger.info(e.getMessage());
 			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
 		}
 	}
@@ -489,6 +510,8 @@ public class TenantResource {
 				httpclient.close();
 			}
 		} catch (Exception e) {
+			// system out the exception into the console log
+			logger.info(e.getMessage());
 			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
 		}
 
@@ -550,6 +573,8 @@ public class TenantResource {
 				httpclient.close();
 			}
 		} catch (Exception e) {
+			// system out the exception into the console log
+			logger.info(e.getMessage());
 			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
 		}
 	}
@@ -626,7 +651,7 @@ public class TenantResource {
 								instanceName, OCDPServiceInstanceJson.toString());
 
 						if (updateRes.getResCodel() == 200) {
-							System.out.println("service updated");
+							logger.info("service updated");
 						}
 
 						// call the df binding to generate the OCDP service
@@ -634,7 +659,7 @@ public class TenantResource {
 						AdapterResponseBean bindingRes = TenantResource.generateOCDPServiceCredentials(tenantId,
 								instanceName, userName);
 						if (bindingRes.getResCodel() == 200) {
-							System.out.println("service binding");
+							logger.info("service binding");
 						}
 					}
 				}
@@ -645,6 +670,8 @@ public class TenantResource {
 			return Response.ok().entity(assignment).build();
 
 		} catch (Exception e) {
+			// system out the exception into the console log
+			logger.info(e.getMessage());
 			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
 		}
 
@@ -717,7 +744,7 @@ public class TenantResource {
 							instanceName, OCDPServiceInstanceJson.toString());
 
 					if (updateRes.getResCodel() == 200) {
-						System.out.println("service updated");
+						logger.info("service updated");
 					}
 
 					// call the df binding to generate the OCDP service
@@ -725,7 +752,7 @@ public class TenantResource {
 					AdapterResponseBean bindingRes = TenantResource.generateOCDPServiceCredentials(tenantId,
 							instanceName, userName);
 					if (bindingRes.getResCodel() == 200) {
-						System.out.println("service binding");
+						logger.info("service binding");
 					}
 
 				}
@@ -736,6 +763,8 @@ public class TenantResource {
 			return Response.ok().entity(assignment).build();
 
 		} catch (Exception e) {
+			// system out the exception into the console log
+			logger.info(e.getMessage());
 			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
 		}
 
@@ -777,7 +806,7 @@ public class TenantResource {
 							UserPersistenceWrapper.getUserById(userId).getUsername());
 
 					if (bindingRes.getResCodel() == 200) {
-						System.out.println("unassigned the permission");
+						logger.info("unassigned the permission");
 					}
 				}
 			}
@@ -787,6 +816,8 @@ public class TenantResource {
 			return Response.ok().entity(new AdapterResponseBean("delete success", userId, 200)).build();
 
 		} catch (Exception e) {
+			// system out the exception into the console log
+			logger.info(e.getMessage());
 			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
 		}
 

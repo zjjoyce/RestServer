@@ -14,6 +14,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.log4j.Logger;
+
 import com.asiainfo.ocmanager.persistence.model.Dashboard;
 import com.asiainfo.ocmanager.rest.bean.AdapterResponseBean;
 import com.asiainfo.ocmanager.rest.resource.utils.DashboardPersistenceWrapper;
@@ -26,6 +28,8 @@ import com.asiainfo.ocmanager.rest.resource.utils.DashboardPersistenceWrapper;
 
 @Path("/dashboard")
 public class DashboardResource {
+	
+	private static Logger logger = Logger.getLogger(TenantResource.class);
 
 	/**
 	 * 
@@ -40,6 +44,8 @@ public class DashboardResource {
 
 			return Response.ok().entity(dashboard).build();
 		} catch (Exception e) {
+			// system out the exception into the console log
+			logger.info(e.getMessage());
 			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
 		}
 	}
@@ -58,6 +64,8 @@ public class DashboardResource {
 
 			return Response.ok().entity(dashboard).build();
 		} catch (Exception e) {
+			// system out the exception into the console log
+			logger.info(e.getMessage());
 			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
 		}
 	}
@@ -77,6 +85,8 @@ public class DashboardResource {
 
 			return Response.ok().entity(new AdapterResponseBean("successful", "Add successfully", 200)).build();
 		} catch (Exception e) {
+			// system out the exception into the console log
+			logger.info(e.getMessage());
 			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
 		}
 	}
@@ -97,6 +107,8 @@ public class DashboardResource {
 
 			return Response.ok().entity(new AdapterResponseBean("successful", "Update successfully", 200)).build();
 		} catch (Exception e) {
+			// system out the exception into the console log
+			logger.info(e.getMessage());
 			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
 		}
 	}
@@ -116,6 +128,8 @@ public class DashboardResource {
 
 			return Response.ok().entity(new AdapterResponseBean("successful", "Delete successfully", 200)).build();
 		} catch (Exception e) {
+			// system out the exception into the console log
+			logger.info(e.getMessage());
 			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
 		}
 	}
