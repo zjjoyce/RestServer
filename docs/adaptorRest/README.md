@@ -393,6 +393,26 @@ __response:__
 ```
 
 
+### Service Instance APIs
+1. 获取多租户平台所有服务实例
+```
+GET /ocmanager/v1/api/service/all/instances
+```
+__response:__
+```
+[
+  {
+    "id": "21aeba68-57f2-11e7-9a0f-fa163efdbea8",
+    "instanceName": "hive-instance001",
+    "quota": "{\"hiveStorageQuota\":\"1024\",\"yarnQueueQuota\":\"10\"}",
+    "serviceTypeId": "",
+    "serviceTypeName": "Hive",
+    "tenantId": "zhaoyim"
+  },
+    ......
+]
+```
+
 
 ### Roles APIs
 1. 获取所有服务角色
@@ -474,12 +494,14 @@ __response:__
     "description": "child tenant",
     "id": "5a6c16a9-0c85-42da-aec3-8ac1f5532fe1",
     "name": "ChildTenant",
-    "parentId": "f7f281ee-a544-4636-9341-2db50c491b96"
+    "parentId": "f7f281ee-a544-4636-9341-2db50c491b96",
+    "level": 2,
   },
   {
     "description": "root tenant",
     "id": "f7f281ee-a544-4636-9341-2db50c491b96",
-    "name": "rootTenant"
+    "name": "rootTenant",
+    "level": 1
   }
   ...
 ]
@@ -496,7 +518,8 @@ __response:__
   "description": "child tenant",
   "id": "5a6c16a9-0c85-42da-aec3-8ac1f5532fe1",
   "name": "ChildTenant",
-  "parentId": "f7f281ee-a544-4636-9341-2db50c491b96"
+  "parentId": "f7f281ee-a544-4636-9341-2db50c491b96",
+  "level": 2
 }
 
 ```
@@ -512,7 +535,8 @@ __response:__
     "description": "child tenant",
     "id": "5a6c16a9-0c85-42da-aec3-8ac1f5532fe1",
     "name": "ChildTenant",
-    "parentId": "f7f281ee-a544-4636-9341-2db50c491b96"
+    "parentId": "f7f281ee-a544-4636-9341-2db50c491b96",
+    "level": 2
   }
   ...
 ]

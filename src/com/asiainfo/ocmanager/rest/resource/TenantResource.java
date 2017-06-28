@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -189,6 +190,12 @@ public class TenantResource {
 		}
 
 		try {
+			List<Tenant> allRootTenants = TenantPersistenceWrapper.getAllRootTenants();
+			List<String> allRootTenantsId = new ArrayList<String>();
+			for (Tenant t : allRootTenants) {
+				allRootTenantsId.add(t.getId());
+			}
+
 			String url = DFPropertiesFoundry.getDFProperties().get(Constant.DATAFOUNDRY_URL);
 			String token = DFPropertiesFoundry.getDFProperties().get(Constant.DATAFOUNDRY_TOKEN);
 			String dfRestUrl = url + "/oapi/v1/projectrequests";
@@ -225,6 +232,15 @@ public class TenantResource {
 					int statusCode = response2.getStatusLine().getStatusCode();
 
 					if (statusCode == 201) {
+						// very ugly code here hard code 3 level for the zhong
+						// xin
+						if (tenant.getParentId() == null) {
+							tenant.setLevel(1);
+						} else if (allRootTenantsId.contains(tenant.getParentId())) {
+							tenant.setLevel(2);
+						} else {
+							tenant.setLevel(3);
+						}
 						TenantPersistenceWrapper.createTenant(tenant);
 					}
 					String bodyStr = EntityUtils.toString(response2.getEntity());

@@ -18,8 +18,8 @@ import com.asiainfo.ocmanager.persistence.DBConnectorFactory;
  */
 public class TenantPersistenceWrapper {
 
-    private static final String ADMINID = "2ef26018-003d-4b2b-b786-0481d4ee9fa8";
-    private static final String ADMINROLEID = "a10170cb-524a-11e7-9dbb-fa163ed7d0ae";
+	private static final String ADMINID = "2ef26018-003d-4b2b-b786-0481d4ee9fa8";
+	private static final String ADMINROLEID = "a10170cb-524a-11e7-9dbb-fa163ed7d0ae";
 
 	/**
 	 *
@@ -29,11 +29,13 @@ public class TenantPersistenceWrapper {
 		SqlSession session = DBConnectorFactory.getSession();
 		try {
 			TenantMapper mapper = session.getMapper(TenantMapper.class);
-            TenantUserRoleAssignmentMapper tenantUserRoleAssignmentMapper = session.getMapper(TenantUserRoleAssignmentMapper.class);
-            TenantUserRoleAssignment tenantUserRoleAssignment = new TenantUserRoleAssignment(tenant.getId(), ADMINID, ADMINROLEID);
+			TenantUserRoleAssignmentMapper tenantUserRoleAssignmentMapper = session
+					.getMapper(TenantUserRoleAssignmentMapper.class);
+			TenantUserRoleAssignment tenantUserRoleAssignment = new TenantUserRoleAssignment(tenant.getId(), ADMINID,
+					ADMINROLEID);
 
-            mapper.insertTenant(tenant);
-            tenantUserRoleAssignmentMapper.insertTenantUserRoleAssignment(tenantUserRoleAssignment);
+			mapper.insertTenant(tenant);
+			tenantUserRoleAssignmentMapper.insertTenantUserRoleAssignment(tenantUserRoleAssignment);
 
 			session.commit();
 		} catch (Exception e) {
@@ -118,9 +120,10 @@ public class TenantPersistenceWrapper {
 
 		try {
 			TenantMapper mapper = session.getMapper(TenantMapper.class);
-            TenantUserRoleAssignmentMapper tenantUserRoleAssignmentMapper = session.getMapper(TenantUserRoleAssignmentMapper.class);
-            tenantUserRoleAssignmentMapper.deleteTenantUserRoleAssignment(tenantId, ADMINID);
-            mapper.deleteTenant(tenantId);
+			TenantUserRoleAssignmentMapper tenantUserRoleAssignmentMapper = session
+					.getMapper(TenantUserRoleAssignmentMapper.class);
+			tenantUserRoleAssignmentMapper.deleteTenantUserRoleAssignment(tenantId, ADMINID);
+			mapper.deleteTenant(tenantId);
 
 			session.commit();
 		} catch (Exception e) {
@@ -129,6 +132,27 @@ public class TenantPersistenceWrapper {
 		} finally {
 			session.close();
 		}
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public static List<Tenant> getAllRootTenants() {
+		SqlSession session = DBConnectorFactory.getSession();
+		List<Tenant> tenants = new ArrayList<Tenant>();
+		try {
+			TenantMapper mapper = session.getMapper(TenantMapper.class);
+			tenants = mapper.selectAllRootTenants();
+			session.commit();
+		} catch (Exception e) {
+			session.rollback();
+			throw e;
+		} finally {
+			session.close();
+		}
+
+		return tenants;
 	}
 
 }
