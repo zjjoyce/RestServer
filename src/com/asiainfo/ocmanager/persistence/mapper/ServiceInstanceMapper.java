@@ -33,4 +33,10 @@ public interface ServiceInstanceMapper {
 	 */
 	public void deleteServiceInstance(@Param("tenantId") String tenantId, @Param("instanceName") String instanceName);
 
+	/**
+	 * 
+	 * @return
+	 */
+	public List<ServiceInstance> selectAllServiceInstances();
+
 }

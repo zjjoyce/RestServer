@@ -29,7 +29,9 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
 import com.asiainfo.ocmanager.persistence.model.Service;
+import com.asiainfo.ocmanager.persistence.model.ServiceInstance;
 import com.asiainfo.ocmanager.rest.constant.Constant;
+import com.asiainfo.ocmanager.rest.resource.utils.ServiceInstancePersistenceWrapper;
 import com.asiainfo.ocmanager.rest.resource.utils.ServicePersistenceWrapper;
 import com.asiainfo.ocmanager.rest.utils.DFPropertiesFoundry;
 import com.asiainfo.ocmanager.rest.utils.SSLSocketIgnoreCA;
@@ -296,6 +298,23 @@ public class ServiceResource {
 			}
 		} finally {
 			httpclient.close();
+		}
+	}
+
+	/**
+	 * Get all service instances
+	 *
+	 * @return service instance list
+	 */
+	@GET
+	@Path("all/instances")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getAllServiceInstances() {
+		try {
+			List<ServiceInstance> serviceInstances = ServiceInstancePersistenceWrapper.getAllServiceInstances();
+			return Response.ok().entity(serviceInstances).build();
+		} catch (Exception e) {
+			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
 		}
 	}
 
