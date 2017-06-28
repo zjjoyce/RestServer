@@ -27,6 +27,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.apache.log4j.Logger;
 
 import com.asiainfo.ocmanager.persistence.model.Service;
 import com.asiainfo.ocmanager.persistence.model.ServiceInstance;
@@ -47,6 +48,8 @@ import com.google.gson.JsonParser;
  */
 @Path("/service")
 public class ServiceResource {
+
+	private static Logger logger = Logger.getLogger(TenantResource.class);
 
 	/**
 	 * Get All OCManager services
@@ -92,13 +95,15 @@ public class ServiceResource {
 
 				}
 			}
+
+			List<Service> services = ServicePersistenceWrapper.getAllServices();
+
+			return Response.ok().entity(services).build();
 		} catch (Exception e) {
+			// system out the exception into the console log
+			logger.info(e.getMessage());
 			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
 		}
-
-		List<Service> services = ServicePersistenceWrapper.getAllServices();
-
-		return Response.ok().entity(services).build();
 	}
 
 	/**
@@ -115,6 +120,8 @@ public class ServiceResource {
 
 			return Response.ok().entity(service == null ? new Service() : service).build();
 		} catch (Exception e) {
+			// system out the exception into the console log
+			logger.info(e.getMessage());
 			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
 		}
 	}
@@ -197,6 +204,8 @@ public class ServiceResource {
 				httpclient.close();
 			}
 		} catch (Exception e) {
+			// system out the exception into the console log
+			logger.info(e.getMessage());
 			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
 		}
 	}
@@ -213,6 +222,8 @@ public class ServiceResource {
 		try {
 			return Response.ok().entity(ServiceResource.callDFToGetAllServices()).build();
 		} catch (Exception e) {
+			// system out the exception into the console log
+			logger.info(e.getMessage());
 			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
 		}
 	}
@@ -255,6 +266,8 @@ public class ServiceResource {
 				httpclient.close();
 			}
 		} catch (Exception e) {
+			// system out the exception into the console log
+			logger.info(e.getMessage());
 			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
 		}
 	}
@@ -314,6 +327,8 @@ public class ServiceResource {
 			List<ServiceInstance> serviceInstances = ServiceInstancePersistenceWrapper.getAllServiceInstances();
 			return Response.ok().entity(serviceInstances).build();
 		} catch (Exception e) {
+			// system out the exception into the console log
+			logger.info(e.getMessage());
 			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
 		}
 	}

@@ -11,6 +11,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.log4j.Logger;
+
 import com.asiainfo.ocmanager.persistence.model.UserRoleView;
 import com.asiainfo.ocmanager.rest.bean.AdapterResponseBean;
 import com.asiainfo.ocmanager.rest.bean.SSOFakerUserBean;
@@ -24,6 +26,8 @@ import com.asiainfo.ocmanager.rest.resource.utils.UserRoleViewPersistenceWrapper
 
 @Path("/sso")
 public class SSOFakerResource {
+
+	private static Logger logger = Logger.getLogger(TenantResource.class);
 
 	/**
 	 * Get the user name for web which CAS proxy set into the header
@@ -69,6 +73,8 @@ public class SSOFakerResource {
 						.build();
 			}
 		} catch (Exception e) {
+			// system out the exception into the console log
+			logger.info(e.getMessage());
 			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
 		}
 	}

@@ -9,6 +9,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.log4j.Logger;
+
 import com.asiainfo.ocmanager.persistence.model.Role;
 import com.asiainfo.ocmanager.rest.resource.utils.RolePersistenceWrapper;
 
@@ -21,6 +23,8 @@ import com.asiainfo.ocmanager.rest.resource.utils.RolePersistenceWrapper;
 @Path("/role")
 public class RoleResource {
 
+	private static Logger logger = Logger.getLogger(TenantResource.class);
+	
 	/**
 	 * Get All OCManager roles
 	 * 
@@ -34,6 +38,8 @@ public class RoleResource {
 
 			return Response.ok().entity(roles).build();
 		} catch (Exception e) {
+			// system out the exception into the console log
+			logger.info(e.getMessage());
 			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
 		}
 	}
