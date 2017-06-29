@@ -122,7 +122,7 @@ public class quotaQuery {
         todo :move hive quota code to here
          */
     HdfsUtils hdfsUtils = new HdfsUtils();
-    Quota hdfsQuota = hdfsUtils.getHdfsQuota(new Path("/user/ocdc"));
+    Quota hdfsQuota = hdfsUtils.getHdfsQuota(new Path(serviceInstanceId));
     List<Quota> queueQuota = YarnUtil.getYarnData(serviceInstanceId);
     //yarn quota
     Iterator<Quota> iterator = queueQuota.iterator();
@@ -144,9 +144,11 @@ public class quotaQuery {
   public static Map getKafkaQuota(String topicName) {
     Map result = new HashMap();
     Properties props = new Properties();
-
-    System.setProperty("java.security.auth.login.config", "conf/kafka-jaas.conf");
-    System.setProperty("java.security.krb5.conf", "conf/krb5.conf");
+    String currentClassPath = new HdfsUtils().getClass().getResource("/").getPath();
+    String  jaasPath= currentClassPath.substring(0, currentClassPath.length() - 8) + "conf/kafka-jaas.conf";
+    String  krbPath = currentClassPath.substring(0,currentClassPath.length() - 8) + "conf/krb5.conf";
+    System.setProperty("java.security.auth.login.config", jaasPath);
+    System.setProperty("java.security.krb5.conf", krbPath);
     //System.setProperty("sun.security.krb5.debug", "true");
     props.put("security.protocol", "SASL_PLAINTEXT");
 
