@@ -223,6 +223,18 @@
     </dependency>
 
     <!-- used by quota rest api-->
+    <dependency>
+      <groupId>org.mongodb</groupId>
+      <artifactId>mongo-java-driver</artifactId>
+      <version>3.4.0</version>
+    </dependency>
+
+
+    <dependency>
+      <groupId>org.apache.kafka</groupId>
+      <artifactId>kafka_2.10</artifactId>
+      <version>0.10.0.0</version>
+    </dependency>
 
 
   </dependencies>
