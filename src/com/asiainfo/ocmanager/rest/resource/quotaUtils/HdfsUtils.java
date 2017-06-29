@@ -1,5 +1,6 @@
 package com.asiainfo.ocmanager.rest.resource.quotaUtils;
 
+import com.asiainfo.ocmanager.rest.utils.DFPropertiesFoundry;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.*;
@@ -26,31 +27,36 @@ public class HdfsUtils {
 
   public static final Configuration conf = new Configuration();
 
+  static{
+      String currentClassPath = new HdfsUtils().getClass().getResource("/").getPath();
+      // remove classes/
+      // the path will be <tomcat home>/webapps/ocmanager/
+      String  keytabPath= currentClassPath.substring(0, currentClassPath.length() - 8) + "conf/shixiuru.keytab";
+      String  krbPath = currentClassPath.substring(0,currentClassPath.length() - 8) + "conf/krb5.conf";
+      // set http client connection timeout
+      System.setProperty("sun.net.client.defaultConnectTimeout", "6000");
+      System.setProperty("sun.net.client.defaultReadTimeout", "6000");
+      // set kerbers conf
+      System.setProperty("java.security.krb5.conf", krbPath);
+      //get FS and yarn config
+      String hdfsConfUrl = "http://10.247.11.9:8080/api/v1/clusters/zxjtcluster/configurations?type=hdfs-site&tag=version1";
+      //String rsUrl = "http://10.247.11.9:8088/ws/v1/cluster/scheduler";
+      String nnurl = AmbariUtils.getProperties(hdfsConfUrl,"dfs.namenode.rpc-address");
+
+      //设置keytab文件的路径
+      conf.set(KEYTAB_FILE_KEY, keytabPath);
+      conf.set(DEFAULT_FS, nnurl);
+      conf.set(AUTHENTICATION, "kerberos");
+      try {
+          UserGroupInformation.setConfiguration(conf);
+          UserGroupInformation.loginUserFromKeytab("shixiuru@EXAMPLE.COM", keytabPath);
+      } catch (IOException e) {
+          System.out.println(e);
+      }
+  }
   public  Quota getHdfsQuota(Path path) {
-    // set http client connection timeout
-    System.setProperty("sun.net.client.defaultConnectTimeout", "6000");
-    System.setProperty("sun.net.client.defaultReadTimeout", "6000");
-    // set kerbers conf
-    System.setProperty("java.security.krb5.conf", "conf/krb5.conf");
-    //get FS and yarn config
-    String hdfsConfUrl = "http://10.247.11.9:8080/api/v1/clusters/zxjtcluster/configurations?type=hdfs-site&tag=version1";
-    //String rsUrl = "http://10.247.11.9:8088/ws/v1/cluster/scheduler";
-    String nnurl = AmbariUtils.getProperties(hdfsConfUrl,"dfs.namenode.rpc-address");
-
-    //设置keytab文件的路径
-    conf.set(KEYTAB_FILE_KEY, "conf/shixiuru.keytab");
-    conf.set(DEFAULT_FS, nnurl);
-    conf.set(AUTHENTICATION, "kerberos");
-
-    try {
-      UserGroupInformation.setConfiguration(conf);
-      UserGroupInformation.loginUserFromKeytab("shixiuru@EXAMPLE.COM", "conf/shixiuru.keytab");
-    } catch (IOException e) {
-      System.out.println(e);
-    }
-
-    Quota hdfsQuota = getContenSummary(path);
-    return hdfsQuota;
+      Quota hdfsQuota = getContenSummary(path);
+      return hdfsQuota;
   }
 
   public static Quota getContenSummary(Path filePath) {
