@@ -67,15 +67,17 @@ public class QuotaResource {
   /**
    * Get Hdfs quota
    *
-   * @param path
+   * @param request
    * @return Quota object
    */
   @GET
-  @Path("hdfs/{path}")
+  @Path("hdfs")
   @Produces(MediaType.APPLICATION_JSON)
-  public Response getHdfsQuota(@PathParam("path") String path) {
-    Map quota = quotaQuery.getHdfsQuota(path);
-    return Response.ok().entity(quota).build();
+  public Response getHdfsQuota(@Context HttpServletRequest request) {
+      String path = request.getParameter("path");
+      Map quota = quotaQuery.getHdfsQuota(path);
+
+      return Response.ok().entity(quota).build();
   }
 
   /**
