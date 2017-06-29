@@ -65,7 +65,7 @@ public class HdfsUtils {
   }
 
   public static Quota getContenSummary(Path filePath) {
-    Quota quota = new Quota();
+    Quota quota = new Quota("","","","","");
     try {
       FileSystem fs = FileSystem.get(conf);
       ContentSummary contentSum = fs.getContentSummary(filePath);
