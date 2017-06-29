@@ -133,6 +133,7 @@ public class TenantResource {
 	 */
 	@GET
 	@Path("{id}/users")
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response getTenantUsers(@PathParam("id") String tenantId) {
 		try {
 			List<UserRoleView> usersRoles = UserRoleViewPersistenceWrapper.getUsersInTenant(tenantId);
@@ -210,7 +211,7 @@ public class TenantResource {
 			for (Tenant t : allRootTenants) {
 				allRootTenantsId.add(t.getId());
 			}
-			
+
 			String url = DFPropertiesFoundry.getDFProperties().get(Constant.DATAFOUNDRY_URL);
 			String token = DFPropertiesFoundry.getDFProperties().get(Constant.DATAFOUNDRY_TOKEN);
 			String dfRestUrl = url + "/oapi/v1/projectrequests";
@@ -402,7 +403,7 @@ public class TenantResource {
 
 								// add the patch Updating into the request body
 								JsonObject status = OCDPServiceInstanceJson.getAsJsonObject().getAsJsonObject("status");
-								status.addProperty("patch", "Updating");
+								status.addProperty("patch", "Update");
 
 								AdapterResponseBean updateRes = TenantResource.updateTenantServiceInstanceInDf(tenantId,
 										instanceName, OCDPServiceInstanceJson.toString());
@@ -453,11 +454,37 @@ public class TenantResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response updateServiceInstanceInTenant(@PathParam("id") String tenantId,
-			@PathParam("instanceName") String instanceName, String reqBodyStr) {
+			@PathParam("instanceName") String instanceName, String parametersStr) {
 
 		try {
+
+			// get the just now created instance info
+			String getInstanceResBody = TenantResource.getTenantServiceInstancesFromDf(tenantId, instanceName);
+
+			JsonElement serviceInstanceJson = new JsonParser().parse(getInstanceResBody);
+			// get status phase
+			String phase = serviceInstanceJson.getAsJsonObject().getAsJsonObject("status").get("phase").getAsString();
+
+			if (phase.equals("Provisioning")) {
+				return Response.status(Status.BAD_REQUEST)
+						.entity("The instance can not be updated when it is Provisioning!").build();
+			}
+
+			// get the provisioning json
+			JsonObject provisioning = serviceInstanceJson.getAsJsonObject().getAsJsonObject("spec")
+					.getAsJsonObject("provisioning");
+
+			// parse the input parameters json
+			JsonElement parameterJon = new JsonParser().parse(parametersStr);
+			// add into the update json
+			provisioning.add("parameters", parameterJon.getAsJsonObject().getAsJsonObject("parameters"));
+
+			// add the patch Updating into the request body
+			JsonObject status = serviceInstanceJson.getAsJsonObject().getAsJsonObject("status");
+			status.addProperty("patch", "Update");
+
 			AdapterResponseBean responseBean = TenantResource.updateTenantServiceInstanceInDf(tenantId, instanceName,
-					reqBodyStr);
+					serviceInstanceJson.toString());
 			return Response.ok().entity(responseBean.getMessage()).build();
 		} catch (Exception e) {
 			// system out the exception into the console log
@@ -645,7 +672,7 @@ public class TenantResource {
 
 						// add the patch Updating into the request body
 						JsonObject status = OCDPServiceInstanceJson.getAsJsonObject().getAsJsonObject("status");
-						status.addProperty("patch", "Updating");
+						status.addProperty("patch", "Update");
 
 						AdapterResponseBean updateRes = TenantResource.updateTenantServiceInstanceInDf(tenantId,
 								instanceName, OCDPServiceInstanceJson.toString());
@@ -738,7 +765,7 @@ public class TenantResource {
 
 					// add the patch Updating into the request body
 					JsonObject status = OCDPServiceInstanceJson.getAsJsonObject().getAsJsonObject("status");
-					status.addProperty("patch", "Updating");
+					status.addProperty("patch", "Update");
 
 					AdapterResponseBean updateRes = TenantResource.updateTenantServiceInstanceInDf(tenantId,
 							instanceName, OCDPServiceInstanceJson.toString());
