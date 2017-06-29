@@ -48,8 +48,8 @@ public class YarnUtil {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Quota memoryquota = new Quota("","","","","");
-        Quota vcoresquota = new Quota("","","","","");
+        Quota memoryquota = new Quota("queueMemoryQuota","","","","queue memory quota(MB)");
+        Quota vcoresquota = new Quota("queueVcoreQuota","","","","queue vcore qutoa(MB)");
         try {
             JSONObject json1 = new JSONObject(restresult);
             String scheduler = json1.getString("scheduler");
@@ -68,10 +68,11 @@ public class YarnUtil {
                     String resourcesUsed = json6.getString("resourcesUsed");
                     JSONObject json7 = new JSONObject(resourcesUsed);
                     String memory = json7.getString("memory");
-                    memoryquota.setName("yarn memoryUsed");
-                    memoryquota.setUsed(memory);
+                    int memoryMb = Integer.valueOf(memory) / 1024;
+                    memoryquota.setName("queueMemoryQuota");
+                    memoryquota.setUsed(String.valueOf(memoryMb));
                     String vCores = json7.getString("vCores");
-                    vcoresquota.setName("yarn vCoresUsed");
+                    vcoresquota.setName("queueVcoreQuota");
                     vcoresquota.setUsed(vCores);
                 }
             }
