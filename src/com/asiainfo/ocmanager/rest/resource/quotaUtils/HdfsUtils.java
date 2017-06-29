@@ -13,6 +13,9 @@ import org.mortbay.util.ajax.JSON;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import com.asiainfo.ocmanager.persistence.model.Quota;
 import com.asiainfo.ocmanager.rest.resource.quotaUtils.AmbariUtils;
 import org.apache.commons.logging.Log;
@@ -57,32 +60,33 @@ public class HdfsUtils {
           System.out.println(e);
       }
   }
-  public  Quota getHdfsQuota(Path path) {
-      Quota hdfsQuota = getContenSummary(path);
+  public  List<Quota> getHdfsQuota(Path path) {
+      List<Quota> hdfsQuota = getContenSummary(path);
       return hdfsQuota;
   }
 
-  public static Quota getContenSummary(Path filePath) {
-    Quota quota = new Quota("","","","","");
-    try {
+  public static List<Quota> getContenSummary(Path filePath) {
+      List quotaList = new ArrayList<Quota>();
+    Quota spaceQuota = new Quota("hdfs space quota","","","","hdfs space quota");
+    Quota fileQuota = new Quota("hdfs space quota","","","","hdfs space quota");
+
+      try {
       FileSystem fs = FileSystem.get(conf);
       ContentSummary contentSum = fs.getContentSummary(filePath);
       Long spaceConsumed = contentSum.getSpaceConsumed();
-      Long spaceQuota = contentSum.getSpaceQuota();
-
-      quota.setName("hdfsQuota");
-      quota.setUsed(String.valueOf(spaceConsumed));
-      quota.setSize(String.valueOf(spaceQuota));
-      quota.setDesc("hive db hdfs quota");
-      quota.setAvailable(String.valueOf(spaceQuota - spaceConsumed));
+      Long spaceQuota1 = contentSum.getSpaceQuota();
+      spaceQuota.setUsed(String.valueOf(spaceConsumed));
+      spaceQuota.setSize(String.valueOf(spaceQuota));
+      spaceQuota.setAvailable(String.valueOf(spaceQuota1 - spaceConsumed));
+      fileQuota.setUsed(String.valueOf(contentSum.getFileCount()));
+      fileQuota.setSize(String.valueOf(contentSum.getQuota()));
+      fileQuota.setAvailable(String.valueOf(contentSum.getQuota() - contentSum.getFileCount()));
+      quotaList.add(fileQuota);
+      quotaList.add(spaceQuota);
     } catch (IOException e) {
       System.out.println(e);
     }
-    return quota;
-  }
-  public static void main(String[] args){
-     Quota quota =  HdfsUtils.getContenSummary(new Path("/user/ocdc"));
-     System.out.println(quota.getName()+quota.getAvailable()+quota.getDesc()+" "+quota.getSize());
+    return quotaList;
   }
 
 

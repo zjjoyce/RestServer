@@ -124,7 +124,7 @@ public class quotaQuery {
         todo :move hive quota code to here
          */
     HdfsUtils hdfsUtils = new HdfsUtils();
-    Quota hdfsQuota = hdfsUtils.getHdfsQuota(new Path(serviceInstanceId));
+    List<Quota> hdfsQuota = hdfsUtils.getHdfsQuota(new Path(serviceInstanceId));
     List<Quota> queueQuota = YarnUtil.getYarnData(serviceInstanceId);
     //yarn quota
     Iterator<Quota> iterator = queueQuota.iterator();
@@ -133,8 +133,10 @@ public class quotaQuery {
         items.add(iterator.next());
     }
     // hdfs quota
-      items.add(hdfsQuota);
-
+      Iterator<Quota> hdfsIter = queueQuota.iterator();
+      while(hdfsIter.hasNext()){
+          items.add(hdfsIter.next());
+      }
       result.put("items",items);
     return result;
   }
