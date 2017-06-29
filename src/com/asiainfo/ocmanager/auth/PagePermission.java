@@ -16,6 +16,7 @@ package com.asiainfo.ocmanager.auth;
  * 给用户授权项目管理员
  * 给用户授权团队成员
  */
+@Deprecated
 public class PagePermission {
   private boolean createUser;
   private boolean updateUser;

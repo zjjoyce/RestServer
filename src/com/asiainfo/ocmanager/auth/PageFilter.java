@@ -17,6 +17,7 @@ import java.lang.reflect.Method;
 
 @Provider
 @PageAuth
+@Deprecated
 public class PageFilter implements ContainerRequestFilter {
 
   @Context

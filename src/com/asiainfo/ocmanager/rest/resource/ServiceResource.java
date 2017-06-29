@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.DELETE;
@@ -16,7 +17,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import com.asiainfo.ocmanager.auth.PageAuth;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
@@ -27,11 +27,14 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.apache.log4j.Logger;
 
 import com.asiainfo.ocmanager.persistence.model.Service;
+import com.asiainfo.ocmanager.persistence.model.ServiceInstance;
 import com.asiainfo.ocmanager.rest.constant.Constant;
+import com.asiainfo.ocmanager.rest.resource.utils.ServiceInstancePersistenceWrapper;
 import com.asiainfo.ocmanager.rest.resource.utils.ServicePersistenceWrapper;
-import com.asiainfo.ocmanager.rest.utils.DFPropertiesFactory;
+import com.asiainfo.ocmanager.rest.utils.DFPropertiesFoundry;
 import com.asiainfo.ocmanager.rest.utils.SSLSocketIgnoreCA;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -45,6 +48,8 @@ import com.google.gson.JsonParser;
  */
 @Path("/service")
 public class ServiceResource {
+
+	private static Logger logger = Logger.getLogger(TenantResource.class);
 
 	/**
 	 * Get All OCManager services
@@ -63,11 +68,17 @@ public class ServiceResource {
 			// this is not a good solution should be enhance in future
 			List<Service> servicesInDB = ServicePersistenceWrapper.getAllServices();
 
+			// get all the services in the adapter db
+			List<String> dbServiceList = new ArrayList<String>();
+			for (Service s : servicesInDB) {
+				dbServiceList.add(s.getId());
+			}
+
 			String servicesFromDf = ServiceResource.callDFToGetAllServices();
 			JsonObject servicesFromDfJson = new JsonParser().parse(servicesFromDf).getAsJsonObject();
 			JsonArray items = servicesFromDfJson.getAsJsonArray("items");
 
-			if (items != null || items.size() != 0) {
+			if (items != null) {
 				for (int i = 0; i < items.size(); i++) {
 					String name = items.get(i).getAsJsonObject().getAsJsonObject("spec").get("name").getAsString();
 					String id = items.get(i).getAsJsonObject().getAsJsonObject("spec").get("id").getAsString();
@@ -77,22 +88,22 @@ public class ServiceResource {
 					if (servicesInDB.size() == 0) {
 						ServicePersistenceWrapper.addService(new Service(id, name, description));
 					} else {
-						for (Service s : servicesInDB) {
-							if (!s.getId().equals(id)) {
-								ServicePersistenceWrapper.addService(new Service(id, name, description));
-							}
+						if (!dbServiceList.contains(id)) {
+							ServicePersistenceWrapper.addService(new Service(id, name, description));
 						}
 					}
 
 				}
 			}
+
+			List<Service> services = ServicePersistenceWrapper.getAllServices();
+
+			return Response.ok().entity(services).build();
 		} catch (Exception e) {
+			// system out the exception into the console log
+			logger.info(e.getMessage());
 			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
 		}
-
-		List<Service> services = ServicePersistenceWrapper.getAllServices();
-
-		return Response.ok().entity(services).build();
 	}
 
 	/**
@@ -104,10 +115,15 @@ public class ServiceResource {
 	@Path("{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getServiceById(@PathParam("id") String serviceId) {
+		try {
+			Service service = ServicePersistenceWrapper.getServiceById(serviceId);
 
-		Service service = ServicePersistenceWrapper.getServiceById(serviceId);
-
-		return Response.ok().entity(service == null ? new Service() : service).build();
+			return Response.ok().entity(service == null ? new Service() : service).build();
+		} catch (Exception e) {
+			// system out the exception into the console log
+			logger.info(e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+		}
 	}
 
 	/**
@@ -116,14 +132,13 @@ public class ServiceResource {
 	 * @return service
 	 */
 	@POST
-	@PageAuth(requiredPermission = "AddService")
 	@Path("/broker")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response addServiceBroker(String reqBodyStr) {
 
 		try {
-			String url = DFPropertiesFactory.getDFProperties().get(Constant.DATAFACTORY_URL);
-			String token = DFPropertiesFactory.getDFProperties().get(Constant.DATAFACTORY_TOKEN);
+			String url = DFPropertiesFoundry.getDFProperties().get(Constant.DATAFOUNDRY_URL);
+			String token = DFPropertiesFoundry.getDFProperties().get(Constant.DATAFOUNDRY_TOKEN);
 			String dfRestUrl = url + "/oapi/v1/servicebrokers";
 
 			// parse the req body make sure it is json
@@ -142,7 +157,8 @@ public class ServiceResource {
 				CloseableHttpResponse response2 = httpclient.execute(httpPost);
 
 				try {
-					int statusCode = response2.getStatusLine().getStatusCode();
+					// int statusCode =
+					// response2.getStatusLine().getStatusCode();
 					String bodyStr = EntityUtils.toString(response2.getEntity());
 					// if (statusCode == 201) {
 					// // TODO should call df service api and compare with
@@ -188,6 +204,8 @@ public class ServiceResource {
 				httpclient.close();
 			}
 		} catch (Exception e) {
+			// system out the exception into the console log
+			logger.info(e.getMessage());
 			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
 		}
 	}
@@ -204,6 +222,8 @@ public class ServiceResource {
 		try {
 			return Response.ok().entity(ServiceResource.callDFToGetAllServices()).build();
 		} catch (Exception e) {
+			// system out the exception into the console log
+			logger.info(e.getMessage());
 			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
 		}
 	}
@@ -214,13 +234,12 @@ public class ServiceResource {
 	 * @return service
 	 */
 	@DELETE
-	@PageAuth(requiredPermission = "DeleteService")
 	@Path("/broker/{name}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response deleteServiceBroker(@PathParam("name") String serviceBrokerName) {
 		try {
-			String url = DFPropertiesFactory.getDFProperties().get(Constant.DATAFACTORY_URL);
-			String token = DFPropertiesFactory.getDFProperties().get(Constant.DATAFACTORY_TOKEN);
+			String url = DFPropertiesFoundry.getDFProperties().get(Constant.DATAFOUNDRY_URL);
+			String token = DFPropertiesFoundry.getDFProperties().get(Constant.DATAFOUNDRY_TOKEN);
 			String dfRestUrl = url + "/oapi/v1/servicebrokers/" + serviceBrokerName;
 
 			SSLConnectionSocketFactory sslsf = SSLSocketIgnoreCA.createSSLSocketFactory();
@@ -247,11 +266,12 @@ public class ServiceResource {
 				httpclient.close();
 			}
 		} catch (Exception e) {
+			// system out the exception into the console log
+			logger.info(e.getMessage());
 			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
 		}
 	}
-	
-	
+
 	/**
 	 * call data foundry rest api
 	 *
@@ -265,8 +285,8 @@ public class ServiceResource {
 	private static String callDFToGetAllServices() throws KeyManagementException, NoSuchAlgorithmException,
 			KeyStoreException, ClientProtocolException, IOException {
 
-		String url = DFPropertiesFactory.getDFProperties().get(Constant.DATAFACTORY_URL);
-		String token = DFPropertiesFactory.getDFProperties().get(Constant.DATAFACTORY_TOKEN);
+		String url = DFPropertiesFoundry.getDFProperties().get(Constant.DATAFOUNDRY_URL);
+		String token = DFPropertiesFoundry.getDFProperties().get(Constant.DATAFOUNDRY_TOKEN);
 		String dfRestUrl = url + "/oapi/v1/namespaces/openshift/backingservices";
 
 		SSLConnectionSocketFactory sslsf = SSLSocketIgnoreCA.createSSLSocketFactory();
@@ -291,6 +311,25 @@ public class ServiceResource {
 			}
 		} finally {
 			httpclient.close();
+		}
+	}
+
+	/**
+	 * Get all service instances
+	 *
+	 * @return service instance list
+	 */
+	@GET
+	@Path("all/instances")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getAllServiceInstances() {
+		try {
+			List<ServiceInstance> serviceInstances = ServiceInstancePersistenceWrapper.getAllServiceInstances();
+			return Response.ok().entity(serviceInstances).build();
+		} catch (Exception e) {
+			// system out the exception into the console log
+			logger.info(e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
 		}
 	}
 

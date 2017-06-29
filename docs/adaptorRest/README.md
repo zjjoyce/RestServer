@@ -16,6 +16,7 @@ __response:__
         "email": "user1@.com",
         "id": "085571dc-7a94-44aa-8963-99c328b5527a",
         "password": "password",
+        "phone": "123",
         "username": "user1"
     },
     ...
@@ -33,6 +34,7 @@ __response:__
     "email": "user1@.com",
     "id": "085571dc-7a94-44aa-8963-99c328b5527a",
     "password": "password",
+    "phone": "123",
     "username": "user1"
 }
 ```
@@ -47,7 +49,8 @@ __request body:__
     "username": "createUser1",
     "email": "createUser1@com",
     "description": "createUser1 description",
-    "password": "createUser1 password"
+    "password": "createUser1 password",
+    "phone": "123"
 }
 ```
 
@@ -58,7 +61,8 @@ __response:__
   "email": "createUser1@com",
   "id": "8dc8f0dd-a6c0-434f-ad0a-095201caa8ef",
   "password": "createUser1 password",
-  "username": "createUser1"
+  "username": "createUser1",
+  "phone": "123",
 }
 ```
 
@@ -66,7 +70,7 @@ __response:__
 
 4. 更新用户
 ```
-PUT /ocmanager/v1/api/user/{id}
+PUT /ocmanager/v1/api/user
 ```
 
 __request body:__
@@ -76,7 +80,8 @@ __request body:__
     "email": "createUser2@comUpdate",
     "id": "a02a11e8-c762-426f-8db9-3c204d87b2dc",
     "description": "createUser2 descriptionUpdate",
-    "password": "createUser2 passwordUpdate"
+    "password": "createUser2 passwordUpdate",
+    "phone": "123"
 }
 ```
 
@@ -88,7 +93,8 @@ __response:__
   "email": "createUser2@comUpdate",
   "id": "a02a11e8-c762-426f-8db9-3c204d87b2dc",
   "password": "createUser2 passwordUpdate",
-  "username": "createUser2Update"
+  "username": "createUser2Update",
+  "phone": "123"
 }
 ```
 
@@ -393,6 +399,26 @@ __response:__
 ```
 
 
+### Service Instance APIs
+1. 获取多租户平台所有服务实例
+```
+GET /ocmanager/v1/api/service/all/instances
+```
+__response:__
+```
+[
+  {
+    "id": "21aeba68-57f2-11e7-9a0f-fa163efdbea8",
+    "instanceName": "hive-instance001",
+    "quota": "{\"hiveStorageQuota\":\"1024\",\"yarnQueueQuota\":\"10\"}",
+    "serviceTypeId": "",
+    "serviceTypeName": "Hive",
+    "tenantId": "zhaoyim"
+  },
+    ......
+]
+```
+
 
 ### Roles APIs
 1. 获取所有服务角色
@@ -421,6 +447,7 @@ POST /ocmanager/v1/api/tenant
 __request body:__
 ```
 {
+    "id": "09367148-c72a-413f-b1de-5a23b566d808",
     "name": "createTenant001",
     "description": "create tenant 001",
     "parentId": "f7f281ee-a544-4636-9341-2db50c491b96"
@@ -473,12 +500,16 @@ __response:__
     "description": "child tenant",
     "id": "5a6c16a9-0c85-42da-aec3-8ac1f5532fe1",
     "name": "ChildTenant",
-    "parentId": "f7f281ee-a544-4636-9341-2db50c491b96"
+    "parentId": "f7f281ee-a544-4636-9341-2db50c491b96",
+    "level": 2,
+    "dacpTeamCode": 2
   },
   {
     "description": "root tenant",
     "id": "f7f281ee-a544-4636-9341-2db50c491b96",
-    "name": "rootTenant"
+    "name": "rootTenant",
+    "level": 1,
+    "dacpTeamCode": 1
   }
   ...
 ]
@@ -495,7 +526,9 @@ __response:__
   "description": "child tenant",
   "id": "5a6c16a9-0c85-42da-aec3-8ac1f5532fe1",
   "name": "ChildTenant",
-  "parentId": "f7f281ee-a544-4636-9341-2db50c491b96"
+  "parentId": "f7f281ee-a544-4636-9341-2db50c491b96",
+  "level": 2,
+  "dacpTeamCode": 2
 }
 
 ```
@@ -511,7 +544,9 @@ __response:__
     "description": "child tenant",
     "id": "5a6c16a9-0c85-42da-aec3-8ac1f5532fe1",
     "name": "ChildTenant",
-    "parentId": "f7f281ee-a544-4636-9341-2db50c491b96"
+    "parentId": "f7f281ee-a544-4636-9341-2db50c491b96",
+    "level": 2,
+    "dacpTeamCode": 2
   }
   ...
 ]
@@ -683,12 +718,16 @@ __response:__
 ```
 [
   {
-    "roleId": "r1Id",
+    "roleId": "r1",
     "roleName": "r1",
-    "userDescription": "u2 description",
-    "userId": "u2Id",
-    "userName": "u2"
-  },
+    "tenantId": "t1",
+    "userDescription": "u1 description",
+    "userEmail": "a@163.com",
+    "userId": "u1",
+    "userName": "u1",
+    "userPassword": "passw0rd",
+    "userPhone": "123"
+  },,
   ...
 ]
 ```
@@ -804,6 +843,110 @@ __response:__
   "http_x_proxy_cas_loginname": "user1",
   "http_x_proxy_cas_mobile": "",
   "http_x_proxy_cas_userid": "",
-  "http_x_proxy_cas_username": "user1"
+  "http_x_proxy_cas_username": "user1",
+  "admin": false,
 }
 ```
+
+
+### Dashboard Links APIs
+1. 添加多租户平台首页连接
+```
+POST /ocmanager/v1/api/dashboard/link
+```
+
+__request body:__
+```
+{
+  "blank": true,
+  "description": "管理入口",
+  "href": "#/console/tenant",
+  "imageUrl": "home_tenant",
+  "name": "多租户管理平台"
+}
+```
+
+
+__response:__
+```
+{
+  "message": "Add successfully",
+  "resCodel": 200,
+  "status": "successful"
+}
+``` 
+
+2. 获取多租户平台首页所有连接
+```
+GET /ocmanager/v1/api/dashboard/link
+```
+__response:__
+```
+[
+  {
+    "blank": true,
+    "description": "管理入口",
+    "href": "#/console/tenant",
+    "id": 15,
+    "imageUrl": "home_tenant",
+    "name": "多租户管理平台"
+  },
+  ...
+]
+```
+
+3. 获取多租户平台首页连接通过连接名
+```
+GET /ocmanager/v1/api/dashboard/link/{name}
+```
+__response:__
+```
+{
+  "blank": true,
+  "description": "管理入口",
+  "href": "#/console/tenant",
+  "id": 15,
+  "imageUrl": "home_tenant",
+  "name": "多租户管理平台"
+}
+```
+
+4. 更新多租户平台首页连接通过id
+```
+PUT /ocmanager/v1/api/dashboard/link/{id}
+```
+
+__request body:__
+```
+{
+  "blank": false,
+  "description": "管理入口_change",
+  "href": "#/console/tenant/change",
+  "imageUrl": "home_tenant_change",
+  "name": "多租户管理平台_change"
+}
+```
+
+
+__response:__
+```
+{
+  "message": "Update successfully",
+  "resCodel": 200,
+  "status": "successful"
+}
+``` 
+
+5. 获取多租户平台首页连接通过连接名
+```
+DELETE /ocmanager/v1/api/dashboard/link/{id}
+```
+__response:__
+```
+{
+  "message": "Delete successfully",
+  "resCodel": 200,
+  "status": "successful"
+}
+```
+

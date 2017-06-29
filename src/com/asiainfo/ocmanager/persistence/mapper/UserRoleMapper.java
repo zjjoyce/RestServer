@@ -37,4 +37,13 @@ public interface UserRoleMapper {
 	 * @return
 	 */
 	public List<UserRoleView> selectTenantAndRoleBasedOnUserName(@Param("userName") String userName);
+
+	/**
+	 * 
+	 * @param userName
+	 * @return
+	 */
+	public List<UserRoleView> selectTURBasedOnUserNameAndRoleId(@Param("userName") String userName,
+			@Param("roleId") String roleId);
+
 }

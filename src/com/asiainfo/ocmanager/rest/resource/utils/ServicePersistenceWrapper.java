@@ -31,6 +31,7 @@ public class ServicePersistenceWrapper {
 			session.commit();
 		} catch (Exception e) {
 			session.rollback();
+			throw e;
 		} finally {
 			session.close();
 		}
@@ -52,6 +53,7 @@ public class ServicePersistenceWrapper {
 			session.commit();
 		} catch (Exception e) {
 			session.rollback();
+			throw e;
 		} finally {
 			session.close();
 		}
@@ -71,14 +73,12 @@ public class ServicePersistenceWrapper {
 			mapper.insertService(service);
 			session.commit();
 
-//			service = mapper.selectServiceById(service.getId());
-//			session.commit();
 		} catch (Exception e) {
 			session.rollback();
+			throw e;
 		} finally {
 			session.close();
 		}
-//		return service;
 	}
 
 }

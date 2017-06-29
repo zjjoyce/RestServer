@@ -19,6 +19,9 @@ public class TestUserRole {
 				System.out.println(ur.getUserId());
 				System.out.println(ur.getUserName());
 				System.out.println(ur.getUserDescription());
+				System.out.println(ur.getUserEmail());
+				System.out.println(ur.getUserPassword());
+				System.out.println(ur.getUserPhone());
 				System.out.println(ur.getRoleId());
 				System.out.println(ur.getRoleName());
 				System.out.println(ur.getTenantId());
@@ -55,6 +58,21 @@ public class TestUserRole {
 			List<UserRoleView> urs3 = mapper.selectTenantAndRoleBasedOnUserName("u2");
 
 			for (UserRoleView ur : urs3) {
+				System.out.println(ur.getUserId());
+				System.out.println(ur.getUserName());
+				System.out.println(ur.getUserDescription());
+				System.out.println(ur.getRoleId());
+				System.out.println(ur.getRoleName());
+				System.out.println(ur.getTenantId());
+				System.out.println(ur.getTenantName());
+			}
+			session.commit();
+			
+			
+			System.out.println("======User Name And Role Id======");
+			List<UserRoleView> urs4 = mapper.selectTURBasedOnUserNameAndRoleId("u1", "r1");
+
+			for (UserRoleView ur : urs4) {
 				System.out.println(ur.getUserId());
 				System.out.println(ur.getUserName());
 				System.out.println(ur.getUserDescription());

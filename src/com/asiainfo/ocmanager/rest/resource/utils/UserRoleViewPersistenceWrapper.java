@@ -30,6 +30,7 @@ public class UserRoleViewPersistenceWrapper {
 			session.commit();
 		} catch (Exception e) {
 			session.rollback();
+			throw e;
 		} finally {
 			session.close();
 		}
@@ -51,6 +52,7 @@ public class UserRoleViewPersistenceWrapper {
 			session.commit();
 		} catch (Exception e) {
 			session.rollback();
+			throw e;
 		} finally {
 			session.close();
 		}
@@ -71,6 +73,7 @@ public class UserRoleViewPersistenceWrapper {
 			session.commit();
 		} catch (Exception e) {
 			session.rollback();
+			throw e;
 		} finally {
 			session.close();
 		}
@@ -91,10 +94,33 @@ public class UserRoleViewPersistenceWrapper {
 			session.commit();
 		} catch (Exception e) {
 			session.rollback();
+			throw e;
 		} finally {
 			session.close();
 		}
 		return turs;
 	}
 
+	
+	/**
+	 * 
+	 * @param userName
+	 * @param roleId
+	 * @return
+	 */
+	public static List<UserRoleView> getTURBasedOnUserNameAndRoleId(String userName, String roleId) {
+		SqlSession session = DBConnectorFactory.getSession();
+		List<UserRoleView> turs = new ArrayList<UserRoleView>();
+		try {
+			UserRoleMapper mapper = session.getMapper(UserRoleMapper.class);
+			turs = mapper.selectTURBasedOnUserNameAndRoleId(userName, roleId);
+			session.commit();
+		} catch (Exception e) {
+			session.rollback();
+			throw e;
+		} finally {
+			session.close();
+		}
+		return turs;
+	}
 }
