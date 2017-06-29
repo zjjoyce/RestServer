@@ -32,8 +32,6 @@ public class HdfsUtils {
 
   static{
       String currentClassPath = new HdfsUtils().getClass().getResource("/").getPath();
-      // remove classes/
-      // the path will be <tomcat home>/webapps/ocmanager/
       String  keytabPath= currentClassPath.substring(0, currentClassPath.length() - 8) + "conf/shixiuru.keytab";
       String  krbPath = currentClassPath.substring(0,currentClassPath.length() - 8) + "conf/krb5.conf";
       log.info("keytab path is :" + keytabPath);
