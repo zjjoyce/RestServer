@@ -25,6 +25,9 @@ public class HbaseUtil {
 
     public static List<Quota> getHbaseData(String namespace){
 
+        String currentClassPath = new HdfsUtils().getClass().getResource("/").getPath();
+        String  keytabPath= currentClassPath.substring(0, currentClassPath.length() - 8) + "conf/shixiuru.keytab";
+        String  krbPath = currentClassPath.substring(0,currentClassPath.length() - 8) + "conf/krb5.conf";
         String hbaseurl = AmbariUtil.getUrl("hbase");
 
         conf.set("hbase.zookeeper.quorum", hbaseurl);
@@ -36,10 +39,10 @@ public class HbaseUtil {
         conf.set("hbase.master.kerberos.principal", "hbase/_HOST@EXAMPLE.COM");
         conf.set("hbase.regionserver.kerberos.principal", "hbase/_HOST@EXAMPLE.COM");
         //System.setProperty("sun.security.krb5.debug", "true");
-        System.setProperty("java.security.krb5.conf","conf/krb5.conf");
+        System.setProperty("java.security.krb5.conf",krbPath);
         UserGroupInformation.setConfiguration(conf);
         try {
-            UserGroupInformation.loginUserFromKeytab("shixiuru@EXAMPLE.COM", "conf/shixiuru.keytab");
+            UserGroupInformation.loginUserFromKeytab("shixiuru@EXAMPLE.COM", keytabPath);
             hconn = ConnectionFactory.createConnection(conf);
             admin = hconn.getAdmin();
             TableName[] tables = admin.listTableNamesByNamespace(namespace);
