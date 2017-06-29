@@ -48,8 +48,8 @@ public class YarnUtil {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Quota memoryquota = new Quota();
-        Quota vcoresquota = new Quota();
+        Quota memoryquota = new Quota("","","","","");
+        Quota vcoresquota = new Quota("","","","","");
         try {
             JSONObject json1 = new JSONObject(restresult);
             String scheduler = json1.getString("scheduler");

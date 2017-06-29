@@ -123,18 +123,17 @@ public class quotaQuery {
          */
     HdfsUtils hdfsUtils = new HdfsUtils();
     Quota hdfsQuota = hdfsUtils.getHdfsQuota(new Path("/user/ocdc"));
-    Quota queueQuota = YarnUtils.getQueueQuota(serviceInstanceId);
-    if(hdfsQuota==null){
-      hdfsQuota = new Quota("hdfsQuota","100","20","180","hive service instance db used space");
-    }
-    if(queueQuota==null){
-      queueQuota= new Quota("queueQuota","100","10","190","hive service instance queue used memory");
-
-    }
+    List<Quota> queueQuota = YarnUtil.getYarnData(serviceInstanceId);
+    //yarn quota
+    Iterator<Quota> iterator = queueQuota.iterator();
     List<Quota> items = new ArrayList<Quota>();
-    items.add(queueQuota);
-    items.add(hdfsQuota);
-    result.put("items",items);
+    while(iterator.hasNext()){
+        items.add(iterator.next());
+    }
+    // hdfs quota
+      items.add(hdfsQuota);
+
+      result.put("items",items);
     return result;
   }
   /**

@@ -15,10 +15,13 @@ import java.net.HttpURLConnection;
 import java.net.URL;import java.io.IOException;
 import com.asiainfo.ocmanager.persistence.model.Quota;
 import com.asiainfo.ocmanager.rest.resource.quotaUtils.AmbariUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 /**
  * Created by yujin on 2017/6/23.
  */
 public class HdfsUtils {
+    private static final Log log = LogFactory.getLog(HdfsUtils.class);
 
   public static final String KEYTAB_FILE_KEY = "hdfs.keytab.file";
   public static final String USER_NAME_KEY = "hdfs.kerberos.principal";
@@ -33,6 +36,8 @@ public class HdfsUtils {
       // the path will be <tomcat home>/webapps/ocmanager/
       String  keytabPath= currentClassPath.substring(0, currentClassPath.length() - 8) + "conf/shixiuru.keytab";
       String  krbPath = currentClassPath.substring(0,currentClassPath.length() - 8) + "conf/krb5.conf";
+      log.info("keytab path is :" + keytabPath);
+      log.info("krb path is :" +krbPath);
       // set http client connection timeout
       System.setProperty("sun.net.client.defaultConnectTimeout", "6000");
       System.setProperty("sun.net.client.defaultReadTimeout", "6000");
@@ -76,6 +81,10 @@ public class HdfsUtils {
       System.out.println(e);
     }
     return quota;
+  }
+  public static void main(String[] args){
+     Quota quota =  HdfsUtils.getContenSummary(new Path("/user/ocdc"));
+     System.out.println(quota.getName()+quota.getAvailable()+quota.getDesc()+" "+quota.getSize());
   }
 
 
