@@ -5,13 +5,13 @@
 <mapper
 	namespace="com.asiainfo.ocmanager.persistence.mapper.ServiceRolePermissionMapper">
 	<!-- get service permission list by role id -->
-	<select id="selectServicePermissionByRoleId"
+	<select id="selectPermissionByServiceNameRoleId"
 		resultType="com.asiainfo.ocmanager.persistence.model.ServiceRolePermission">
 		select
-		  service_id as "ServiceId",
+		  service_servicename as "serviceName",
 		  role_id as "RoleId",
 		  ServicePermission as "ServicePermission"
 			from
-			services_roles_permission where role_id=#{roleId}
+			services_roles_permission where role_id=#{roleId} and service_servicename = #{serviceName}
 	</select>
 </mapper>

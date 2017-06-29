@@ -1,5 +1,7 @@
 package com.asiainfo.ocmanager.rest.resource;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -9,7 +11,12 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.log4j.Logger;
+
+import com.asiainfo.ocmanager.persistence.model.UserRoleView;
+import com.asiainfo.ocmanager.rest.bean.AdapterResponseBean;
 import com.asiainfo.ocmanager.rest.bean.SSOFakerUserBean;
+import com.asiainfo.ocmanager.rest.resource.utils.UserRoleViewPersistenceWrapper;
 
 /**
  * 
@@ -19,6 +26,8 @@ import com.asiainfo.ocmanager.rest.bean.SSOFakerUserBean;
 
 @Path("/sso")
 public class SSOFakerResource {
+
+	private static Logger logger = Logger.getLogger(TenantResource.class);
 
 	/**
 	 * Get the user name for web which CAS proxy set into the header
@@ -30,22 +39,43 @@ public class SSOFakerResource {
 	@Path("user")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getUserName(@Context HttpServletRequest request) {
-		String http_x_proxy_cas_loginname = request.getHeader("http-x-proxy-cas-loginname");
-		String http_x_proxy_cas_username = request.getHeader("http-x-proxy-cas-username");
-		String http_x_proxy_cas_email = request.getHeader("http-x-proxy-cas-email");
-		http_x_proxy_cas_email = http_x_proxy_cas_email == null ? "" : http_x_proxy_cas_email;
-		String http_x_proxy_cas_userid = request.getHeader("http-x-proxy-cas-userid");
-		http_x_proxy_cas_userid = http_x_proxy_cas_userid == null ? "" : http_x_proxy_cas_userid;
-		String http_x_proxy_cas_mobile = request.getHeader("http-x-proxy-cas-mobile");
-		http_x_proxy_cas_mobile = http_x_proxy_cas_mobile == null ? "" : http_x_proxy_cas_mobile;
+		try {
+			String http_x_proxy_cas_loginname = request.getHeader("http_x_proxy_cas_loginname");
+			String http_x_proxy_cas_username = request.getHeader("http_x_proxy_cas_username");
+			http_x_proxy_cas_username = http_x_proxy_cas_username == null ? "" : http_x_proxy_cas_username;
+			String http_x_proxy_cas_email = request.getHeader("http_x_proxy_cas_email");
+			http_x_proxy_cas_email = http_x_proxy_cas_email == null ? "" : http_x_proxy_cas_email;
+			String http_x_proxy_cas_userid = request.getHeader("http_x_proxy_cas_userid");
+			http_x_proxy_cas_userid = http_x_proxy_cas_userid == null ? "" : http_x_proxy_cas_userid;
+			String http_x_proxy_cas_mobile = request.getHeader("http_x_proxy_cas_mobile");
+			http_x_proxy_cas_mobile = http_x_proxy_cas_mobile == null ? "" : http_x_proxy_cas_mobile;
 
-		// make sure the user name is set
-		if (http_x_proxy_cas_loginname == null || http_x_proxy_cas_username == null) {
-			return Response.status(Status.BAD_REQUEST)
-					.entity("Can not get sso user information, please make sure the user info is set.").build();
-		} else {
-			return Response.ok().entity(new SSOFakerUserBean(http_x_proxy_cas_loginname, http_x_proxy_cas_username,
-					http_x_proxy_cas_email, http_x_proxy_cas_userid, http_x_proxy_cas_mobile)).build();
+			// make sure the user name is set
+			if (http_x_proxy_cas_loginname == null) {
+				return Response.status(Status.BAD_REQUEST)
+						.entity(new AdapterResponseBean("Failed",
+								"Can not get sso user information, please make sure the user info is set.", 200))
+						.build();
+			} else {
+
+				// our system only has one system admin, so hard code here
+				// if based on the system admin role id can return results, it
+				// means
+				// the user is system admin
+				List<UserRoleView> urses = UserRoleViewPersistenceWrapper.getTURBasedOnUserNameAndRoleId(
+						http_x_proxy_cas_loginname, "a10170cb-524a-11e7-9dbb-fa163ed7d0ae");
+
+				boolean isAdmin = urses.size() == 0 ? false : true;
+
+				return Response.ok()
+						.entity(new SSOFakerUserBean(http_x_proxy_cas_loginname, http_x_proxy_cas_username,
+								http_x_proxy_cas_email, http_x_proxy_cas_userid, http_x_proxy_cas_mobile, isAdmin))
+						.build();
+			}
+		} catch (Exception e) {
+			// system out the exception into the console log
+			logger.info(e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
 		}
 	}
 

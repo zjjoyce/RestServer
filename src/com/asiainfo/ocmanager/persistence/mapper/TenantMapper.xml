@@ -17,11 +17,16 @@
 		resultType="com.asiainfo.ocmanager.persistence.model.Tenant">
 		select * from tenants where parentId=#{parentId}
 	</select>
+	<!-- get root tenants who is not having parent -->
+	<select id="selectAllRootTenants"
+		resultType="com.asiainfo.ocmanager.persistence.model.Tenant">
+		select * from tenants where parentId is NULL
+	</select>	
 	<!-- create tenant -->
 	<insert id="insertTenant" keyProperty="id"
 		parameterType="com.asiainfo.ocmanager.persistence.model.Tenant">
-		insert into tenants (id, name, description, parentId)
-		values (#{id}, #{name}, #{description}, #{parentId})
+		insert into tenants (id, name, description, parentId, level)
+		values (#{id}, #{name}, #{description}, #{parentId}, #{level})
 	</insert>
 	<!-- delete tenant -->
 	<delete id="deleteTenant">

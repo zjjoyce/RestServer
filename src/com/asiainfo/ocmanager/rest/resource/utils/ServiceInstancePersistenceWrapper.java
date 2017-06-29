@@ -21,7 +21,7 @@ public class ServiceInstancePersistenceWrapper {
 	 * @param tenantId
 	 * @return
 	 */
-	public static List<ServiceInstance> getServiceInstancesInTenant(String tenantId){
+	public static List<ServiceInstance> getServiceInstancesInTenant(String tenantId) {
 		SqlSession session = DBConnectorFactory.getSession();
 		List<ServiceInstance> serviceInstances = new ArrayList<ServiceInstance>();
 		try {
@@ -32,14 +32,14 @@ public class ServiceInstancePersistenceWrapper {
 			session.commit();
 		} catch (Exception e) {
 			session.rollback();
+			throw e;
 		} finally {
 			session.close();
 		}
-		
+
 		return serviceInstances;
 	}
-	
-	
+
 	/**
 	 * 
 	 * @param tenant
@@ -54,6 +54,7 @@ public class ServiceInstancePersistenceWrapper {
 			session.commit();
 		} catch (Exception e) {
 			session.rollback();
+			throw e;
 		} finally {
 			session.close();
 		}
@@ -74,9 +75,33 @@ public class ServiceInstancePersistenceWrapper {
 			session.commit();
 		} catch (Exception e) {
 			session.rollback();
+			throw e;
 		} finally {
 			session.close();
 		}
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public static List<ServiceInstance> getAllServiceInstances() {
+		SqlSession session = DBConnectorFactory.getSession();
+		List<ServiceInstance> serviceInstances = new ArrayList<ServiceInstance>();
+		try {
+			ServiceInstanceMapper mapper = session.getMapper(ServiceInstanceMapper.class);
+
+			serviceInstances = mapper.selectAllServiceInstances();
+
+			session.commit();
+		} catch (Exception e) {
+			session.rollback();
+			throw e;
+		} finally {
+			session.close();
+		}
+
+		return serviceInstances;
 	}
 
 }

@@ -17,4 +17,8 @@
 	<delete id="deleteServiceInstance">
 		delete from service_instances where tenantId = #{tenantId} and instanceName = #{instanceName}
 	</delete>
+    <!-- get all service instances -->
+    <select id="selectAllServiceInstances" resultType="com.asiainfo.ocmanager.persistence.model.ServiceInstance">
+        select * from service_instances
+    </select>
 </mapper>

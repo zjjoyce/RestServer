@@ -44,4 +44,11 @@ public interface TenantMapper {
 	 * @param id
 	 */
 	public void deleteTenant(@Param("id") String id);
+
+	/**
+	 * 
+	 * @return
+	 */
+	public List<Tenant> selectAllRootTenants();
+
 }

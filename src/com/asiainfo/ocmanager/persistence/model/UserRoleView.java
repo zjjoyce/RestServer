@@ -4,6 +4,9 @@ public class UserRoleView {
 	private String userId;
 	private String userName;
 	private String userDescription;
+	private String userEmail;
+	private String userPhone;
+	private String userPassword;
 	private String roleId;
 	private String roleName;
 	private String tenantId;
@@ -73,4 +76,29 @@ public class UserRoleView {
 	public void setPermission(String permission) {
 		this.permission = permission;
 	}
+
+	public String getUserEmail() {
+		return userEmail;
+	}
+
+	public void setUserEmail(String userEmail) {
+		this.userEmail = userEmail;
+	}
+
+	public String getUserPhone() {
+		return userPhone;
+	}
+
+	public void setUserPhone(String userPhone) {
+		this.userPhone = userPhone;
+	}
+
+	public String getUserPassword() {
+		return userPassword;
+	}
+
+	public void setUserPassword(String userPassword) {
+		this.userPassword = userPassword;
+	}
+
 }
