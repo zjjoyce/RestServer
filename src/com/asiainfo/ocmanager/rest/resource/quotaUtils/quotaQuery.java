@@ -72,18 +72,20 @@ public class quotaQuery {
 
   /**
    *
-   * @param serviceInstanceId
+   * @param queuename
    * @return Spark Quota
    */
-  public static Map getSparkQuota(String serviceInstanceId) {
+  public static Map getSparkQuota(String queuename) {
     Map result = new HashMap();
         /*
-        todo :move mapreduce quota code to here
+        todo :move spark quota code to here
          */
-
-    Quota queueQuota= new Quota("queueQuota","100","10","190","spark service instance queue used memory");
+    List<Quota> sparkQuota = YarnUtil.getYarnData(queuename);
     List<Quota> items = new ArrayList<Quota>();
-    items.add(queueQuota);
+    Iterator<Quota> iterator = sparkQuota.iterator();
+    while(iterator.hasNext()){
+        items.add(iterator.next());
+    }
     result.put("items",items);
     return result;
   }
