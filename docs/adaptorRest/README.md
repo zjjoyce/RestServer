@@ -838,84 +838,12 @@ PUT /ocmanager/v1/api/tenant/{id}/service/instance/{instanceName}
 
 __request body:__
 ```
-{
-    "kind": "BackingServiceInstance",
-    "apiVersion": "v1",
-    "metadata": {
-        "name": "hive-instance",
-        "namespace": "zhaoyim",
-        "selfLink": "/oapi/v1/namespaces/zhaoyim/backingserviceinstances/hive-instance",
-        "uid": "f1a993d6-57c8-11e7-9a0f-fa163efdbea8",
-        "resourceVersion": "17457486",
-        "creationTimestamp": "2017-06-23T04:03:41Z"
-    },
-    "spec": {
-        "provisioning": {
-            "dashboard_url": "",
-            "backingservice_name": "Hive",
-            "backingservice_spec_id": "2ef26018-003d-4b2b-b786-0481d4ee9fa3",
-            "backingservice_plan_guid": "aa7e364f-fdbf-4187-b60a-218b6fa398ed",
-            "backingservice_plan_name": "shared",
-            "parameters": {
-                "hiveStorageQuota": "1024",
-                "instance_id": "14ea4d05-57c9-11e7-9a0f-fa163efdbea8",
-                "tenant_name": "zhaoyim",
-                "user_name": "u2",
-                "yarnQueueQuota": "10"
-            },
-            "credentials": {
-                "Hive database": "14ea4d0557c911e79a0ffa163efdbea8",
-                "host": "zx-dn-03",
-                "password": "e6510d82-2ed3-48f5-8668-b82d572aaac1",
-                "port": "10000",
-                "uri": "jdbc:hive2://zx-dn-03:10000/14ea4d0557c911e79a0ffa163efdbea8;principal=hive/zx-dn-03@EXAMPLE.COM",
-                "username": "zhaoyim@EXAMPLE.COM"
-            },
-            "accesses": {
-                "2ef26018-003d-4b2b-b786-0481d4ee9fa3": [
-                    "select",
-                    "update",
-                    "create",
-                    "drop",
-                    "alter",
-                    "index",
-                    "lock"
-                ],
-                "ae0f2324-27a8-415b-9c7f-64ab6cd88d40": [
-                    "submit-app",
-                    "admin-queue"
-                ],
-                "ae67d4ba-5c4e-4937-a68b-5b47cfe356d8": [
-                    "read",
-                    "write",
-                    "execute"
-                ],
-                "d3b9a485-f038-4605-9b9b-29792f5c61d1": [
-                    "submit-app",
-                    "admin-queue"
-                ],
-                "d9845ade-9410-4c7f-8689-4e032c1a8450": [
-                    "read",
-                    "write",
-                    "create",
-                    "admin"
-                ]
-            }
-        },
-        "userprovidedservice": {
-            "credentials": null
-        },
-        "binding": null,
-        "bound": 0,
-        "instance_id": "14ea4d05-57c9-11e7-9a0f-fa163efdbea8",
-        "tags": null
-    },
-    "status": {
-        "phase": "Unbound",
-        "action": "",
-        "last_operation": null,
-        "patch": "Updating"
-    }
+{      
+    "parameters": 
+        {
+            "hiveStorageQuota": "99999",
+            "yarnQueueQuota": "88888"
+        }
 }
 ```
 
@@ -941,11 +869,8 @@ __response:__
       "backingservice_plan_guid": "aa7e364f-fdbf-4187-b60a-218b6fa398ed",
       "backingservice_plan_name": "shared",
       "parameters": {
-        "hiveStorageQuota": "2048",
-        "instance_id": "14ea4d05-57c9-11e7-9a0f-fa163efdbea8",
-        "tenant_name": "zhaoyim",
-        "user_name": "u2",
-        "yarnQueueQuota": "20"
+            "hiveStorageQuota": "99999",
+            "yarnQueueQuota": "88888"
       },
       "credentials": {
         "Hive database": "14ea4d0557c911e79a0ffa163efdbea8",
