@@ -898,6 +898,20 @@ __response:__
 ``` 
 
 
+15. 获取角色根据租户和用户名
+```
+GET /ocmanager/v1/api/tenant/{tenantId}/user/{userName}/role
+```
+__response:__
+```
+{
+  "roleId": "r1Id",
+  "tenantId": "t1Id",
+  "userId": "u1Id",
+  "userName": "u1Name"
+}
+```
+
 
 ### Single Sign on APIs
 1. 获取当前用户(所要用户信息需要设置在request header中)
