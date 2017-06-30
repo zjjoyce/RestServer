@@ -235,7 +235,7 @@ __response:__
 
 4. 删除Service broker（删除服务， 服务是注册在service broker 里面的，因此会删除service broker 中注册的所有服务）
 ```
-POST /ocmanager/v1/api/service/broker/{name}
+DELETE /ocmanager/v1/api/service/broker/{name}
 ```
 
 __response:__
@@ -1005,7 +1005,7 @@ __response:__
 }
 ``` 
 
-5. 获取多租户平台首页连接通过连接名
+5. 删除多租户平台首页连接通过连接名
 ```
 DELETE /ocmanager/v1/api/dashboard/link/{id}
 ```
