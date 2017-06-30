@@ -384,7 +384,8 @@ public class TenantResource {
 							// if the status.phase is Provisioning the update
 							// will failed, so need to wait
 							while (phase.equals("Provisioning")) {
-								Thread.sleep(10000);
+								// wait for 3 sec
+								Thread.sleep(3000);
 								// get the instance info again
 								getInstanceResBody = TenantResource.getTenantServiceInstancesFromDf(tenantId,
 										serviceInstance.getInstanceName());
