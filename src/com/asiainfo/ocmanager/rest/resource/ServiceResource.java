@@ -84,12 +84,14 @@ public class ServiceResource {
 					String id = items.get(i).getAsJsonObject().getAsJsonObject("spec").get("id").getAsString();
 					String description = items.get(i).getAsJsonObject().getAsJsonObject("spec").get("description")
 							.getAsString();
+					String origin = items.get(i).getAsJsonObject().getAsJsonObject("metadata").getAsJsonObject("labels")
+							.get("asiainfo.io/servicebroker").getAsString();
 
 					if (servicesInDB.size() == 0) {
-						ServicePersistenceWrapper.addService(new Service(id, name, description));
+						ServicePersistenceWrapper.addService(new Service(id, name, description, origin));
 					} else {
 						if (!dbServiceList.contains(id)) {
-							ServicePersistenceWrapper.addService(new Service(id, name, description));
+							ServicePersistenceWrapper.addService(new Service(id, name, description, origin));
 						}
 					}
 
