@@ -39,7 +39,7 @@ public class UserResource {
 	 * @return user list
 	 */
 	@GET
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	public Response getUsers() {
 		try {
 			List<User> users = UserPersistenceWrapper.getUsers();
@@ -60,7 +60,7 @@ public class UserResource {
 	 */
 	@GET
 	@Path("{id}")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	public Response getUserById(@PathParam("id") String userId) {
 		try {
 			User user = UserPersistenceWrapper.getUserById(userId);
@@ -80,7 +80,7 @@ public class UserResource {
 	 * @return new user info
 	 */
 	@POST
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response createUser(User user) {
 		try {
@@ -101,7 +101,7 @@ public class UserResource {
 	 * @return updated user info
 	 */
 	@PUT
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response updateUser(User user) {
 		try {
@@ -122,7 +122,7 @@ public class UserResource {
 	 */
 	@DELETE
 	@Path("{id}")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	public Response deleteUser(@PathParam("id") String userId) {
 		try {
 			UserPersistenceWrapper.deleteUser(userId);
@@ -141,7 +141,7 @@ public class UserResource {
 	 */
 	@GET
 	@Path("id/{id}/tenants")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	public Response getTenantAndRoleById(@PathParam("id") String userId) {
 		try {
 			List<UserRoleView> turs = UserRoleViewPersistenceWrapper.getTenantAndRoleBasedOnUserId(userId);
@@ -155,7 +155,7 @@ public class UserResource {
 
 	@GET
 	@Path("name/{name}/tenants")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	public Response getTenantAndRoleByName(@PathParam("name") String userName) {
 		try {
 			List<UserRoleView> turs = UserRoleViewPersistenceWrapper.getTenantAndRoleBasedOnUserName(userName);
