@@ -31,7 +31,7 @@ public class RoleResource {
 	 * @return role list
 	 */
 	@GET
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	public Response getRoles() {
 		try {
 			List<Role> roles = RolePersistenceWrapper.getRoles();

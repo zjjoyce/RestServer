@@ -70,7 +70,7 @@ public class TenantResource {
 	 * @return tenant list
 	 */
 	@GET
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	public Response getAllTenants() {
 		try {
 			List<Tenant> tenants = TenantPersistenceWrapper.getAllTenants();
@@ -91,7 +91,7 @@ public class TenantResource {
 	 */
 	@GET
 	@Path("{id}")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	public Response getTenantById(@PathParam("id") String tenantId) {
 		try {
 			Tenant tenant = TenantPersistenceWrapper.getTenantById(tenantId);
@@ -112,7 +112,7 @@ public class TenantResource {
 	 */
 	@GET
 	@Path("{id}/children")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	public Response getChildrenTenants(@PathParam("id") String parentTenantId) {
 		try {
 			List<Tenant> tenants = TenantPersistenceWrapper.getChildrenTenants(parentTenantId);
@@ -133,7 +133,7 @@ public class TenantResource {
 	 */
 	@GET
 	@Path("{id}/users")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	public Response getTenantUsers(@PathParam("id") String tenantId) {
 		try {
 			List<UserRoleView> usersRoles = UserRoleViewPersistenceWrapper.getUsersInTenant(tenantId);
@@ -154,7 +154,7 @@ public class TenantResource {
 	 */
 	@GET
 	@Path("{id}/service/instances")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	public Response getTenantServiceInstances(@PathParam("id") String tenantId) {
 		try {
 			List<ServiceInstance> serviceInstances = ServiceInstancePersistenceWrapper
@@ -176,7 +176,7 @@ public class TenantResource {
 	 */
 	@GET
 	@Path("{tenantId}/service/instance/{InstanceName}/access/info")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	public Response getTenantServiceInstanceAccessInfo(@PathParam("tenantId") String tenantId,
 			@PathParam("InstanceName") String InstanceName) {
 		try {
@@ -197,7 +197,7 @@ public class TenantResource {
 	 * @return new tenant info
 	 */
 	@POST
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response createTenant(Tenant tenant, @Context HttpServletRequest request) {
 
@@ -283,7 +283,7 @@ public class TenantResource {
 	 */
 	@POST
 	@Path("{id}/service/instance")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response createServiceInstanceInTenant(@PathParam("id") String tenantId, String reqBodyStr) {
 
@@ -451,7 +451,7 @@ public class TenantResource {
 	 */
 	@PUT
 	@Path("{id}/service/instance/{instanceName}")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response updateServiceInstanceInTenant(@PathParam("id") String tenantId,
 			@PathParam("instanceName") String instanceName, String parametersStr) {
@@ -502,7 +502,7 @@ public class TenantResource {
 	 */
 	@DELETE
 	@Path("{id}/service/instance/{instanceName}")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response deleteServiceInstanceInTenant(@PathParam("id") String tenantId,
 			@PathParam("instanceName") String instanceName) {
@@ -553,7 +553,7 @@ public class TenantResource {
 	 */
 	@Deprecated
 	@PUT
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Tenant updateTenant(Tenant tenant) {
 		return tenant;
@@ -567,7 +567,7 @@ public class TenantResource {
 	 */
 	@DELETE
 	@Path("{id}")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response deleteTenant(@PathParam("id") String tenantId) {
 		try {
@@ -615,7 +615,7 @@ public class TenantResource {
 	 */
 	@POST
 	@Path("{id}/user/role/assignment")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response assignRoleToUserInTenant(@PathParam("id") String tenantId, TenantUserRoleAssignment assignment) {
 
@@ -713,7 +713,7 @@ public class TenantResource {
 	 */
 	@PUT
 	@Path("{id}/user/role/assignment")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response updateRoleToUserInTenant(@PathParam("id") String tenantId, TenantUserRoleAssignment assignment) {
 
@@ -806,7 +806,7 @@ public class TenantResource {
 	 */
 	@DELETE
 	@Path("{id}/user/{userId}/role/assignment")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response unassignRoleFromUserInTenant(@PathParam("id") String tenantId, @PathParam("userId") String userId) {
 
