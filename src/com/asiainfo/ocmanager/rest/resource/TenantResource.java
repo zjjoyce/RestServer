@@ -145,6 +145,29 @@ public class TenantResource {
 		}
 	}
 
+	
+	/**
+	 * Get the role based on the tenant and user
+	 * 
+	 * @param tenantId
+	 * @param userName
+	 * @return
+	 */
+	@GET
+	@Path("{id}/user/{userName}/role")
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
+	public Response getRoleByTenantUserName(@PathParam("id") String tenantId, @PathParam("userName") String userName) {
+		try {
+			UserRoleView role = UserRoleViewPersistenceWrapper.getRoleBasedOnUserAndTenant(userName, tenantId);
+			return Response.ok().entity(role).build();
+		} catch (Exception e) {
+			// system out the exception into the console log
+			logger.info(e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+		}
+	}
+	
+	
 	/**
 	 * Get the service instance list in the specific tenant
 	 *
