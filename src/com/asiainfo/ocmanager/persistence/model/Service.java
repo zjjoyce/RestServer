@@ -9,15 +9,17 @@ public class Service {
 	private String id;
 	private String servicename;
 	private String description;
+	private String origin;
 
 	public Service() {
 
 	}
 
-	public Service(String id, String servicename, String description) {
+	public Service(String id, String servicename, String description, String origin) {
 		this.id = id;
 		this.servicename = servicename;
 		this.description = description;
+		this.origin = origin;
 	}
 
 	public String getId() {
@@ -42,6 +44,14 @@ public class Service {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public String getOrigin() {
+		return origin;
+	}
+
+	public void setOrigin(String origin) {
+		this.origin = origin;
 	}
 
 }
