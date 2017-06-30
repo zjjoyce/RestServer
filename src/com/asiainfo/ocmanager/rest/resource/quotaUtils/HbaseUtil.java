@@ -25,7 +25,7 @@ public class HbaseUtil {
 
     public static List<Quota> getHbaseData(String namespace){
 
-        String currentClassPath = new HdfsUtils().getClass().getResource("/").getPath();
+        String currentClassPath = new HbaseUtil().getClass().getResource("/").getPath();
         String  keytabPath= currentClassPath.substring(0, currentClassPath.length() - 8) + "conf/shixiuru.keytab";
         String  krbPath = currentClassPath.substring(0,currentClassPath.length() - 8) + "conf/krb5.conf";
         String hbaseurl = AmbariUtil.getUrl("hbase");
