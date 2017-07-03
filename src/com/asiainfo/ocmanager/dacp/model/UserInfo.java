@@ -1,5 +1,7 @@
 package com.asiainfo.ocmanager.dacp.model;
 
+import java.util.ArrayList;
+
 /**
  * Created by yujin on 2017/7/3.
  */
@@ -11,10 +13,10 @@ public class UserInfo {
     private String qq;
     private String mail;
     private String msn;
-    private String[] role;
+    private ArrayList<String> role;
 
     public UserInfo(){}
-    public UserInfo(String userName,String usercnName,String password,String phone,String qq,String mail,String msn,String[] role){
+    public UserInfo(String userName,String usercnName,String password,String phone,String qq,String mail,String msn,ArrayList<String> role){
         this.userName = userName;
         this.usercnName = usercnName;
         this.password = password;
@@ -44,7 +46,7 @@ public class UserInfo {
     public void setMsn(String userName){this.userName = userName;}
     public String getMsn(){return this.msn;}
 
-    public void setRole(String[] role){this.role = role;}
-    public String[] getRole(){return this.role;}
+    public void setRole(ArrayList<String> role){this.role = role;}
+    public ArrayList<String> getRole(){return this.role;}
 
 }

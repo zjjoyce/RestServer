@@ -5,15 +5,15 @@ package com.asiainfo.ocmanager.dacp.model;
  */
 public class Team {
     private String xmlId;
-    private String teamCode;
+    private int teamCode;
     private String teamName;
-    private String teamType;
+    private int teamType;
     private String startDate;
     private String state;
     private String iconPath;
     private String remark;
 
-    public Team(String xmlId,String teamCode,String teamType,String state){
+    public Team(String xmlId,int teamCode,int teamType,String state){
         this.xmlId = xmlId;
         this.teamCode = teamCode;
         this.teamType = teamType;
@@ -22,13 +22,13 @@ public class Team {
     public void setXmlId(String xmlId){this.xmlId = xmlId;}
     public String getXmlId(){return this.xmlId;}
 
-    public void setTeamCode(String teamCode){this.teamCode = teamCode;}
-    public String getTeamCode(){return this.teamCode;}
+    public void setTeamCode(int teamCode){this.teamCode = teamCode;}
+    public int getTeamCode(){return this.teamCode;}
     public void setTeamName(String teamName){this.teamName = teamName;}
     public String getTeamName(){return this.teamName;}
 
-    public void setTeamType(String teamType){this.teamType = teamType;}
-    public String getTeamType(){return this.teamType;}
+    public void setTeamType(int teamType){this.teamType = teamType;}
+    public int getTeamType(){return this.teamType;}
 
     public void setStartDate(String startDate){this.startDate = startDate;}
     public String getStartDate(){return this.startDate;}
