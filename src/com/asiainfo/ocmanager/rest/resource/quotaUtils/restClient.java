@@ -2,8 +2,10 @@ package com.asiainfo.ocmanager.rest.resource.quotaUtils;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.methods.DeleteMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -59,6 +61,22 @@ public class restClient {
         } else {
             result = method.getResponseBodyAsString();
         }
+        return result;
+    }
+    public static String delete(String url)throws Exception{
+        String result = null;
+        HttpClient client = new HttpClient();
+        DeleteMethod method = new DeleteMethod(url);
+
+        method.getParams().setContentCharset("UTF-8");
+        int statusCode = client.executeMethod(method);
+
+        if (statusCode != HttpStatus.SC_OK) {
+            throw new Exception("请求失败:"+HttpStatus.getStatusText(statusCode));
+        }else {
+            result = method.getResponseBodyAsString();
+        }
+
         return result;
     }
     public static void main(String[] args)throws Exception {
