@@ -4,10 +4,7 @@ import com.asiainfo.ocmanager.persistence.model.Quota;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.PartitionInfo;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Created by yujin on 2017/6/29.
@@ -19,8 +16,8 @@ public class kafkaUtils {
         String currentClassPath = new HdfsUtils().getClass().getResource("/").getPath();
         String  jaasPath= currentClassPath.substring(0, currentClassPath.length() - 8) + "conf/kafka-jaas.conf";
         String  krbPath = currentClassPath.substring(0,currentClassPath.length() - 8) + "conf/krb5.conf";
-        System.setProperty("java.security.auth.login.config", jaasPath);
-        System.setProperty("java.security.krb5.conf", krbPath);
+        System.setProperty("java.security.auth.login.config", "conf/kafka-jaas.conf");
+        System.setProperty("java.security.krb5.conf", "conf/krb5.conf");
         //System.setProperty("sun.security.krb5.debug", "true");
         props.put("security.protocol", "SASL_PLAINTEXT");
         System.out.println("begin to register for kerberos");
@@ -34,8 +31,15 @@ public class kafkaUtils {
 
     }
     public static Quota getKafkaQuota(String topicName){
+        String path=Thread.currentThread().getContextClassLoader().getResource("").toString();
+        path=path.replace('/', '\\'); // 将/换成\
+        path=path.replace("file:", ""); //去掉file:
+        path=path.replace("classes\\", ""); //去掉class\
+        path=path.substring(1); //去掉第一个\,如 \D:\JavaWeb...
+        path+="conf\\shixiuru.keytab";
+        System.out.println("Kafka kafka-jaas.conf 文件中路径："+path);
         KafkaConsumer<byte[], byte[]> consumer = new KafkaConsumer<byte[], byte[]>(props);
-        consumer.subscribe(Arrays.asList(topicName));
+        //consumer.subscribe(Arrays.asList(topicName));
         //Map<String, List<PartitionInfo>> listPartionInfoForTopic = consumer.listTopics();
         List<PartitionInfo> PartionInfoForTopic = consumer.partitionsFor(topicName);
         int partitionNum = PartionInfoForTopic.size();
