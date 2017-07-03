@@ -24,7 +24,7 @@ public class HdfsUtil {
     public static final Configuration conf = new Configuration();
 
     public static List<Quota> getHDFSData(String path){
-        String currentClassPath = new HdfsUtils().getClass().getResource("/").getPath();
+        String currentClassPath = new HdfsUtil().getClass().getResource("/").getPath();
         String  keytabPath= currentClassPath.substring(0, currentClassPath.length() - 8) + "conf/shixiuru.keytab";
         String  krbPath = currentClassPath.substring(0,currentClassPath.length() - 8) + "conf/krb5.conf";
         String dfsurl = AmbariUtil.getUrl("hdfs");
