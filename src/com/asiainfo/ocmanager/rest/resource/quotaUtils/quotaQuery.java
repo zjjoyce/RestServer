@@ -152,14 +152,14 @@ public class quotaQuery {
      * @param database
      * @return GP Quota
      */
-    public static Map getGpQuota(String database,String username,String password) {
+    public static Map getGpQuota(String database) {
         Map result = new HashMap();
         List<Quota> items = new ArrayList<Quota>();
         long useplace = 0;
         try {
             Class.forName("org.postgresql.Driver");
             //Connection db = DriverManager.getConnection("jdbc:postgresql://10.247.32.84:5432/d778303ea916d266", "u09f42e1eaa08a8b", "pa465990aee497b4");
-            Connection db1 = DriverManager.getConnection("jdbc:postgresql://10.247.32.84:5432/" + database, username, password);
+            Connection db1 = DriverManager.getConnection("jdbc:postgresql://10.247.32.84:5432/" + database, "gpadmin", "asiainfoldp");
             Statement st = db1.createStatement();
             ResultSet rs = st.executeQuery("select  sum((pg_relation_size(relid)))from pg_stat_user_tables");
             while (rs.next()) {
