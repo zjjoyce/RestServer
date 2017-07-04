@@ -8,13 +8,14 @@ import java.io.InputStreamReader;
 import java.net.URL;
 /**
  * Created by Allen on 2017/7/3.
+ * 调用DataFoundry API获取数据
  */
 public class DacpQuery {
 
     private static HttpsURLConnection conn;
     private static BufferedReader reader;
 
-    private static HostnameVerifier hv = new HostnameVerifier() {
+    /*private static HostnameVerifier hv = new HostnameVerifier() {
         public boolean verify(String urlHostName, SSLSession session) {
             System.out.println("Warning: URL Host: " + urlHostName + " vs. "
                     + session.getPeerHost());
@@ -60,22 +61,22 @@ public class DacpQuery {
                 throws java.security.cert.CertificateException {
             return;
         }
-    }
-    public static String GetData()throws Exception {
+    }*/
+    public static String GetData(String name)throws Exception {
 
         String url = Property.getDFProperties().get(Property.DATAFOUNDRY_URL_DACP);
         String token = Property.getDFProperties().get(Property.DATAFOUNDRY_TOKEN_DACP);
-        String dfRestUrl = url + "/oapi/v1/namespaces/san/backingserviceinstances";
-        System.out.println(url);
+        String dfRestUrl = url + "/oapi/v1/namespaces/"+name+"/backingserviceinstances";
+        /*System.out.println(url);
         System.out.println(token);
-        System.out.println(dfRestUrl);
+        System.out.println(dfRestUrl);*/
         /*HttpPost httpPost = new HttpPost(dfRestUrl);
         httpPost.addHeader("Content-type", "application/json");
         httpPost.addHeader("Authorization", "bearer " + token);*/
 
         String restresult = "";
-        trustAllHttpsCertificates();
-        conn.setDefaultHostnameVerifier(hv);
+        Authentication.trustAllHttpsCertificates();
+        conn.setDefaultHostnameVerifier(Authentication.hv);
         conn = (HttpsURLConnection) new URL(dfRestUrl).openConnection();
         conn.setRequestMethod("GET");
         conn.setRequestProperty("Content-Type", "application/json");

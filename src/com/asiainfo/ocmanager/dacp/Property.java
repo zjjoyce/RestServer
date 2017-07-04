@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Properties;
 /**
  * Created by Allen on 2017/7/3.
+ * 获取Token认证参数
  */
 public class Property {
     public final static String DATAFOUNDRY_URL_DACP = "dataFounday.url.dacp";
