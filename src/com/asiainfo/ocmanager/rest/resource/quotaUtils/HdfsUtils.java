@@ -68,7 +68,7 @@ public class HdfsUtils {
   public static List<Quota> getContenSummary(Path filePath) {
       List quotaList = new ArrayList<Quota>();
     Quota spaceQuota = new Quota("hdfs space quota","","","","hdfs space quota");
-    Quota fileQuota = new Quota("hdfs space quota","","","","hdfs space quota");
+    Quota fileQuota = new Quota("hdfs file count quota","","","","hdfs file count quota");
 
       try {
       FileSystem fs = FileSystem.get(conf);
