@@ -20,9 +20,9 @@ public class Property {
             synchronized (Property.class) {
                 if (map.size() == 0) {
                     String classPath = new Property().getClass().getResource("/").getPath();
-                    String currentClassesPath = classPath.substring(0, classPath.length() - 8);
-                    InputStream inStream = new FileInputStream(
-                            new File(currentClassesPath + "ocmanager/WEB-INF/conf/dataFoundry.properties"));
+                    String currentClassesPath = classPath.substring(0, classPath.length() - 8)+ "conf/dataFoundry.properties";
+                    System.out.println(currentClassesPath);
+                    InputStream inStream = new FileInputStream(new File(currentClassesPath ));
                     Properties prop = new Properties();
                     prop.load(inStream);
                     map.put(DATAFOUNDRY_URL_DACP, prop.getProperty(DATAFOUNDRY_URL_DACP));
