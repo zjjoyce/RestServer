@@ -112,7 +112,7 @@ public class quotaQuery {
         todo :move hive quota code to here
          */
         HdfsUtils hdfsUtils = new HdfsUtils();
-        List<Quota> hdfsQuota = hdfsUtils.getHdfsQuota(new Path("/apps/hive/warehouse"+serviceInstanceId+".db"));
+        List<Quota> hdfsQuota = hdfsUtils.getHdfsQuota(new Path("/apps/hive/warehouse/"+serviceInstanceId+".db"));
         List<Quota> queueQuota = YarnUtil.getYarnData(serviceInstanceId);
         //yarn quota
         Iterator<Quota> iterator = queueQuota.iterator();

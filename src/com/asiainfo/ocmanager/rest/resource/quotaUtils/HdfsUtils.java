@@ -84,7 +84,11 @@ public class HdfsUtils {
       quotaList.add(fileQuota);
       quotaList.add(spaceQuota);
     } catch (IOException e) {
-      System.out.println(e);
+      log.error("get conent error:" + e);
+      List<Quota> quotas = new ArrayList<Quota>();
+      quotas.add(spaceQuota);
+      quotas.add(fileQuota);
+      return quotas;
     }
     return quotaList;
   }
