@@ -670,7 +670,8 @@ public class TenantResource {
             // post to dacp rest interface
 
             // get team param
-            Team team = new Team("",0,1,"ON");
+
+            Team team = new Team("",0,"",1,"","","");
             team = TeamWrapper.getTeamFromTenant(tenantId);
             //get userinfo
             List<UserInfo> userInfos = UserWrapper.getUserInfoFromUserRoleView(tenantId);
