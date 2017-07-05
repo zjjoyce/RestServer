@@ -68,26 +68,32 @@ public class HdfsUtils {
   public static List<Quota> getContenSummary(Path filePath) {
       List quotaList = new ArrayList<Quota>();
     Quota spaceQuota = new Quota("hdfs space quota","","","","hdfs space quota");
-    Quota fileQuota = new Quota("hdfs space quota","","","","hdfs space quota");
+    Quota fileQuota = new Quota("hdfs file count quota","","","","hdfs file count quota");
 
       try {
       FileSystem fs = FileSystem.get(conf);
       ContentSummary contentSum = fs.getContentSummary(filePath);
+      // space quota
       Long spaceConsumed = contentSum.getSpaceConsumed();
       Long spaceQuota1 = contentSum.getSpaceQuota();
       spaceQuota.setUsed(String.valueOf(spaceConsumed));
-      spaceQuota.setSize(String.valueOf(spaceQuota));
+      spaceQuota.setSize(String.valueOf(spaceQuota1));
       spaceQuota.setAvailable(String.valueOf(spaceQuota1 - spaceConsumed));
+      //file count quota
       fileQuota.setUsed(String.valueOf(contentSum.getFileCount()));
       fileQuota.setSize(String.valueOf(contentSum.getQuota()));
       fileQuota.setAvailable(String.valueOf(contentSum.getQuota() - contentSum.getFileCount()));
+      // add two to result
       quotaList.add(fileQuota);
       quotaList.add(spaceQuota);
     } catch (IOException e) {
-      System.out.println(e);
+      log.error("get conent error:" + e);
+      List<Quota> quotas = new ArrayList<Quota>();
+      quotas.add(spaceQuota);
+      quotas.add(fileQuota);
+      return quotas;
     }
     return quotaList;
   }
-
 
 }
