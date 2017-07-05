@@ -21,7 +21,7 @@ import java.util.Map;
 /**
  * Created by YANLSH on 2017/7/3.
  */
-public class testForResource {
+public class dacpForResourceUtil {
     public static void main(String args[]){
         /*hiveuri hiveStr hiveEndStr*/
         String hiveStr = ";dacp.java.security.krb5.realm=EXAMPLE.COM;dacp.java.security.krb5.kdc=10.247.11.9;dacp.hadoop.security.authentication=Kerberos;";
