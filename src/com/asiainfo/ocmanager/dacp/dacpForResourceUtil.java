@@ -3,14 +3,12 @@ package com.asiainfo.ocmanager.dacp;
 import com.asiainfo.ocmanager.dacp.model.DBDistribution;
 import com.asiainfo.ocmanager.dacp.model.DBRegister;
 import com.asiainfo.ocmanager.dacp.model.HadoopResource;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
-import com.sun.tools.javac.util.StringUtils;
 import net.sf.json.JSONObject;
 
 import java.util.ArrayList;
