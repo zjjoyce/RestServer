@@ -13,11 +13,14 @@ public class Team {
     private String iconPath;
     private String remark;
 
-    public Team(String xmlId,int teamCode,int teamType,String state){
+    public Team(String xmlId,int teamCode,String teamName,int teamType,String startDate,String state,String iconPath){
         this.xmlId = xmlId;
+        this.teamName = teamName;
         this.teamCode = teamCode;
         this.teamType = teamType;
+        this.startDate = startDate;
         this.state = state;
+        this.iconPath = iconPath;
     }
     public void setXmlId(String xmlId){this.xmlId = xmlId;}
     public String getXmlId(){return this.xmlId;}
