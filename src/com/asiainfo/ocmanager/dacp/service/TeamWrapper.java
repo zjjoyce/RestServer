@@ -22,7 +22,8 @@ public class TeamWrapper {
         String xmlId = tenant.getId();
         int teamCode = tenant.getDacpTeamCode();
         int teamType = tenant.getLevel();
-        Team team = new Team(xmlId,teamCode,teamType,"ON");
+        String teamName = tenant.getName();
+        Team team = new Team(xmlId,teamCode,teamName,teamType,"","ON","/dacp-res/dps/img/team1.png");
         return team;
     }
 
