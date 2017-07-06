@@ -347,17 +347,6 @@ public class TenantResource {
 								.getAsJsonObject("provisioning").get("backingservice_spec_id").getAsString());
 						serviceInstance.setServiceTypeName(resBodyJsonObj.getAsJsonObject("spec")
 								.getAsJsonObject("provisioning").get("backingservice_name").getAsString());
-						if ((resBodyJsonObj.getAsJsonObject("spec").getAsJsonObject("provisioning").get("parameters")
-								.isJsonNull())) {
-							// TODO should get df service quota
-						} else {
-							// parameters are a json format should use to string
-							serviceInstance.setQuota(resBodyJsonObj.getAsJsonObject("spec")
-									.getAsJsonObject("provisioning").get("parameters").toString());
-						}
-
-						// insert the service instance into the adapter DB
-						ServiceInstancePersistenceWrapper.createServiceInstance(serviceInstance);
 
 						// get the just now created instance info
 						String getInstanceResBody = TenantResource.getTenantServiceInstancesFromDf(tenantId,
@@ -374,28 +363,49 @@ public class TenantResource {
 						String instanceName = serviceInstanceJson.getAsJsonObject().getAsJsonObject("metadata")
 								.get("name").getAsString();
 
+						// loop to wait the instance status.phase change to
+						// Unbound if the status.phase is Provisioning the
+						// update will failed, so need to wait
+						logger.info("createServiceInstanceInTenant -> waiting Provisioning to Unbound");
+						while (phase.equals(Constant.PROVISIONING)) {
+							// wait for 3 secs
+							Thread.sleep(3000);
+							// get the instance info again
+							getInstanceResBody = TenantResource.getTenantServiceInstancesFromDf(tenantId,
+									serviceInstance.getInstanceName());
+							serviceInstanceJson = new JsonParser().parse(getInstanceResBody);
+							serviceName = serviceInstanceJson.getAsJsonObject().getAsJsonObject("spec")
+									.getAsJsonObject("provisioning").get("backingservice_name").getAsString();
+							phase = serviceInstanceJson.getAsJsonObject().getAsJsonObject("status").get("phase")
+									.getAsString();
+						}
+						logger.info("createServiceInstanceInTenant -> waiting Provisioning to Unbound successfully");
+
+						// sync here after the create successfully
+						// get the latest status and insert into DB
+						if ((resBodyJsonObj.getAsJsonObject("spec").getAsJsonObject("provisioning").get("parameters")
+								.isJsonNull())) {
+							// TODO should get df service quota
+						} else {
+							// parameters are a json format should use to string
+							serviceInstance.setQuota(serviceInstanceJson.getAsJsonObject().getAsJsonObject("spec")
+									.getAsJsonObject("provisioning").get("parameters").toString());
+						}
+						serviceInstance.setStatus(phase);
+
+						// insert the service instance into the adapter DB
+						ServiceInstancePersistenceWrapper.createServiceInstance(serviceInstance);
+
+						// if the phase is failed, it means the create failed
+						if (phase.equals(Constant.FAILURE)) {
+							logger.info("createServiceInstanceInTenant -> phase is failure, throw directly");
+							return Response.ok()
+									.entity(new AdapterResponseBean("Create failed", getInstanceResBody, 201)).build();
+						}
+
 						// only the OCDP services need to wait to assign the
 						// permission
 						if (Constant.list.contains(serviceName.toLowerCase())) {
-
-							// loop to wait the instance status.phase change to
-							// Unbound if the status.phase is Provisioning the
-							// update will failed, so need to wait
-							logger.info("createServiceInstanceInTenant -> waiting Provisioning to Unbound");
-							while (phase.equals(Constant.PROVISIONING)) {
-								// wait for 3 secs
-								Thread.sleep(3000);
-								// get the instance info again
-								getInstanceResBody = TenantResource.getTenantServiceInstancesFromDf(tenantId,
-										serviceInstance.getInstanceName());
-								serviceInstanceJson = new JsonParser().parse(getInstanceResBody);
-								serviceName = serviceInstanceJson.getAsJsonObject().getAsJsonObject("spec")
-										.getAsJsonObject("provisioning").get("backingservice_name").getAsString();
-								phase = serviceInstanceJson.getAsJsonObject().getAsJsonObject("status").get("phase")
-										.getAsString();
-							}
-							logger.info(
-									"createServiceInstanceInTenant -> waiting Provisioning to Unbound successfully");
 
 							List<UserRoleView> users = UserRoleViewPersistenceWrapper.getUsersInTenant(tenantId);
 
@@ -431,8 +441,7 @@ public class TenantResource {
 								// can access the service instance
 								// and they have the same permission
 								ServiceRolePermission permission = ServiceRolePermissionWrapper
-										.getServicePermissionByRoleId(serviceName,
-												Constant.PROJECTMANAGERROLE);
+										.getServicePermissionByRoleId(serviceName, Constant.PROJECTMANAGERROLE);
 
 								provisioning.getAsJsonObject("parameters").addProperty("accesses",
 										permission.getServicePermission());
@@ -463,11 +472,8 @@ public class TenantResource {
 										}
 									}
 								}
-
 							}
-
 						}
-
 					}
 
 					return Response.ok().entity(bodyStr).build();
