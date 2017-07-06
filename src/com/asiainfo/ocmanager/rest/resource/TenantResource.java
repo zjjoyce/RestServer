@@ -399,8 +399,7 @@ public class TenantResource {
 						// if the phase is failed, it means the create failed
 						if (phase.equals(Constant.FAILURE)) {
 							logger.info("createServiceInstanceInTenant -> phase is failure, throw directly");
-							return Response.ok()
-									.entity(new AdapterResponseBean("Create failed", getInstanceResBody, 201)).build();
+							return Response.ok().entity(getInstanceResBody).build();
 						}
 
 						// only the OCDP services need to wait to assign the
