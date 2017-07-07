@@ -77,8 +77,8 @@ public class TenantResource {
 			return Response.ok().entity(tenants).build();
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("getAllTenants -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 	}
 
@@ -98,8 +98,8 @@ public class TenantResource {
 			return Response.ok().entity(tenant).build();
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("getTenantById -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 	}
 
@@ -119,8 +119,8 @@ public class TenantResource {
 			return Response.ok().entity(tenants).build();
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("getChildrenTenants -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 	}
 
@@ -140,8 +140,8 @@ public class TenantResource {
 			return Response.ok().entity(usersRoles).build();
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("getTenantUsers -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 	}
 
@@ -161,8 +161,8 @@ public class TenantResource {
 			return Response.ok().entity(role).build();
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("getRoleByTenantUserName -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 	}
 
@@ -183,8 +183,8 @@ public class TenantResource {
 			return Response.ok().entity(serviceInstances).build();
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("getTenantServiceInstances -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 	}
 
@@ -204,8 +204,8 @@ public class TenantResource {
 			return Response.ok().entity(TenantResource.getTenantServiceInstancesFromDf(tenantId, InstanceName)).build();
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("getTenantServiceInstanceAccessInfo -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 
 	}
@@ -263,12 +263,14 @@ public class TenantResource {
 				se.setContentType("application/json");
 				httpPost.setEntity(se);
 
+				logger.info("createTenant -> start create");
 				CloseableHttpResponse response2 = httpclient.execute(httpPost);
 
 				try {
 					int statusCode = response2.getStatusLine().getStatusCode();
 
 					if (statusCode == 201) {
+						logger.info("createTenant -> start successfully");
 						// very ugly code here hard code 3 level
 						// only for citic should enhance
 						if (tenant.getParentId() == null) {
@@ -291,8 +293,8 @@ public class TenantResource {
 			}
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("createTenant -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 	}
 
@@ -484,8 +486,8 @@ public class TenantResource {
 			}
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("createServiceInstanceInTenant -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 
 	}
@@ -515,6 +517,8 @@ public class TenantResource {
 			String phase = serviceInstanceJson.getAsJsonObject().getAsJsonObject("status").get("phase").getAsString();
 
 			if (phase.equals(Constant.PROVISIONING)) {
+				logger.info(
+						"updateServiceInstanceInTenant -> The instance can not be updated when it is Provisioning!");
 				return Response.status(Status.BAD_REQUEST)
 						.entity("The instance can not be updated when it is Provisioning!").build();
 			}
@@ -532,13 +536,31 @@ public class TenantResource {
 			JsonObject status = serviceInstanceJson.getAsJsonObject().getAsJsonObject("status");
 			status.addProperty("patch", Constant.UPDATE);
 
+			logger.info("updateServiceInstanceInTenant -> update start");
 			AdapterResponseBean responseBean = TenantResource.updateTenantServiceInstanceInDf(tenantId, instanceName,
 					serviceInstanceJson.toString());
+
+			String quota = null;
+			if (responseBean.getResCodel() == 200) {
+				logger.info("updateServiceInstanceInTenant -> update successfully");
+				JsonElement resBodyJson = new JsonParser().parse(responseBean.getMessage());
+				JsonObject resBodyJsonObj = resBodyJson.getAsJsonObject();
+				if ((resBodyJsonObj.getAsJsonObject("spec").getAsJsonObject("provisioning").get("parameters")
+						.isJsonNull())) {
+					// TODO should get df service quota
+				} else {
+					quota = serviceInstanceJson.getAsJsonObject().getAsJsonObject("spec")
+							.getAsJsonObject("provisioning").get("parameters").toString();
+				}
+
+				ServiceInstancePersistenceWrapper.updateServiceInstanceQuota(tenantId, instanceName, quota);
+			}
+
 			return Response.ok().entity(responseBean.getMessage()).build();
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("updateServiceInstanceInTenant -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 	}
 
@@ -605,12 +627,14 @@ public class TenantResource {
 				httpDelete.addHeader("Content-type", "application/json");
 				httpDelete.addHeader("Authorization", "bearer " + token);
 
+				logger.info("deleteServiceInstanceInTenant -> start delete");
 				CloseableHttpResponse response1 = httpclient.execute(httpDelete);
 
 				try {
 					int statusCode = response1.getStatusLine().getStatusCode();
 					if (statusCode == 200) {
 						ServiceInstancePersistenceWrapper.deleteServiceInstance(tenantId, instanceName);
+						logger.info("deleteServiceInstanceInTenant -> delete successfully");
 					}
 					String bodyStr = EntityUtils.toString(response1.getEntity());
 
@@ -623,8 +647,8 @@ public class TenantResource {
 			}
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("deleteServiceInstanceInTenant -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 
 	}
@@ -668,12 +692,14 @@ public class TenantResource {
 				httpDelete.addHeader("Content-type", "application/json");
 				httpDelete.addHeader("Authorization", "bearer " + token);
 
+				logger.info("deleteTenant -> delete start");
 				CloseableHttpResponse response1 = httpclient.execute(httpDelete);
 
 				try {
 					int statusCode = response1.getStatusLine().getStatusCode();
 					if (statusCode == 200) {
 						TenantPersistenceWrapper.deleteTenant(tenantId);
+						logger.info("deleteTenant -> delete successfully");
 					}
 					String bodyStr = EntityUtils.toString(response1.getEntity());
 
@@ -686,8 +712,8 @@ public class TenantResource {
 			}
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("deleteTenant -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 	}
 
@@ -784,8 +810,8 @@ public class TenantResource {
 
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("assignRoleToUserInTenant -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 
 	}
@@ -889,8 +915,8 @@ public class TenantResource {
 
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("updateRoleToUserInTenant -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 
 	}
@@ -943,8 +969,8 @@ public class TenantResource {
 
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("unassignRoleFromUserInTenant -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 
 	}
@@ -963,6 +989,7 @@ public class TenantResource {
 		int currentBound = instJson.getAsJsonObject().getAsJsonObject("spec").get("bound").getAsInt();
 
 		while (currentBound == bound) {
+			logger.info("watiInstanceUnBindingComplete -> waiting");
 			Thread.sleep(500);
 			instStr = TenantResource.getTenantServiceInstancesFromDf(tenantId, instanceName);
 			instJson = new JsonParser().parse(instStr);
@@ -985,6 +1012,7 @@ public class TenantResource {
 		int currentBound = instJson.getAsJsonObject().getAsJsonObject("spec").get("bound").getAsInt();
 
 		while (currentBound == bound) {
+			logger.info("watiInstanceBindingComplete -> waiting");
 			Thread.sleep(500);
 			instStr = TenantResource.getTenantServiceInstancesFromDf(tenantId, instanceName);
 			instJson = new JsonParser().parse(instStr);
@@ -1003,6 +1031,7 @@ public class TenantResource {
 		JsonElement patch = updateInstJson.getAsJsonObject().getAsJsonObject("status").get("patch");
 
 		while (patch != null) {
+			logger.info("watiInstanceUpdateComplete -> waiting");
 			Thread.sleep(500);
 			updateInstStr = TenantResource.getTenantServiceInstancesFromDf(tenantId, instanceName);
 			updateInstJson = new JsonParser().parse(updateInstStr);
