@@ -60,6 +60,9 @@ public class TestTenant {
 				System.out.println(r.getLevel());
 			}
 
+			System.out.println("=== update tenant name ===");
+			mapper.updateTenantName("t1", "aaaaaaaa");
+			
 			session.commit();
 		} catch (Exception e) {
 			session.rollback();
