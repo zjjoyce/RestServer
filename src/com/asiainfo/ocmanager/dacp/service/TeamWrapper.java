@@ -19,10 +19,15 @@ public class TeamWrapper {
      */
     public static Team getTeamFromTenant(String tenantId){
         Tenant tenant = TenantPersistenceWrapper.getTenantById(tenantId);
+        if(tenant.equals(null)){
+            Team team = new  Team("",0,"",1,"","ON","/dacp-res/dps/img/team1.png");
+            return team;
+        }
         String xmlId = tenant.getId();
         int teamCode = tenant.getDacpTeamCode();
         int teamType = tenant.getLevel();
-        Team team = new Team(xmlId,teamCode,teamType,"ON");
+        String teamName = tenant.getName();
+        Team team = new Team(xmlId,teamCode,teamName,teamType,"","ON","/dacp-res/dps/img/team1.png");
         return team;
     }
 

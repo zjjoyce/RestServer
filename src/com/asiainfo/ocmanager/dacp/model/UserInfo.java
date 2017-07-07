@@ -16,7 +16,6 @@ public class UserInfo {
     private String msn;
     private List<String> role;
 
-    public UserInfo(){}
     public UserInfo(String userName,String usercnName,String password,String phone,String qq,String mail,String msn,List<String> role){
         this.userName = userName;
         this.usercnName = usercnName;

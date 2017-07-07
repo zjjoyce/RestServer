@@ -13,11 +13,11 @@ public class kafkaUtils {
     private static final Properties props = new Properties();
 
     static{
-        String currentClassPath = new HdfsUtils().getClass().getResource("/").getPath();
+        String currentClassPath = new kafkaUtils().getClass().getResource("/").getPath();
         String  jaasPath= currentClassPath.substring(0, currentClassPath.length() - 8) + "conf/kafka-jaas.conf";
         String  krbPath = currentClassPath.substring(0,currentClassPath.length() - 8) + "conf/krb5.conf";
-        System.setProperty("java.security.auth.login.config", "conf/kafka-jaas.conf");
-        System.setProperty("java.security.krb5.conf", "conf/krb5.conf");
+        System.setProperty("java.security.auth.login.config",jaasPath);
+        System.setProperty("java.security.krb5.conf", krbPath);
         //System.setProperty("sun.security.krb5.debug", "true");
         props.put("security.protocol", "SASL_PLAINTEXT");
         System.out.println("begin to register for kerberos");
@@ -27,48 +27,39 @@ public class kafkaUtils {
         props.put("auto.commit.interval.ms", "1000");
         props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
-        System.out.println("keytab is :" + props.getProperty("keyTab"));
-
     }
-    public static Quota getKafkaQuota(String topicName){
-        String path=Thread.currentThread().getContextClassLoader().getResource("").toString();
-        path=path.replace('/', '\\'); // 将/换成\
-        path=path.replace("file:", ""); //去掉file:
-        path=path.replace("classes\\", ""); //去掉class\
-        path=path.substring(1); //去掉第一个\,如 \D:\JavaWeb...
-        path+="conf\\shixiuru.keytab";
-        System.out.println("Kafka kafka-jaas.conf 文件中路径："+path);
-        KafkaConsumer<byte[], byte[]> consumer = new KafkaConsumer<byte[], byte[]>(props);
-        //consumer.subscribe(Arrays.asList(topicName));
-        //Map<String, List<PartitionInfo>> listPartionInfoForTopic = consumer.listTopics();
+    public static Quota  getKafkaQuota(String topicName){
+
+
+        KafkaConsumer<byte[],byte[]> consumer = new KafkaConsumer<byte[],byte[]>(props);
+
         List<PartitionInfo> PartionInfoForTopic = consumer.partitionsFor(topicName);
         int partitionNum = PartionInfoForTopic.size();
-        String partitionNumStr = String.valueOf("1");
+        String partitionNumStr = String.valueOf(partitionNum);
         Quota partitionQuota= new Quota("partitionQuota",partitionNumStr,"","","kafka topic partiton num");
 
+//
+//
+//        String topic = "__consumer_offsets";
+//        //port
+//        int port = Integer.parseInt("6667");
+//        //查找的分区
+//        int partition = Integer.parseInt("23");
+//        // broker节点
+//        List<String> seeds = new ArrayList<String>();
+//        seeds.add("zx-dn-10");
+//        seeds.add("zx-dn-11");
+//        seeds.add("zx-dn-12");
+//        seeds.add("zx-dn-13");
+//        seeds.add("zx-dn-14");
+//        seeds.add("zx-bdi-01");
+//        seeds.add("zx-bdi-02");
+//        seeds.add("zx-bdi-03");
 
 
 
-        String topic = "__consumer_offsets";
-        //port
-        int port = Integer.parseInt("6667");
-        //查找的分区
-        int partition = Integer.parseInt("23");
-        // broker节点
-        List<String> seeds = new ArrayList<String>();
-        seeds.add("zx-dn-10");
-        seeds.add("zx-dn-11");
-        seeds.add("zx-dn-12");
-        seeds.add("zx-dn-13");
-        seeds.add("zx-dn-14");
-        seeds.add("zx-bdi-01");
-        seeds.add("zx-bdi-02");
-        seeds.add("zx-bdi-03");
 
-
-
-
-        String clientName = "Client_Leader_LookUp";
+//        String clientName = "Client_Leader_LookUp";
         /*for (String seedBroker : seeds) {
             SimpleConsumer consumer1 = null;
             try {
@@ -92,6 +83,5 @@ public class kafkaUtils {
         }*/
         return partitionQuota;
     }
-
 
 }
