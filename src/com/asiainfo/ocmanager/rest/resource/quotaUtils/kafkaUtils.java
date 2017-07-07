@@ -1,9 +1,14 @@
 package com.asiainfo.ocmanager.rest.resource.quotaUtils;
 
 import com.asiainfo.ocmanager.persistence.model.Quota;
+import com.jcraft.jsch.*;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.PartitionInfo;
 
+
+import java.io.*;
 import java.util.*;
 
 /**
@@ -11,11 +16,12 @@ import java.util.*;
  */
 public class kafkaUtils {
     private static final Properties props = new Properties();
+    public static Log logger = LogFactory.getLog(kafkaUtils.class);
 
-    static{
+    public  static Quota  getKafkaQuota(String topicName){
         String currentClassPath = new kafkaUtils().getClass().getResource("/").getPath();
-        String  jaasPath= currentClassPath.substring(0, currentClassPath.length() - 8) + "conf/kafka-jaas.conf";
-        String  krbPath = currentClassPath.substring(0,currentClassPath.length() - 8) + "conf/krb5.conf";
+        String  jaasPath= currentClassPath.substring(0, currentClassPath.length() - 8) + "ocmanager/WEB-INF/conf/kafka-jaas.conf";
+        String  krbPath = currentClassPath.substring(0,currentClassPath.length() - 8) + "ocmanager/WEB-INF/conf/krb5.conf";
         System.setProperty("java.security.auth.login.config",jaasPath);
         System.setProperty("java.security.krb5.conf", krbPath);
         //System.setProperty("sun.security.krb5.debug", "true");
@@ -27,61 +33,88 @@ public class kafkaUtils {
         props.put("auto.commit.interval.ms", "1000");
         props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
-    }
-    public static Quota  getKafkaQuota(String topicName){
 
-
-        KafkaConsumer<byte[],byte[]> consumer = new KafkaConsumer<byte[],byte[]>(props);
+        KafkaConsumer<byte[],byte[]> consumer = new KafkaConsumer<>(props);
 
         List<PartitionInfo> PartionInfoForTopic = consumer.partitionsFor(topicName);
         int partitionNum = PartionInfoForTopic.size();
         String partitionNumStr = String.valueOf(partitionNum);
         Quota partitionQuota= new Quota("partitionQuota",partitionNumStr,"","","kafka topic partiton num");
 
-//
-//
-//        String topic = "__consumer_offsets";
-//        //port
-//        int port = Integer.parseInt("6667");
-//        //查找的分区
-//        int partition = Integer.parseInt("23");
-//        // broker节点
-//        List<String> seeds = new ArrayList<String>();
-//        seeds.add("zx-dn-10");
-//        seeds.add("zx-dn-11");
-//        seeds.add("zx-dn-12");
-//        seeds.add("zx-dn-13");
-//        seeds.add("zx-dn-14");
-//        seeds.add("zx-bdi-01");
-//        seeds.add("zx-bdi-02");
-//        seeds.add("zx-bdi-03");
 
+        logger.info("partitionQuota is:" + partitionNumStr);
 
-
-
-//        String clientName = "Client_Leader_LookUp";
-        /*for (String seedBroker : seeds) {
-            SimpleConsumer consumer1 = null;
-            try {
-                consumer1 = new SimpleConsumer(seedBroker, port, 100000, 64 * 1024, clientName);
-                List<Object> topics = new ArrayList<Object>();
-                topics.add(topic);
-                TopicMetadataRequest topicMetadataRequest = new TopicMetadataRequest(topics);
-                TopicMetadataResponse topicMetadataResponse = consumer1.send(topicMetadataRequest);
-
-                List<TopicMetadata> topicMetadatas = topicMetadataResponse.topicsMetadata();
-                for (TopicMetadata topicMetadata : topicMetadatas) {
-                    int a = Integer.valueOf(topicMetadata.sizeInBytes().toString());
-                    System.out.println("此topic的大小为：" + a);
-                }
-            } catch (Exception e) {
-                System.out.println("error communicating with broker [" + seedBroker + "] to find leader for [" + topic + ", " + partition + "] reason: " + e);
-            } finally {
-                if (consumer1 != null)
-                    consumer1.close();
-            }
-        }*/
         return partitionQuota;
     }
+    public static Quota getKafkaSpaceQuota(String topicName){
 
+        Quota quota = new Quota();
+        JSch jsch = new JSch();
+        Session session = null;
+        Channel channel = null;
+        String privateKeyPath = "\\C:\\users\\yujin\\yujing2_rsa_pub";
+        String shellCommand = "du -sm /hdfs/data1/kafka-logs/__consumer_offsets-42\n";
+
+        try{
+            jsch.addIdentity(privateKeyPath);
+            session = jsch.getSession("ai","zx-dn-10",22);
+            session.setConfig("PreferredAuthentications","publickey,keyboard-interactive,password");
+            Properties config = new Properties();
+            config.put("StrictHostKeyChecking","no");
+            session.setConfig(config);
+            session.connect(30000);
+
+            // 创建sftp通信通道
+            channel = (Channel) session.openChannel("shell");
+            channel.connect(1000);
+
+
+            //获取输入流和输出流
+            InputStream instream = channel.getInputStream();
+            OutputStream outstream = channel.getOutputStream();
+
+
+            // 发送需要执行的shell命令，需要用\n 结束，表示回车
+            outstream.write(shellCommand.getBytes());
+            outstream.flush();
+
+
+            //获取执行结果
+            if(instream.available() > 0){
+                byte[] data = new byte[instream.available()];
+                int nlen = instream.read(data);
+                if(nlen < 0){
+                    throw new Exception("network error.");
+                }
+                //转换输出结果并打印
+                String temp = new String(data,0,nlen,"iso8859-1");
+                System.out.println(temp);
+                String[] cmdResult = temp.split("\n");
+                String dirSize = cmdResult[1].split("\t")[0];
+                quota.setSize(dirSize);
+
+            }
+//            outstream.close();
+//            instream.close();
+
+        }catch (JSchException e){
+            logger.error("Error during SSH command execution.Command is :"+shellCommand);
+        }catch (IOException e){
+            logger.error(e);
+        }catch (Exception ex){
+            logger.error(ex);
+            }finally {
+
+            channel.disconnect();
+            session.disconnect();
+        }
+        return quota;
+
+    }
+    public static void main(String[] args){
+        kafkaUtils kafka= new kafkaUtils();
+//        Quota quota = kafka.getKafkaQuota("__consumer_offsets");
+        Quota quota = kafka.getKafkaSpaceQuota("test");
+        logger.info("kafka quota is:"+quota.getSize());
+    }
 }
