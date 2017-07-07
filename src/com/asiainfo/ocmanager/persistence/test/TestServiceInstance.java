@@ -32,6 +32,10 @@ public class TestServiceInstance {
 				System.out.println(si.getServiceTypeName());
 			}
 
+			
+			System.out.println("=== update quota successfully ==");
+			mapper.updateInstanceQuota("zhaoyim", "hive-instance001", null);
+			
 			session.commit();
 		} catch (Exception e) {
 			session.rollback();

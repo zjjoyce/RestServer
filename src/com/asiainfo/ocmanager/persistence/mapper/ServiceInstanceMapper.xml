@@ -21,4 +21,10 @@
     <select id="selectAllServiceInstances" resultType="com.asiainfo.ocmanager.persistence.model.ServiceInstance">
         select * from service_instances
     </select>
+	<!-- update instance quota -->
+	<update id="updateInstanceQuota" parameterType="java.lang.String">
+		update service_instances set
+		quota = #{quota}
+		where tenantId = #{tenantId} and instanceName = #{instanceName}
+	</update>
 </mapper>

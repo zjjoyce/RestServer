@@ -46,8 +46,8 @@ public class UserResource {
 			return Response.ok().entity(users).build();
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("getUsers -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 	}
 
@@ -67,8 +67,8 @@ public class UserResource {
 			return Response.ok().entity(user == null ? new User() : user).build();
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("getUserById -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 	}
 
@@ -88,8 +88,8 @@ public class UserResource {
 			return Response.ok().entity(user).build();
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("createUser -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 	}
 
@@ -109,8 +109,8 @@ public class UserResource {
 			return Response.ok().entity(user).build();
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("updateUser -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 	}
 
@@ -129,8 +129,8 @@ public class UserResource {
 			return Response.ok().entity(new AdapterResponseBean("delete success", userId, 200)).build();
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("deleteUser -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 	}
 
@@ -148,8 +148,8 @@ public class UserResource {
 			return Response.ok().entity(turs).build();
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("getTenantAndRoleById -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 	}
 
@@ -162,8 +162,8 @@ public class UserResource {
 			return Response.ok().entity(turs).build();
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("getTenantAndRoleByName -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 	}
 }

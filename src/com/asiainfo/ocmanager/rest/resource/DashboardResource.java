@@ -28,7 +28,7 @@ import com.asiainfo.ocmanager.rest.resource.utils.DashboardPersistenceWrapper;
 
 @Path("/dashboard")
 public class DashboardResource {
-	
+
 	private static Logger logger = Logger.getLogger(TenantResource.class);
 
 	/**
@@ -45,8 +45,8 @@ public class DashboardResource {
 			return Response.ok().entity(dashboard).build();
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("getAllDashboardLinks -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 	}
 
@@ -65,8 +65,8 @@ public class DashboardResource {
 			return Response.ok().entity(dashboard).build();
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("getDashboardLink -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 	}
 
@@ -86,8 +86,8 @@ public class DashboardResource {
 			return Response.ok().entity(new AdapterResponseBean("successful", "Add successfully", 200)).build();
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("addDashboardLink -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 	}
 
@@ -108,8 +108,8 @@ public class DashboardResource {
 			return Response.ok().entity(new AdapterResponseBean("successful", "Update successfully", 200)).build();
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("updateDashboardLink -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 	}
 
@@ -129,8 +129,8 @@ public class DashboardResource {
 			return Response.ok().entity(new AdapterResponseBean("successful", "Delete successfully", 200)).build();
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("deleteDashboardLink -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 	}
 

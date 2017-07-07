@@ -103,8 +103,8 @@ public class ServiceResource {
 			return Response.ok().entity(services).build();
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("getServices -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 	}
 
@@ -123,8 +123,8 @@ public class ServiceResource {
 			return Response.ok().entity(service == null ? new Service() : service).build();
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("getServiceById -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 	}
 
@@ -162,41 +162,6 @@ public class ServiceResource {
 					// int statusCode =
 					// response2.getStatusLine().getStatusCode();
 					String bodyStr = EntityUtils.toString(response2.getEntity());
-					// if (statusCode == 201) {
-					// // TODO should call df service api and compare with
-					// adapter db service data, insert the data which is not in
-					// the adapter db
-					// List<Service> servicesInDB =
-					// ServicePersistenceWrapper.getAllServices();
-					//
-					// String servicesFromDf =
-					// ServiceResource.callDFToGetAllServices();
-					// JsonObject servicesFromDfJson = new
-					// JsonParser().parse(servicesFromDf).getAsJsonObject();
-					// JsonArray items =
-					// servicesFromDfJson.getAsJsonArray("items");
-					//
-					// if (items != null || items.size() != 0) {
-					// for (int i = 0; i < items.size(); i++) {
-					// String name =
-					// items.get(i).getAsJsonObject().getAsJsonObject("spec")
-					// .get("name").getAsString();
-					// String id =
-					// items.get(i).getAsJsonObject().getAsJsonObject("spec")
-					// .get("id").getAsString();
-					// String description =
-					// items.get(i).getAsJsonObject().getAsJsonObject("spec")
-					// .get("description").getAsString();
-					//
-					// for(Service s: servicesInDB){
-					// if (!s.getId().equals(id)) {
-					// ServicePersistenceWrapper.addService(new Service(id,
-					// name, description));
-					// }
-					// }
-					// }
-					// }
-					// }
 
 					return Response.ok().entity(bodyStr).build();
 				} finally {
@@ -207,8 +172,8 @@ public class ServiceResource {
 			}
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("addServiceBroker -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 	}
 
@@ -225,8 +190,8 @@ public class ServiceResource {
 			return Response.ok().entity(ServiceResource.callDFToGetAllServices()).build();
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("getServiceFromDf -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 	}
 
@@ -269,8 +234,8 @@ public class ServiceResource {
 			}
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("deleteServiceBroker -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 	}
 
@@ -330,8 +295,8 @@ public class ServiceResource {
 			return Response.ok().entity(serviceInstances).build();
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("getAllServiceInstances -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 	}
 
