@@ -21,6 +21,7 @@ import com.asiainfo.ocmanager.rest.utils.DFPropertiesFoundry;
 
 public class DBConnectorFactory {
 
+	// TODO the db connection need to change not use the one connection
 	public static SqlSessionFactory sessionFactory;
 
 	static {

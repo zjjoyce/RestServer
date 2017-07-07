@@ -20,6 +20,13 @@ public class Constant {
 	public final static String PROJECTMANAGERROLE = "a12a84d0-524a-11e7-9dbb-fa163ed7d0ae";
 
 	/*****************************************************************/
+	/************************** monitor const ************************/
+	/*****************************************************************/
+	
+	public final static String TENANT_MONITOR_PERIOD = "tenant.monitor.period";
+	public final static String TENANT_MONITOR_URL = "tenant.monitor.url";
+
+	/*****************************************************************/
 	/************************** adapter const ************************/
 	/*****************************************************************/
 	// ocdp service name list
