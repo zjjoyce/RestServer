@@ -11,7 +11,9 @@ public enum DBUrlEnum {
     MySQL("jdbc:mysql://","mysql"),                     //mysqlStr ip:port /  dbname
     GREENPLUM("jdbc:pivotal:greenplum://","greenplum"), //greenplumStr ip:port greenplumEndStr dbname
     DB2("jdbc:db2://","db2"),                           //db2Str ip:port / dbname
-    SQLSERVER("jdbc:sqlserver://","sqlserver");         //sqlserverStr ip:port sqlserverEndStr dbname
+    SQLSERVER("jdbc:sqlserver://","sqlserver"),         //sqlserverStr ip:port sqlserverEndStr dbnam
+    NEO4J("jdbc:neo4j://","neo4j"),
+    MONGODB("","mongodb");
 
 
     static String hiveEndStr = "dacp.keytab.file=/home/dacp/dacp03dn;dacp.kerberos.principal=dacp/ZX-DN-03@EXAMPLE.COM";
@@ -45,6 +47,10 @@ public enum DBUrlEnum {
                     return c.driveUrl + ip + ":" + port + "/" + dbname; //jdbc:db2://x.x.x.x:50010/ngcqdw
                 }else if("sqlserver".equals(driveTypeStr)){
                     return c.driveUrl + ip + ":" + port + sqlserverEndStr + dbname; //jdbc:mysql://x.x.x.x:3306/d81ec211eec89cd5
+                }else if("mongodb".equals(driveTypeStr)){
+                    return uri; //mongodb://username:password@ip:port/datavase
+                }else if("neo4j".equals(driveTypeStr)){
+                    return c.driveUrl + ip + ":" + port + "/"; //jdbc:neo4j://localhost:7474/
                 }
             }
         }
@@ -54,19 +60,4 @@ public enum DBUrlEnum {
     public String getDriveType() {
         return driveType;
     }
-
-    public void setDriveType(String driveType) {
-        this.driveType = driveType;
-    }
-
-    public String getDriveClassname() {
-        return driveUrl;
-    }
-
-    public void setDriveClassname(String driveClassname) {
-        this.driveUrl = driveClassname;
-    }
-
-
-
 }
