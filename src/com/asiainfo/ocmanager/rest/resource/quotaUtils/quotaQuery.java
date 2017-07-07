@@ -7,10 +7,10 @@ import com.asiainfo.ocmanager.persistence.model.Quota;
 import com.asiainfo.ocmanager.rest.resource.quotaUtils.HdfsUtils;
 import com.sun.org.apache.xpath.internal.operations.Quo;
 
-import kafka.javaapi.TopicMetadata;
-import kafka.javaapi.TopicMetadataRequest;
-import kafka.javaapi.TopicMetadataResponse;
-import kafka.javaapi.consumer.SimpleConsumer;
+//import kafka.javaapi.TopicMetadata;
+//import kafka.javaapi.TopicMetadataRequest;
+//import kafka.javaapi.TopicMetadataResponse;
+//import kafka.javaapi.consumer.SimpleConsumer;
 import org.apache.hadoop.fs.Path;
 
 import com.mongodb.MongoClient;
