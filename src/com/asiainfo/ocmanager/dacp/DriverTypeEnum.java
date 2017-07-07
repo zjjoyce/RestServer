@@ -1,12 +1,21 @@
 package com.asiainfo.ocmanager.dacp;
 
 /**
- * Created by YANLSH on 2017/7/3.
+ * Created by YANLSH
+ * Created on 2017/7/3
  */
 public enum DriverTypeEnum {
     ORACLE("oracle.jdbc.dirver.OracleDriver","oracle"), MySQL("com.mysql.jdbc.Driver","mysql"),
     DB2("com.ibm.db2.jdbc.net.DB2Driver","db2"), HIVE("org.apache.hadoop.hive.jdbc.HiveDriver","hive"),
-    GREENPLUM("org.postgresql.Driver","greenplum");
+    GREENPLUM("com.pivotal.jdbc.GreenplumDriver","greenplum"),MONGODB("mongodb.jdbc.MongoDriver","mongodb"),
+    NEO4J("org.neo4j.jdbc.Driver","neo4j"),GBASE("com.gbase.jdbc.Driver","gbase"),
+    TERADATA("com.ncr.teradata.TeraDriver","teradata"),SQLSERVER("com.microsoft.sqlserver.jdbc.SQLServerDriver","sqlserver"),
+    POSTGRE("org.postgresql.Driver","postgresql"),
+    HDFS("","hdfs"),
+    SPARK("","spark"),
+    HBASE("","hbase"),
+    KAFKA("","kafka"),
+    MAPREDUCE("","mapreduce");
 
     String driveClassname;
 
@@ -31,19 +40,4 @@ public enum DriverTypeEnum {
     public String getDriveType() {
         return driveType;
     }
-
-    public void setDriveType(String driveType) {
-        this.driveType = driveType;
-    }
-
-    public String getDriveClassname() {
-        return driveClassname;
-    }
-
-    public void setDriveClassname(String driveClassname) {
-        this.driveClassname = driveClassname;
-    }
-
-
-
 }
