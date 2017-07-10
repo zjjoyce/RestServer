@@ -39,15 +39,15 @@ public class UserResource {
 	 * @return user list
 	 */
 	@GET
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	public Response getUsers() {
 		try {
 			List<User> users = UserPersistenceWrapper.getUsers();
 			return Response.ok().entity(users).build();
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("getUsers -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 	}
 
@@ -60,15 +60,15 @@ public class UserResource {
 	 */
 	@GET
 	@Path("{id}")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	public Response getUserById(@PathParam("id") String userId) {
 		try {
 			User user = UserPersistenceWrapper.getUserById(userId);
 			return Response.ok().entity(user == null ? new User() : user).build();
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("getUserById -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 	}
 
@@ -80,7 +80,7 @@ public class UserResource {
 	 * @return new user info
 	 */
 	@POST
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response createUser(User user) {
 		try {
@@ -88,8 +88,8 @@ public class UserResource {
 			return Response.ok().entity(user).build();
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("createUser -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 	}
 
@@ -101,7 +101,7 @@ public class UserResource {
 	 * @return updated user info
 	 */
 	@PUT
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response updateUser(User user) {
 		try {
@@ -109,8 +109,8 @@ public class UserResource {
 			return Response.ok().entity(user).build();
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("updateUser -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 	}
 
@@ -122,15 +122,15 @@ public class UserResource {
 	 */
 	@DELETE
 	@Path("{id}")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	public Response deleteUser(@PathParam("id") String userId) {
 		try {
 			UserPersistenceWrapper.deleteUser(userId);
 			return Response.ok().entity(new AdapterResponseBean("delete success", userId, 200)).build();
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("deleteUser -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 	}
 
@@ -141,29 +141,29 @@ public class UserResource {
 	 */
 	@GET
 	@Path("id/{id}/tenants")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	public Response getTenantAndRoleById(@PathParam("id") String userId) {
 		try {
 			List<UserRoleView> turs = UserRoleViewPersistenceWrapper.getTenantAndRoleBasedOnUserId(userId);
 			return Response.ok().entity(turs).build();
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("getTenantAndRoleById -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 	}
 
 	@GET
 	@Path("name/{name}/tenants")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	public Response getTenantAndRoleByName(@PathParam("name") String userName) {
 		try {
 			List<UserRoleView> turs = UserRoleViewPersistenceWrapper.getTenantAndRoleBasedOnUserName(userName);
 			return Response.ok().entity(turs).build();
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("getTenantAndRoleByName -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 	}
 }

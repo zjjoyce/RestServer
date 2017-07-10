@@ -104,4 +104,26 @@ public class ServiceInstancePersistenceWrapper {
 		return serviceInstances;
 	}
 
+	/**
+	 * 
+	 * @param tenantId
+	 * @param instanceName
+	 * @param quota
+	 */
+	public static void updateServiceInstanceQuota(String tenantId, String instanceName, String quota) {
+		SqlSession session = DBConnectorFactory.getSession();
+		try {
+			ServiceInstanceMapper mapper = session.getMapper(ServiceInstanceMapper.class);
+
+			mapper.updateInstanceQuota(tenantId, instanceName, quota);
+
+			session.commit();
+		} catch (Exception e) {
+			session.rollback();
+			throw e;
+		} finally {
+			session.close();
+		}
+	}
+
 }

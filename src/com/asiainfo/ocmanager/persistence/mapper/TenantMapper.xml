@@ -32,4 +32,10 @@
 	<delete id="deleteTenant">
 		delete from tenants where id=#{id}
 	</delete>
+	<!-- update tenant name -->
+	<update id="updateTenantName" parameterType="java.lang.String">
+		update tenants set
+		name = #{name}
+		where id = #{id}
+	</update>
 </mapper>
