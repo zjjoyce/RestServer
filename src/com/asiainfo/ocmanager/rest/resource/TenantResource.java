@@ -20,6 +20,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import com.asiainfo.ocmanager.dacp.DacpAllResult;
 import com.asiainfo.ocmanager.dacp.model.DacpResult;
 import com.asiainfo.ocmanager.dacp.model.Team;
 import com.asiainfo.ocmanager.dacp.model.UserInfo;
@@ -667,37 +668,7 @@ public class TenantResource {
 
 			assignment = TURAssignmentPersistenceWrapper.assignRoleToUserInTenant(assignment);
 
-            // post to dacp rest interface
-
-            // get team param
-
-            Team team = new Team("",0,"",1,"","","");
-            team = TeamWrapper.getTeamFromTenant(tenantId);
-            //get userinfo
-            List<UserInfo> userInfos = UserWrapper.getUserInfoFromUserRoleView(tenantId);
-            // add userinfo and team info to info jsonObject
-            Gson gson = new Gson();
-            String teamStr = gson.toJson(team);
-            String userInfoStr = gson.toJson(userInfos);
-            JsonObject jsonObject = new JsonObject();
-            jsonObject.addProperty("userInfo",userInfoStr);
-            jsonObject.addProperty("team",teamStr);
-
-            String infoStr = gson.toJson(jsonObject);
-            Map info = new HashMap<String,String>();
-            info.put("info",infoStr);
-            // post to rest api
-            String restResult = restClient.post("http://10.247.33.80:8080/dacp/dps/tenant/all",info);
-            DacpResult dacpResult = gson.fromJson(restResult,DacpResult.class);
-            String result = dacpResult.getResult();
-            // log the result of sync process
-            if(result.equals("true")){
-                logger.info("dacp is ok");
-            }else{
-                logger.error("sync dacp is failed,error message is:" + dacpResult.getMessage());
-            }
-        // end post to dacp rest interface
-
+            String result = DacpAllResult.getAllResult(tenantId);
 
 			return Response.ok().entity(assignment).build();
 

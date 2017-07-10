@@ -13,7 +13,7 @@ public class Team {
     private String icon_path;
     private String remark;
 
-    public Team(String xmlid,int team_code,String team_name,int team_type,String start_date,String state,String icon_path){
+    public Team(String xmlid,int team_code,String team_name,int team_type,String start_date,String state,String icon_path,String remark){
         this.xmlid = xmlid;
         this.team_name = team_name;
         this.team_code = team_code;
@@ -21,6 +21,7 @@ public class Team {
         this.start_date = start_date;
         this.state = state;
         this.icon_path = icon_path;
+        this.remark = remark;
     }
     public void setxmlid(String xmlid){this.xmlid = xmlid;}
     public String getxmlid(){return this.xmlid;}
@@ -44,7 +45,5 @@ public class Team {
 
     public void setRemark(String remark){this.remark = remark;}
     public String getRemark(){return this.remark;}
-
-
 
 }
