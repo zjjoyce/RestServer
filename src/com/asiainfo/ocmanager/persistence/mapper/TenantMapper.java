@@ -50,5 +50,12 @@ public interface TenantMapper {
 	 * @return
 	 */
 	public List<Tenant> selectAllRootTenants();
+	
+	/**
+	 * 
+	 * @param tenant
+	 */
+	public void updateTenantName(@Param("id") String id, @Param("name") String name);
+	
 
 }

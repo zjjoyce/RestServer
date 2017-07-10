@@ -155,4 +155,23 @@ public class TenantPersistenceWrapper {
 		return tenants;
 	}
 
+	/**
+	 * 
+	 * @param tenantId
+	 * @param newName
+	 */
+	public static void updateTenantName(String tenantId, String newName) {
+		SqlSession session = DBConnectorFactory.getSession();
+		try {
+			TenantMapper mapper = session.getMapper(TenantMapper.class);
+			mapper.updateTenantName(tenantId, newName);
+			session.commit();
+		} catch (Exception e) {
+			session.rollback();
+			throw e;
+		} finally {
+			session.close();
+		}
+	}
+
 }

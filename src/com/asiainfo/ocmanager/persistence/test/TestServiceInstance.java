@@ -14,7 +14,7 @@ public class TestServiceInstance {
 		try {
 			ServiceInstanceMapper mapper = session.getMapper(ServiceInstanceMapper.class);
 			mapper.insertServiceInstance(
-					new ServiceInstance("9", "inst9", "2", "300", "ETCD", "hdfs tenant 005 quota"));
+					new ServiceInstance("9", "inst9", "t1", "300", "ETCD", "hdfs tenant 005 quota", "active"));
 			mapper.deleteServiceInstance("2", "inst9");
 			System.out.println("=== delete successfully ==");
 
@@ -32,6 +32,10 @@ public class TestServiceInstance {
 				System.out.println(si.getServiceTypeName());
 			}
 
+			
+			System.out.println("=== update quota successfully ==");
+			mapper.updateInstanceQuota("zhaoyim", "hive-instance001", null);
+			
 			session.commit();
 		} catch (Exception e) {
 			session.rollback();
