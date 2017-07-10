@@ -56,12 +56,12 @@ public class QuotaResource {
    * @return Quota object
    */
   @GET
-  @Path("hive/{dbname}/{queuename}")
+  @Path("hive/{dbname}")
   @Produces(MediaType.APPLICATION_JSON)
-  public Response getHiveQuota(@PathParam("dbname") String dbname,@PathParam("queuename") String queuename) {
-    Map items = quotaQuery.getHiveQuota(dbname,queuename);
-
-    return Response.ok().entity(items).build();
+  public Response getHiveQuota(@PathParam("dbname") String dbname,@Context HttpServletRequest request) {
+      String queuename = request.getParameter("queue");
+      Map items = quotaQuery.getHiveQuota(dbname,queuename);
+      return Response.ok().entity(items).build();
   }
 
   /**
