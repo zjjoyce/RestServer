@@ -7,8 +7,8 @@ import java.util.List;
  * Created by yujin on 2017/7/3.
  */
 public class UserInfo {
-    private String userName;
-    private String usercnName;
+    private String username;
+    private String usercnname;
     private String password;
     private String phone;
     private String qq;
@@ -16,9 +16,9 @@ public class UserInfo {
     private String msn;
     private List<String> role;
 
-    public UserInfo(String userName,String usercnName,String password,String phone,String qq,String mail,String msn,List<String> role){
-        this.userName = userName;
-        this.usercnName = usercnName;
+    public UserInfo(String username,String usercnname,String password,String phone,String qq,String mail,String msn,List<String> role){
+        this.username = username;
+        this.usercnname = usercnname;
         this.password = password;
         this.phone = phone;
         this.qq = qq;
@@ -26,11 +26,11 @@ public class UserInfo {
         this.msn = msn;
         this.role = role;
     }
-    public void setUserName(String userName){this.userName = userName;}
-    public String getUserName(){return this.userName;}
+    public void setUserName(String userName){this.username = username;}
+    public String getUserName(){return this.username;}
 
-    public void setUsercnName(String usercnName){this.usercnName = usercnName;}
-    public String getUsercnName(){return this.usercnName;}
+    public void setUsercnName(String usercnName){this.usercnname = usercnname;}
+    public String getUsercnName(){return this.usercnname;}
 
     public void setPassword(String password){this.password = password;}
     public String getPassword(){return this.password;}
@@ -40,10 +40,10 @@ public class UserInfo {
     public void setQq(String qq){this.qq = qq;}
     public String getQq(){return this.qq;}
 
-    public void setMail(String mail){this.userName = mail;}
+    public void setMail(String mail){this.username = mail;}
     public String getMail(){return this.mail;}
 
-    public void setMsn(String userName){this.userName = userName;}
+    public void setMsn(String userName){this.username = userName;}
     public String getMsn(){return this.msn;}
 
     public void setRole(List<String> role){this.role = role;}
