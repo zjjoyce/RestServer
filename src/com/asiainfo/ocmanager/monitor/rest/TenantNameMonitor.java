@@ -33,7 +33,7 @@ public class TenantNameMonitor {
 		try {
 			String period = MonitorPropertiesFactory.getMonitorProperties().get(Constant.TENANT_MONITOR_PERIOD);
 			logger.info("TenantNameMonitor -> get period - " + Integer.parseInt(period));
-			scheduler.scheduleAtFixedRate(tenantNameSyncer, 1, Integer.parseInt(period), TimeUnit.SECONDS);
+			scheduler.scheduleAtFixedRate(tenantNameSyncer, 300, Integer.parseInt(period), TimeUnit.SECONDS);
 		} catch (IOException e) {
 			logger.info("TenantNameMonitor -> " + e.getMessage());
 			e.printStackTrace();
