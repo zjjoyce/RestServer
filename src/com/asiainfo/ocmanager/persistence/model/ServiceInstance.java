@@ -13,19 +13,21 @@ public class ServiceInstance {
 	private String serviceTypeId;
 	private String serviceTypeName;
 	private String quota;
+	private String status;
 
 	public ServiceInstance() {
 
 	}
 
 	public ServiceInstance(String id, String instanceName, String tenantId, String serviceTypeId,
-			String serviceTypeName, String quota) {
+			String serviceTypeName, String quota, String status) {
 		this.id = id;
 		this.instanceName = instanceName;
 		this.tenantId = tenantId;
 		this.serviceTypeId = serviceTypeId;
 		this.serviceTypeName = serviceTypeName;
 		this.quota = quota;
+		this.status = status;
 	}
 
 	public String getId() {
@@ -74,6 +76,14 @@ public class ServiceInstance {
 
 	public void setQuota(String quota) {
 		this.quota = quota;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
 	}
 
 }

@@ -15,7 +15,7 @@
 	<!-- add service -->
 	<insert id="insertService" keyProperty="id"
 		parameterType="com.asiainfo.ocmanager.persistence.model.Service">
-		insert into services (id, servicename, description)
-		  values (#{id}, #{servicename}, #{description})
+		insert into services (id, servicename, description, origin)
+		  values (#{id}, #{servicename}, #{description}, #{origin})
 	</insert>
 </mapper>

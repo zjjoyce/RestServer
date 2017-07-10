@@ -81,7 +81,7 @@ public class YarnUtil {
         }
         List<Quota> result = new ArrayList<Quota>();
         result.add(memoryquota);
-        result.add(vcoresquota);
+//        result.add(vcoresquota);
         return result;
     }
 }

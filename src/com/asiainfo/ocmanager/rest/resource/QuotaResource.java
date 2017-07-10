@@ -56,10 +56,10 @@ public class QuotaResource {
    * @return Quota object
    */
   @GET
-  @Path("hive/{serviceInstanceId}")
+  @Path("hive/{dbname}/{queuename}")
   @Produces(MediaType.APPLICATION_JSON)
-  public Response getHiveQuota(@PathParam("serviceInstanceId") String instanceId) {
-    Map items = quotaQuery.getHiveQuota(instanceId);
+  public Response getHiveQuota(@PathParam("dbname") String dbname,@PathParam("queuename") String queuename) {
+    Map items = quotaQuery.getHiveQuota(dbname,queuename);
 
     return Response.ok().entity(items).build();
   }

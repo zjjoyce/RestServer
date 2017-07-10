@@ -39,4 +39,13 @@ public interface ServiceInstanceMapper {
 	 */
 	public List<ServiceInstance> selectAllServiceInstances();
 
+	/**
+	 * 
+	 * @param tenantId
+	 * @param instanceName
+	 * @param quota
+	 */
+	public void updateInstanceQuota(@Param("tenantId") String tenantId, @Param("instanceName") String instanceName,
+			@Param("quota") String quota);
+
 }

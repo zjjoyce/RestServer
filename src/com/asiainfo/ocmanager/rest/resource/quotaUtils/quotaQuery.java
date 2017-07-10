@@ -103,17 +103,18 @@ public class quotaQuery {
 
     /**
      *
-     * @param serviceInstanceId
+     * @param dbname
+     * @param queuename
      * @return hive Quota
      */
-    public static Map getHiveQuota(String serviceInstanceId) {
+    public static Map getHiveQuota(String dbname,String queuename) {
         Map result = new HashMap();
         /*
         todo :move hive quota code to here
          */
         HdfsUtils hdfsUtils = new HdfsUtils();
-        List<Quota> hdfsQuota = hdfsUtils.getHdfsQuota(new Path("/apps/hive/warehouse/"+serviceInstanceId+".db"));
-        List<Quota> queueQuota = YarnUtil.getYarnData(serviceInstanceId);
+        List<Quota> hdfsQuota = hdfsUtils.getHdfsQuota(new Path("/apps/hive/warehouse/"+dbname+".db"));
+        List<Quota> queueQuota = YarnUtil.getYarnData(queuename);
         //yarn quota
         Iterator<Quota> iterator = queueQuota.iterator();
         List<Quota> items = new ArrayList<Quota>();
