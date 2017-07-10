@@ -57,7 +57,7 @@ public class ServiceResource {
 	 * @return service list
 	 */
 	@GET
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	public Response getServices() {
 
 		try {
@@ -84,12 +84,14 @@ public class ServiceResource {
 					String id = items.get(i).getAsJsonObject().getAsJsonObject("spec").get("id").getAsString();
 					String description = items.get(i).getAsJsonObject().getAsJsonObject("spec").get("description")
 							.getAsString();
+					String origin = items.get(i).getAsJsonObject().getAsJsonObject("metadata").getAsJsonObject("labels")
+							.get("asiainfo.io/servicebroker").getAsString();
 
 					if (servicesInDB.size() == 0) {
-						ServicePersistenceWrapper.addService(new Service(id, name, description));
+						ServicePersistenceWrapper.addService(new Service(id, name, description, origin));
 					} else {
 						if (!dbServiceList.contains(id)) {
-							ServicePersistenceWrapper.addService(new Service(id, name, description));
+							ServicePersistenceWrapper.addService(new Service(id, name, description, origin));
 						}
 					}
 
@@ -101,8 +103,8 @@ public class ServiceResource {
 			return Response.ok().entity(services).build();
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("getServices -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 	}
 
@@ -113,7 +115,7 @@ public class ServiceResource {
 	 */
 	@GET
 	@Path("{id}")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	public Response getServiceById(@PathParam("id") String serviceId) {
 		try {
 			Service service = ServicePersistenceWrapper.getServiceById(serviceId);
@@ -121,8 +123,8 @@ public class ServiceResource {
 			return Response.ok().entity(service == null ? new Service() : service).build();
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("getServiceById -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 	}
 
@@ -133,7 +135,7 @@ public class ServiceResource {
 	 */
 	@POST
 	@Path("/broker")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	public Response addServiceBroker(String reqBodyStr) {
 
 		try {
@@ -160,41 +162,6 @@ public class ServiceResource {
 					// int statusCode =
 					// response2.getStatusLine().getStatusCode();
 					String bodyStr = EntityUtils.toString(response2.getEntity());
-					// if (statusCode == 201) {
-					// // TODO should call df service api and compare with
-					// adapter db service data, insert the data which is not in
-					// the adapter db
-					// List<Service> servicesInDB =
-					// ServicePersistenceWrapper.getAllServices();
-					//
-					// String servicesFromDf =
-					// ServiceResource.callDFToGetAllServices();
-					// JsonObject servicesFromDfJson = new
-					// JsonParser().parse(servicesFromDf).getAsJsonObject();
-					// JsonArray items =
-					// servicesFromDfJson.getAsJsonArray("items");
-					//
-					// if (items != null || items.size() != 0) {
-					// for (int i = 0; i < items.size(); i++) {
-					// String name =
-					// items.get(i).getAsJsonObject().getAsJsonObject("spec")
-					// .get("name").getAsString();
-					// String id =
-					// items.get(i).getAsJsonObject().getAsJsonObject("spec")
-					// .get("id").getAsString();
-					// String description =
-					// items.get(i).getAsJsonObject().getAsJsonObject("spec")
-					// .get("description").getAsString();
-					//
-					// for(Service s: servicesInDB){
-					// if (!s.getId().equals(id)) {
-					// ServicePersistenceWrapper.addService(new Service(id,
-					// name, description));
-					// }
-					// }
-					// }
-					// }
-					// }
 
 					return Response.ok().entity(bodyStr).build();
 				} finally {
@@ -205,8 +172,8 @@ public class ServiceResource {
 			}
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("addServiceBroker -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 	}
 
@@ -217,14 +184,14 @@ public class ServiceResource {
 	 */
 	@GET
 	@Path("/df")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	public Response getServiceFromDf() {
 		try {
 			return Response.ok().entity(ServiceResource.callDFToGetAllServices()).build();
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("getServiceFromDf -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 	}
 
@@ -235,7 +202,7 @@ public class ServiceResource {
 	 */
 	@DELETE
 	@Path("/broker/{name}")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	public Response deleteServiceBroker(@PathParam("name") String serviceBrokerName) {
 		try {
 			String url = DFPropertiesFoundry.getDFProperties().get(Constant.DATAFOUNDRY_URL);
@@ -267,8 +234,8 @@ public class ServiceResource {
 			}
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("deleteServiceBroker -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 	}
 
@@ -294,7 +261,7 @@ public class ServiceResource {
 		CloseableHttpClient httpclient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
 		try {
 			HttpGet httpGet = new HttpGet(dfRestUrl);
-			httpGet.addHeader("Content-type", "application/json");
+			httpGet.addHeader("Content-type", "application/json;charset=utf-8");
 			httpGet.addHeader("Authorization", "bearer " + token);
 
 			CloseableHttpResponse response1 = httpclient.execute(httpGet);
@@ -303,7 +270,7 @@ public class ServiceResource {
 				// int statusCode =
 				// response1.getStatusLine().getStatusCode();
 
-				String bodyStr = EntityUtils.toString(response1.getEntity());
+				String bodyStr = EntityUtils.toString(response1.getEntity(), "UTF-8");
 
 				return bodyStr;
 			} finally {
@@ -321,15 +288,15 @@ public class ServiceResource {
 	 */
 	@GET
 	@Path("all/instances")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	public Response getAllServiceInstances() {
 		try {
 			List<ServiceInstance> serviceInstances = ServiceInstancePersistenceWrapper.getAllServiceInstances();
 			return Response.ok().entity(serviceInstances).build();
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("getAllServiceInstances -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 	}
 

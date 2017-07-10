@@ -37,7 +37,7 @@ public class SSOFakerResource {
 	 */
 	@GET
 	@Path("user")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	public Response getUserName(@Context HttpServletRequest request) {
 		try {
 			String http_x_proxy_cas_loginname = request.getHeader("http_x_proxy_cas_loginname");
@@ -74,8 +74,8 @@ public class SSOFakerResource {
 			}
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("getUserName -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 	}
 

@@ -20,6 +20,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import com.asiainfo.ocmanager.dacp.DacpAllResult;
 import com.asiainfo.ocmanager.dacp.model.DacpResult;
 import com.asiainfo.ocmanager.dacp.model.Team;
 import com.asiainfo.ocmanager.dacp.model.UserInfo;
@@ -70,15 +71,15 @@ public class TenantResource {
 	 * @return tenant list
 	 */
 	@GET
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	public Response getAllTenants() {
 		try {
 			List<Tenant> tenants = TenantPersistenceWrapper.getAllTenants();
 			return Response.ok().entity(tenants).build();
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("getAllTenants -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 	}
 
@@ -91,15 +92,15 @@ public class TenantResource {
 	 */
 	@GET
 	@Path("{id}")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	public Response getTenantById(@PathParam("id") String tenantId) {
 		try {
 			Tenant tenant = TenantPersistenceWrapper.getTenantById(tenantId);
 			return Response.ok().entity(tenant).build();
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("getTenantById -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 	}
 
@@ -112,15 +113,15 @@ public class TenantResource {
 	 */
 	@GET
 	@Path("{id}/children")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	public Response getChildrenTenants(@PathParam("id") String parentTenantId) {
 		try {
 			List<Tenant> tenants = TenantPersistenceWrapper.getChildrenTenants(parentTenantId);
 			return Response.ok().entity(tenants).build();
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("getChildrenTenants -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 	}
 
@@ -133,14 +134,36 @@ public class TenantResource {
 	 */
 	@GET
 	@Path("{id}/users")
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	public Response getTenantUsers(@PathParam("id") String tenantId) {
 		try {
 			List<UserRoleView> usersRoles = UserRoleViewPersistenceWrapper.getUsersInTenant(tenantId);
 			return Response.ok().entity(usersRoles).build();
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("getTenantUsers -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
+		}
+	}
+
+	/**
+	 * Get the role based on the tenant and user
+	 * 
+	 * @param tenantId
+	 * @param userName
+	 * @return
+	 */
+	@GET
+	@Path("{id}/user/{userName}/role")
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
+	public Response getRoleByTenantUserName(@PathParam("id") String tenantId, @PathParam("userName") String userName) {
+		try {
+			UserRoleView role = UserRoleViewPersistenceWrapper.getRoleBasedOnUserAndTenant(userName, tenantId);
+			return Response.ok().entity(role).build();
+		} catch (Exception e) {
+			// system out the exception into the console log
+			logger.info("getRoleByTenantUserName -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 	}
 
@@ -153,7 +176,7 @@ public class TenantResource {
 	 */
 	@GET
 	@Path("{id}/service/instances")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	public Response getTenantServiceInstances(@PathParam("id") String tenantId) {
 		try {
 			List<ServiceInstance> serviceInstances = ServiceInstancePersistenceWrapper
@@ -161,8 +184,8 @@ public class TenantResource {
 			return Response.ok().entity(serviceInstances).build();
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("getTenantServiceInstances -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 	}
 
@@ -175,15 +198,15 @@ public class TenantResource {
 	 */
 	@GET
 	@Path("{tenantId}/service/instance/{InstanceName}/access/info")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	public Response getTenantServiceInstanceAccessInfo(@PathParam("tenantId") String tenantId,
 			@PathParam("InstanceName") String InstanceName) {
 		try {
 			return Response.ok().entity(TenantResource.getTenantServiceInstancesFromDf(tenantId, InstanceName)).build();
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("getTenantServiceInstanceAccessInfo -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 
 	}
@@ -196,7 +219,7 @@ public class TenantResource {
 	 * @return new tenant info
 	 */
 	@POST
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response createTenant(Tenant tenant, @Context HttpServletRequest request) {
 
@@ -241,14 +264,16 @@ public class TenantResource {
 				se.setContentType("application/json");
 				httpPost.setEntity(se);
 
+				logger.info("createTenant -> start create");
 				CloseableHttpResponse response2 = httpclient.execute(httpPost);
 
 				try {
 					int statusCode = response2.getStatusLine().getStatusCode();
 
 					if (statusCode == 201) {
-						// very ugly code here hard code 3 level for the zhong
-						// xin
+						logger.info("createTenant -> start successfully");
+						// very ugly code here hard code 3 level
+						// only for citic should enhance
 						if (tenant.getParentId() == null) {
 							tenant.setLevel(1);
 						} else if (allRootTenantsId.contains(tenant.getParentId())) {
@@ -269,8 +294,8 @@ public class TenantResource {
 			}
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("createTenant -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 	}
 
@@ -282,7 +307,7 @@ public class TenantResource {
 	 */
 	@POST
 	@Path("{id}/service/instance")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response createServiceInstanceInTenant(@PathParam("id") String tenantId, String reqBodyStr) {
 
@@ -305,6 +330,7 @@ public class TenantResource {
 				se.setContentType("application/json");
 				httpPost.setEntity(se);
 
+				logger.info("createServiceInstanceInTenant -> begin to create service instance");
 				CloseableHttpResponse response2 = httpclient.execute(httpPost);
 
 				try {
@@ -312,9 +338,10 @@ public class TenantResource {
 					String bodyStr = EntityUtils.toString(response2.getEntity());
 					ServiceInstance serviceInstance = new ServiceInstance();
 					if (statusCode == 201) {
+						logger.info("createServiceInstanceInTenant -> create service instances successfully");
+
 						JsonElement resBodyJson = new JsonParser().parse(bodyStr);
 						JsonObject resBodyJsonObj = resBodyJson.getAsJsonObject();
-
 						serviceInstance.setId(resBodyJsonObj.getAsJsonObject("metadata").get("uid").getAsString());
 						serviceInstance
 								.setInstanceName(resBodyJsonObj.getAsJsonObject("metadata").get("name").getAsString());
@@ -323,18 +350,6 @@ public class TenantResource {
 								.getAsJsonObject("provisioning").get("backingservice_spec_id").getAsString());
 						serviceInstance.setServiceTypeName(resBodyJsonObj.getAsJsonObject("spec")
 								.getAsJsonObject("provisioning").get("backingservice_name").getAsString());
-
-						if ((resBodyJsonObj.getAsJsonObject("spec").getAsJsonObject("provisioning").get("parameters")
-								.isJsonNull())) {
-							// TODO should get df service quota
-						} else {
-							// parameters are a json format should use to string
-							serviceInstance.setQuota(resBodyJsonObj.getAsJsonObject("spec")
-									.getAsJsonObject("provisioning").get("parameters").toString());
-						}
-
-						// insert the service instance into the adapter DB
-						ServiceInstancePersistenceWrapper.createServiceInstance(serviceInstance);
 
 						// get the just now created instance info
 						String getInstanceResBody = TenantResource.getTenantServiceInstancesFromDf(tenantId,
@@ -351,78 +366,116 @@ public class TenantResource {
 						String instanceName = serviceInstanceJson.getAsJsonObject().getAsJsonObject("metadata")
 								.get("name").getAsString();
 
+						// loop to wait the instance status.phase change to
+						// Unbound if the status.phase is Provisioning the
+						// update will failed, so need to wait
+						logger.info("createServiceInstanceInTenant -> waiting Provisioning to Unbound");
+						while (phase.equals(Constant.PROVISIONING)) {
+							// wait for 3 secs
+							Thread.sleep(3000);
+							// get the instance info again
+							getInstanceResBody = TenantResource.getTenantServiceInstancesFromDf(tenantId,
+									serviceInstance.getInstanceName());
+							serviceInstanceJson = new JsonParser().parse(getInstanceResBody);
+							serviceName = serviceInstanceJson.getAsJsonObject().getAsJsonObject("spec")
+									.getAsJsonObject("provisioning").get("backingservice_name").getAsString();
+							phase = serviceInstanceJson.getAsJsonObject().getAsJsonObject("status").get("phase")
+									.getAsString();
+						}
+						logger.info("createServiceInstanceInTenant -> waiting Provisioning to Unbound successfully");
+
+						// sync here after the create successfully
+						// get the latest status and insert into DB
+						if ((resBodyJsonObj.getAsJsonObject("spec").getAsJsonObject("provisioning").get("parameters")
+								.isJsonNull())) {
+							// TODO should get df service quota
+						} else {
+							// parameters are a json format should use to string
+							serviceInstance.setQuota(serviceInstanceJson.getAsJsonObject().getAsJsonObject("spec")
+									.getAsJsonObject("provisioning").get("parameters").toString());
+						}
+						serviceInstance.setStatus(phase);
+
+						// insert the service instance into the adapter DB
+						ServiceInstancePersistenceWrapper.createServiceInstance(serviceInstance);
+
+						// if the phase is failed, it means the create failed
+						if (phase.equals(Constant.FAILURE)) {
+							logger.info("createServiceInstanceInTenant -> phase is failure, throw directly");
+							return Response.ok().entity(getInstanceResBody).build();
+						}
+
 						// only the OCDP services need to wait to assign the
 						// permission
 						if (Constant.list.contains(serviceName.toLowerCase())) {
 
-							// loop to wait the instance status.phase change to
-							// Unbound
-							// if the status.phase is Provisioning the update
-							// will failed, so need to wait
-							while (phase.equals("Provisioning")) {
-								Thread.sleep(10000);
-								// get the instance info again
-								getInstanceResBody = TenantResource.getTenantServiceInstancesFromDf(tenantId,
-										serviceInstance.getInstanceName());
-								serviceInstanceJson = new JsonParser().parse(getInstanceResBody);
-								serviceName = serviceInstanceJson.getAsJsonObject().getAsJsonObject("spec")
-										.getAsJsonObject("provisioning").get("backingservice_name").getAsString();
-								phase = serviceInstanceJson.getAsJsonObject().getAsJsonObject("status").get("phase")
-										.getAsString();
-							}
-
-							// get all the users under the tenant
 							List<UserRoleView> users = UserRoleViewPersistenceWrapper.getUsersInTenant(tenantId);
 
-							// loop the users to update the created instance
+							List<String> userNameList = new ArrayList<String>();
 							for (UserRoleView u : users) {
-								// get the instance response body, which will
-								// pass to update
-								JsonElement OCDPServiceInstanceJson = new JsonParser().parse(getInstanceResBody);
-								// get the provisioning json
-								JsonObject provisioning = OCDPServiceInstanceJson.getAsJsonObject()
-										.getAsJsonObject("spec").getAsJsonObject("provisioning");
-								// add the user name to the parameters for
-								// update
-								provisioning.getAsJsonObject("parameters").addProperty("user_name", u.getUserName());
-
-								// get the service permission based on the
-								// service name and role
 								ServiceRolePermission permission = ServiceRolePermissionWrapper
 										.getServicePermissionByRoleId(serviceName, u.getRoleId());
-
-								if (permission == null) {
-									permission = new ServiceRolePermission();
-									permission.setServicePermission("");
+								if (!(permission == null)) {
+									userNameList.add(u.getUserName());
 								}
+							}
+							if (!(userNameList.size() == 0)) {
 
-								// add the accesses fields into the request body
+								getInstanceResBody = TenantResource.getTenantServiceInstancesFromDf(tenantId,
+										serviceInstance.getInstanceName());
+
+								JsonElement OCDPServiceInstanceJson = new JsonParser().parse(getInstanceResBody);
+
+								JsonObject provisioning = OCDPServiceInstanceJson.getAsJsonObject()
+										.getAsJsonObject("spec").getAsJsonObject("provisioning");
+
+								String userNameListStr = "";
+								for (String u : userNameList) {
+									userNameListStr = userNameListStr + "," + u;
+								}
+								// remove first comma
+								userNameListStr = userNameListStr.substring(1, userNameListStr.length());
+
+								provisioning.getAsJsonObject("parameters").addProperty("user_name", userNameListStr);
+
+								// hard code the role id here
+								// because now only pm and team member
+								// can access the service instance
+								// and they have the same permission
+								ServiceRolePermission permission = ServiceRolePermissionWrapper
+										.getServicePermissionByRoleId(serviceName, Constant.PROJECTMANAGERROLE);
+
 								provisioning.getAsJsonObject("parameters").addProperty("accesses",
 										permission.getServicePermission());
 
-								// add the patch Updating into the request body
 								JsonObject status = OCDPServiceInstanceJson.getAsJsonObject().getAsJsonObject("status");
-								status.addProperty("patch", "Updating");
+								status.addProperty("patch", Constant.UPDATE);
 
+								logger.info("createServiceInstanceInTenant -> begin update service instance");
 								AdapterResponseBean updateRes = TenantResource.updateTenantServiceInstanceInDf(tenantId,
 										instanceName, OCDPServiceInstanceJson.toString());
 
 								if (updateRes.getResCodel() == 200) {
-									logger.info("service updated");
-								}
 
-								// call the df binding to generate the OCDP
-								// service credentials
-								AdapterResponseBean bindingRes = TenantResource.generateOCDPServiceCredentials(tenantId,
-										instanceName, u.getUserName());
-								if (bindingRes.getResCodel() == 200) {
-									logger.info("service binding");
-								}
+									logger.info("createServiceInstanceInTenant -> wait update complete");
+									TenantResource.watiInstanceUpdateComplete(updateRes, tenantId, instanceName);
+									logger.info("createServiceInstanceInTenant -> update complete");
 
+									logger.info("createServiceInstanceInTenant -> begin to binding");
+									for (int i = 0; i < userNameList.size(); i++) {
+										AdapterResponseBean bindingRes = TenantResource.generateOCDPServiceCredentials(
+												tenantId, instanceName, userNameList.get(i));
+
+										if (bindingRes.getResCodel() == 201) {
+											logger.info("createServiceInstanceInTenant -> wait binding complete");
+											TenantResource.watiInstanceBindingComplete(bindingRes, tenantId,
+													instanceName);
+											logger.info("createServiceInstanceInTenant -> binding complete");
+										}
+									}
+								}
 							}
-
 						}
-
 					}
 
 					return Response.ok().entity(bodyStr).build();
@@ -434,8 +487,8 @@ public class TenantResource {
 			}
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("createServiceInstanceInTenant -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 
 	}
@@ -450,19 +503,71 @@ public class TenantResource {
 	 */
 	@PUT
 	@Path("{id}/service/instance/{instanceName}")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response updateServiceInstanceInTenant(@PathParam("id") String tenantId,
-			@PathParam("instanceName") String instanceName, String reqBodyStr) {
+			@PathParam("instanceName") String instanceName, String parametersStr) {
 
 		try {
+
+			// get the just now created instance info
+			String getInstanceResBody = TenantResource.getTenantServiceInstancesFromDf(tenantId, instanceName);
+
+			JsonElement serviceInstanceJson = new JsonParser().parse(getInstanceResBody);
+			// get status phase
+			String phase = serviceInstanceJson.getAsJsonObject().getAsJsonObject("status").get("phase").getAsString();
+
+			if (phase.equals(Constant.PROVISIONING)) {
+				logger.info(
+						"updateServiceInstanceInTenant -> The instance can not be updated when it is Provisioning!");
+				return Response.status(Status.BAD_REQUEST)
+						.entity("The instance can not be updated when it is Provisioning!").build();
+			}
+
+			if (phase.equals(Constant.FAILURE)) {
+				logger.info("updateServiceInstanceInTenant -> The instance can not be updated when it is Failure!");
+				return Response.status(Status.BAD_REQUEST).entity("The instance can not be updated when it is Failure!")
+						.build();
+			}
+
+			// get the provisioning json
+			JsonObject provisioning = serviceInstanceJson.getAsJsonObject().getAsJsonObject("spec")
+					.getAsJsonObject("provisioning");
+
+			// parse the input parameters json
+			JsonElement parameterJon = new JsonParser().parse(parametersStr);
+			// add into the update json
+			provisioning.add("parameters", parameterJon.getAsJsonObject().getAsJsonObject("parameters"));
+
+			// add the patch Updating into the request body
+			JsonObject status = serviceInstanceJson.getAsJsonObject().getAsJsonObject("status");
+			status.addProperty("patch", Constant.UPDATE);
+
+			logger.info("updateServiceInstanceInTenant -> update start");
 			AdapterResponseBean responseBean = TenantResource.updateTenantServiceInstanceInDf(tenantId, instanceName,
-					reqBodyStr);
+					serviceInstanceJson.toString());
+
+			String quota = null;
+			if (responseBean.getResCodel() == 200) {
+				logger.info("updateServiceInstanceInTenant -> update successfully");
+				JsonElement resBodyJson = new JsonParser().parse(responseBean.getMessage());
+				JsonObject resBodyJsonObj = resBodyJson.getAsJsonObject();
+				if ((resBodyJsonObj.getAsJsonObject("spec").getAsJsonObject("provisioning").get("parameters")
+						.isJsonNull())) {
+					// TODO should get df service quota
+				} else {
+					quota = serviceInstanceJson.getAsJsonObject().getAsJsonObject("spec")
+							.getAsJsonObject("provisioning").get("parameters").toString();
+				}
+
+				ServiceInstancePersistenceWrapper.updateServiceInstanceQuota(tenantId, instanceName, quota);
+			}
+
 			return Response.ok().entity(responseBean.getMessage()).build();
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("updateServiceInstanceInTenant -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 	}
 
@@ -475,12 +580,53 @@ public class TenantResource {
 	 */
 	@DELETE
 	@Path("{id}/service/instance/{instanceName}")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response deleteServiceInstanceInTenant(@PathParam("id") String tenantId,
 			@PathParam("instanceName") String instanceName) {
 
 		try {
+
+			String getInstanceResBody = TenantResource.getTenantServiceInstancesFromDf(tenantId, instanceName);
+			JsonElement resBodyJson = new JsonParser().parse(getInstanceResBody);
+			JsonObject instance = resBodyJson.getAsJsonObject();
+			String serviceName = instance.getAsJsonObject("spec").getAsJsonObject("provisioning")
+					.get("backingservice_name").getAsString();
+			// get status phase
+			String phase = instance.getAsJsonObject("status").get("phase").getAsString();
+
+			// if the instance is Failure do not need to unbound
+			if (phase.equals(Constant.FAILURE)) {
+				// get all the users under the tenant
+				List<UserRoleView> users = UserRoleViewPersistenceWrapper.getUsersInTenant(tenantId);
+				for (UserRoleView u : users) {
+
+					// ignore the users who not have the service permissions
+					// align with create service instance
+					ServiceRolePermission permission = ServiceRolePermissionWrapper
+							.getServicePermissionByRoleId(serviceName, u.getRoleId());
+					if (permission == null) {
+						continue;
+					}
+
+					if (Constant.list.contains(serviceName.toLowerCase())) {
+
+						// only the Unbound service instances can be delete
+						// so unbinding the service instance first
+						logger.info("deleteServiceInstanceInTenant -> begin to unbinding");
+						AdapterResponseBean unBindingRes = TenantResource.removeOCDPServiceCredentials(tenantId,
+								instanceName, UserPersistenceWrapper.getUserById(u.getUserId()).getUsername());
+
+						if (unBindingRes.getResCodel() == 201) {
+							logger.info("deleteServiceInstanceInTenant -> wait unbinding complete");
+							TenantResource.watiInstanceUnBindingComplete(unBindingRes, tenantId, instanceName);
+							logger.info("deleteServiceInstanceInTenant -> unbinding complete");
+						}
+					}
+				}
+			}
+
+			// begin to delete the instance
 			String url = DFPropertiesFoundry.getDFProperties().get(Constant.DATAFOUNDRY_URL);
 			String token = DFPropertiesFoundry.getDFProperties().get(Constant.DATAFOUNDRY_TOKEN);
 			String dfRestUrl = url + "/oapi/v1/namespaces/" + tenantId + "/backingserviceinstances/" + instanceName;
@@ -493,12 +639,14 @@ public class TenantResource {
 				httpDelete.addHeader("Content-type", "application/json");
 				httpDelete.addHeader("Authorization", "bearer " + token);
 
+				logger.info("deleteServiceInstanceInTenant -> start delete");
 				CloseableHttpResponse response1 = httpclient.execute(httpDelete);
 
 				try {
 					int statusCode = response1.getStatusLine().getStatusCode();
 					if (statusCode == 200) {
 						ServiceInstancePersistenceWrapper.deleteServiceInstance(tenantId, instanceName);
+						logger.info("deleteServiceInstanceInTenant -> delete successfully");
 					}
 					String bodyStr = EntityUtils.toString(response1.getEntity());
 
@@ -511,8 +659,8 @@ public class TenantResource {
 			}
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("deleteServiceInstanceInTenant -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 
 	}
@@ -526,7 +674,7 @@ public class TenantResource {
 	 */
 	@Deprecated
 	@PUT
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Tenant updateTenant(Tenant tenant) {
 		return tenant;
@@ -540,7 +688,7 @@ public class TenantResource {
 	 */
 	@DELETE
 	@Path("{id}")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response deleteTenant(@PathParam("id") String tenantId) {
 		try {
@@ -556,12 +704,14 @@ public class TenantResource {
 				httpDelete.addHeader("Content-type", "application/json");
 				httpDelete.addHeader("Authorization", "bearer " + token);
 
+				logger.info("deleteTenant -> delete start");
 				CloseableHttpResponse response1 = httpclient.execute(httpDelete);
 
 				try {
 					int statusCode = response1.getStatusLine().getStatusCode();
 					if (statusCode == 200) {
 						TenantPersistenceWrapper.deleteTenant(tenantId);
+						logger.info("deleteTenant -> delete successfully");
 					}
 					String bodyStr = EntityUtils.toString(response1.getEntity());
 
@@ -574,8 +724,8 @@ public class TenantResource {
 			}
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("deleteTenant -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 	}
 
@@ -588,7 +738,7 @@ public class TenantResource {
 	 */
 	@POST
 	@Path("{id}/user/role/assignment")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response assignRoleToUserInTenant(@PathParam("id") String tenantId, TenantUserRoleAssignment assignment) {
 
@@ -602,13 +752,15 @@ public class TenantResource {
 
 			JsonArray allServiceInstancesArray = allServiceInstancesJson.getAsJsonObject().getAsJsonArray("items");
 			for (int i = 0; i < allServiceInstancesArray.size(); i++) {
+				// TODO should consider the resource version changed need to
+				// call get instance by id
 				JsonObject instance = allServiceInstancesArray.get(i).getAsJsonObject();
 				// get service name
 				String serviceName = instance.getAsJsonObject("spec").getAsJsonObject("provisioning")
 						.get("backingservice_name").getAsString();
 
 				String phase = instance.getAsJsonObject("status").get("phase").getAsString();
-				if (!phase.equals("Provisioning")) {
+				if (!phase.equals(Constant.PROVISIONING) && !phase.equals(Constant.FAILURE)) {
 					// Because the Provisioning will make the update failed
 					if (Constant.list.contains(serviceName.toLowerCase())) {
 						// get service instance name
@@ -617,8 +769,7 @@ public class TenantResource {
 								instanceName);
 
 						// get the service permission based on the service name
-						// and
-						// role
+						// and role
 						ServiceRolePermission permission = ServiceRolePermissionWrapper
 								.getServicePermissionByRoleId(serviceName, assignment.getRoleId());
 
@@ -627,10 +778,7 @@ public class TenantResource {
 							permission.setServicePermission("");
 						}
 
-						// parse the update request body based on the get
-						// service
-						// instance
-						// by id response body
+						// parse the update request body
 						JsonElement OCDPServiceInstanceJson = new JsonParser().parse(OCDPServiceInstanceStr);
 						// get the provisioning json
 						JsonObject provisioning = OCDPServiceInstanceJson.getAsJsonObject().getAsJsonObject("spec")
@@ -645,21 +793,23 @@ public class TenantResource {
 
 						// add the patch Updating into the request body
 						JsonObject status = OCDPServiceInstanceJson.getAsJsonObject().getAsJsonObject("status");
-						status.addProperty("patch", "Updating");
+						status.addProperty("patch", Constant.UPDATE);
 
+						logger.info("assignRoleToUserInTenant -> begin to update");
 						AdapterResponseBean updateRes = TenantResource.updateTenantServiceInstanceInDf(tenantId,
 								instanceName, OCDPServiceInstanceJson.toString());
 
 						if (updateRes.getResCodel() == 200) {
-							logger.info("service updated");
-						}
+							logger.info("assignRoleToUserInTenant -> wait update complete");
+							TenantResource.watiInstanceUpdateComplete(updateRes, tenantId, instanceName);
+							logger.info("assignRoleToUserInTenant -> update complete");
 
-						// call the df binding to generate the OCDP service
-						// credentials
-						AdapterResponseBean bindingRes = TenantResource.generateOCDPServiceCredentials(tenantId,
-								instanceName, userName);
-						if (bindingRes.getResCodel() == 200) {
-							logger.info("service binding");
+							logger.info("assignRoleToUserInTenant -> begin to binding");
+							AdapterResponseBean bindingRes = TenantResource.generateOCDPServiceCredentials(tenantId,
+									instanceName, userName);
+							if (bindingRes.getResCodel() == 201) {
+								logger.info("assignRoleToUserInTenant -> binding successfully");
+							}
 						}
 					}
 				}
@@ -667,44 +817,14 @@ public class TenantResource {
 
 			assignment = TURAssignmentPersistenceWrapper.assignRoleToUserInTenant(assignment);
 
-            // post to dacp rest interface
-
-            // get team param
-
-            Team team = new Team("",0,"",1,"","","");
-            team = TeamWrapper.getTeamFromTenant(tenantId);
-            //get userinfo
-            List<UserInfo> userInfos = UserWrapper.getUserInfoFromUserRoleView(tenantId);
-            // add userinfo and team info to info jsonObject
-            Gson gson = new Gson();
-            String teamStr = gson.toJson(team);
-            String userInfoStr = gson.toJson(userInfos);
-            JsonObject jsonObject = new JsonObject();
-            jsonObject.addProperty("userInfo",userInfoStr);
-            jsonObject.addProperty("team",teamStr);
-
-            String infoStr = gson.toJson(jsonObject);
-            Map info = new HashMap<String,String>();
-            info.put("info",infoStr);
-            // post to rest api
-            String restResult = restClient.post("http://10.247.33.80:8080/dacp/dps/tenant/all",info);
-            DacpResult dacpResult = gson.fromJson(restResult,DacpResult.class);
-            String result = dacpResult.getResult();
-            // log the result of sync process
-            if(result.equals("true")){
-                logger.info("dacp is ok");
-            }else{
-                logger.error("sync dacp is failed,error message is:" + dacpResult.getMessage());
-            }
-        // end post to dacp rest interface
-
+            String result = DacpAllResult.getAllResult(tenantId);
 
 			return Response.ok().entity(assignment).build();
 
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("assignRoleToUserInTenant -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 
 	}
@@ -718,7 +838,7 @@ public class TenantResource {
 	 */
 	@PUT
 	@Path("{id}/user/role/assignment")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response updateRoleToUserInTenant(@PathParam("id") String tenantId, TenantUserRoleAssignment assignment) {
 
@@ -736,57 +856,71 @@ public class TenantResource {
 				// get service name
 				String serviceName = instance.getAsJsonObject("spec").getAsJsonObject("provisioning")
 						.get("backingservice_name").getAsString();
+				String phase = instance.getAsJsonObject("status").get("phase").getAsString();
 
-				if (Constant.list.contains(serviceName.toLowerCase())) {
-					// get service instance name
-					String instanceName = instance.getAsJsonObject("metadata").get("name").getAsString();
-					String OCDPServiceInstanceStr = TenantResource.getTenantServiceInstancesFromDf(tenantId,
-							instanceName);
+				if (!phase.equals(Constant.PROVISIONING) && !phase.equals(Constant.FAILURE)) {
+					if (Constant.list.contains(serviceName.toLowerCase())) {
 
-					// get the service permission based on the service name and
-					// role
-					ServiceRolePermission permission = ServiceRolePermissionWrapper
-							.getServicePermissionByRoleId(serviceName, assignment.getRoleId());
+						// get service instance name
+						String instanceName = instance.getAsJsonObject("metadata").get("name").getAsString();
+						String userName = UserPersistenceWrapper.getUserById(assignment.getUserId()).getUsername();
 
-					if (permission == null) {
-						permission = new ServiceRolePermission();
-						permission.setServicePermission("");
+						logger.info("updateRoleToUserInTenant -> begin to unbinding");
+						AdapterResponseBean unBindingRes = TenantResource.removeOCDPServiceCredentials(tenantId,
+								instanceName, userName);
+
+						if (unBindingRes.getResCodel() == 201) {
+							logger.info("updateRoleToUserInTenant -> wait unbinding compelte");
+							TenantResource.watiInstanceUnBindingComplete(unBindingRes, tenantId, instanceName);
+							logger.info("updateRoleToUserInTenant -> unbinding compelte");
+
+							String OCDPServiceInstanceStr = TenantResource.getTenantServiceInstancesFromDf(tenantId,
+									instanceName);
+
+							// get the service permission
+							ServiceRolePermission permission = ServiceRolePermissionWrapper
+									.getServicePermissionByRoleId(serviceName, assignment.getRoleId());
+
+							if (permission == null) {
+								permission = new ServiceRolePermission();
+								permission.setServicePermission("");
+							}
+
+							// parse the update request body
+							JsonElement OCDPServiceInstanceJson = new JsonParser().parse(OCDPServiceInstanceStr);
+							// get the provisioning json
+							JsonObject provisioning = OCDPServiceInstanceJson.getAsJsonObject().getAsJsonObject("spec")
+									.getAsJsonObject("provisioning");
+
+							provisioning.getAsJsonObject("parameters").addProperty("user_name", userName);
+
+							// add the accesses fields into the request body
+							provisioning.getAsJsonObject("parameters").addProperty("accesses",
+									permission.getServicePermission());
+
+							// add the patch Updating into the request body
+							JsonObject status = OCDPServiceInstanceJson.getAsJsonObject().getAsJsonObject("status");
+							status.addProperty("patch", Constant.UPDATE);
+
+							logger.info("updateRoleToUserInTenant -> begin to update");
+							AdapterResponseBean updateRes = TenantResource.updateTenantServiceInstanceInDf(tenantId,
+									instanceName, OCDPServiceInstanceJson.toString());
+
+							if (updateRes.getResCodel() == 200) {
+
+								logger.info("updateRoleToUserInTenant -> wait update compete");
+								TenantResource.watiInstanceUpdateComplete(updateRes, tenantId, instanceName);
+								logger.info("updateRoleToUserInTenant -> update compete");
+
+								logger.info("updateRoleToUserInTenant -> begin to binding");
+								AdapterResponseBean bindingRes = TenantResource.generateOCDPServiceCredentials(tenantId,
+										instanceName, userName);
+								if (bindingRes.getResCodel() == 201) {
+									logger.info("updateRoleToUserInTenant -> binding successfully");
+								}
+							}
+						}
 					}
-
-					// parse the update request body based on the get service
-					// instance
-					// by id response body
-					JsonElement OCDPServiceInstanceJson = new JsonParser().parse(OCDPServiceInstanceStr);
-					// get the provisioning json
-					JsonObject provisioning = OCDPServiceInstanceJson.getAsJsonObject().getAsJsonObject("spec")
-							.getAsJsonObject("provisioning");
-					// add the user name to the parameters for update
-					String userName = UserPersistenceWrapper.getUserById(assignment.getUserId()).getUsername();
-					provisioning.getAsJsonObject("parameters").addProperty("user_name", userName);
-
-					// add the accesses fields into the request body
-					provisioning.getAsJsonObject("parameters").addProperty("accesses",
-							permission.getServicePermission());
-
-					// add the patch Updating into the request body
-					JsonObject status = OCDPServiceInstanceJson.getAsJsonObject().getAsJsonObject("status");
-					status.addProperty("patch", "Updating");
-
-					AdapterResponseBean updateRes = TenantResource.updateTenantServiceInstanceInDf(tenantId,
-							instanceName, OCDPServiceInstanceJson.toString());
-
-					if (updateRes.getResCodel() == 200) {
-						logger.info("service updated");
-					}
-
-					// call the df binding to generate the OCDP service
-					// credentials
-					AdapterResponseBean bindingRes = TenantResource.generateOCDPServiceCredentials(tenantId,
-							instanceName, userName);
-					if (bindingRes.getResCodel() == 200) {
-						logger.info("service binding");
-					}
-
 				}
 			}
 
@@ -796,8 +930,8 @@ public class TenantResource {
 
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("updateRoleToUserInTenant -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 
 	}
@@ -811,7 +945,7 @@ public class TenantResource {
 	 */
 	@DELETE
 	@Path("{id}/user/{userId}/role/assignment")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response unassignRoleFromUserInTenant(@PathParam("id") String tenantId, @PathParam("userId") String userId) {
 
@@ -826,19 +960,24 @@ public class TenantResource {
 				// get service name
 				String serviceName = instance.getAsJsonObject("spec").getAsJsonObject("provisioning")
 						.get("backingservice_name").getAsString();
+				String phase = instance.getAsJsonObject("status").get("phase").getAsString();
 
-				if (Constant.list.contains(serviceName.toLowerCase())) {
-					// get service instance name
-					String instanceName = instance.getAsJsonObject("metadata").get("name").getAsString();
+				if (!phase.equals(Constant.PROVISIONING) && !phase.equals(Constant.FAILURE)) {
+					if (Constant.list.contains(serviceName.toLowerCase())) {
+						// get service instance name
+						String instanceName = instance.getAsJsonObject("metadata").get("name").getAsString();
 
-					// the unassign df and service broker only use the unbinding
-					// to do
-					// so here not need to call update
-					AdapterResponseBean bindingRes = TenantResource.removeOCDPServiceCredentials(tenantId, instanceName,
-							UserPersistenceWrapper.getUserById(userId).getUsername());
+						// the unassign df and service broker only use the
+						// unbinding
+						// to do
+						// so here not need to call update
+						logger.info("unassignRoleFromUserInTenant -> begin to unbinding");
+						AdapterResponseBean bindingRes = TenantResource.removeOCDPServiceCredentials(tenantId,
+								instanceName, UserPersistenceWrapper.getUserById(userId).getUsername());
 
-					if (bindingRes.getResCodel() == 200) {
-						logger.info("unassigned the permission");
+						if (bindingRes.getResCodel() == 201) {
+							logger.info("unassignRoleFromUserInTenant -> unbinding successfully");
+						}
 					}
 				}
 			}
@@ -849,8 +988,74 @@ public class TenantResource {
 
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("unassignRoleFromUserInTenant -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
+		}
+
+	}
+
+	private static void watiInstanceUnBindingComplete(AdapterResponseBean unBindingRes, String tenantId,
+			String instanceName) throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException,
+			IOException, InterruptedException {
+
+		String unBindingResStr = unBindingRes.getMessage();
+		JsonElement unBindingResJson = new JsonParser().parse(unBindingResStr);
+		int bound = unBindingResJson.getAsJsonObject().getAsJsonObject("spec").get("bound").getAsInt();
+
+		String instStr = TenantResource.getTenantServiceInstancesFromDf(tenantId, instanceName);
+		JsonElement instJson = new JsonParser().parse(instStr);
+
+		int currentBound = instJson.getAsJsonObject().getAsJsonObject("spec").get("bound").getAsInt();
+
+		while (currentBound == bound) {
+			logger.info("watiInstanceUnBindingComplete -> waiting");
+			Thread.sleep(500);
+			instStr = TenantResource.getTenantServiceInstancesFromDf(tenantId, instanceName);
+			instJson = new JsonParser().parse(instStr);
+			currentBound = instJson.getAsJsonObject().getAsJsonObject("spec").get("bound").getAsInt();
+		}
+
+	}
+
+	private static void watiInstanceBindingComplete(AdapterResponseBean bindingRes, String tenantId,
+			String instanceName) throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException,
+			IOException, InterruptedException {
+
+		String bindingResStr = bindingRes.getMessage();
+		JsonElement bindingResJson = new JsonParser().parse(bindingResStr);
+		int bound = bindingResJson.getAsJsonObject().getAsJsonObject("spec").get("bound").getAsInt();
+
+		String instStr = TenantResource.getTenantServiceInstancesFromDf(tenantId, instanceName);
+		JsonElement instJson = new JsonParser().parse(instStr);
+
+		int currentBound = instJson.getAsJsonObject().getAsJsonObject("spec").get("bound").getAsInt();
+
+		while (currentBound == bound) {
+			logger.info("watiInstanceBindingComplete -> waiting");
+			Thread.sleep(500);
+			instStr = TenantResource.getTenantServiceInstancesFromDf(tenantId, instanceName);
+			instJson = new JsonParser().parse(instStr);
+			currentBound = instJson.getAsJsonObject().getAsJsonObject("spec").get("bound").getAsInt();
+		}
+
+	}
+
+	private static void watiInstanceUpdateComplete(AdapterResponseBean updateRes, String tenantId, String instanceName)
+			throws InterruptedException, KeyManagementException, NoSuchAlgorithmException, KeyStoreException,
+			IOException {
+
+		String updateInstStr = updateRes.getMessage();
+		JsonElement updateInstJson = new JsonParser().parse(updateInstStr);
+
+		JsonElement patch = updateInstJson.getAsJsonObject().getAsJsonObject("status").get("patch");
+
+		while (patch != null) {
+			logger.info("watiInstanceUpdateComplete -> waiting");
+			Thread.sleep(500);
+			updateInstStr = TenantResource.getTenantServiceInstancesFromDf(tenantId, instanceName);
+			updateInstJson = new JsonParser().parse(updateInstStr);
+
+			patch = updateInstJson.getAsJsonObject().getAsJsonObject("status").get("patch");
 		}
 
 	}
@@ -860,7 +1065,7 @@ public class TenantResource {
 		String url = DFPropertiesFoundry.getDFProperties().get(Constant.DATAFOUNDRY_URL);
 		String token = DFPropertiesFoundry.getDFProperties().get(Constant.DATAFOUNDRY_TOKEN);
 		String dfRestUrl = url + "/oapi/v1/namespaces/" + tenantId + "/backingserviceinstances/" + instanceName
-				+ ":instance_name/binding";
+				+ "/binding";
 
 		JsonObject reqBody = new JsonObject();
 		reqBody.addProperty("apiVersion", "v1");
@@ -907,7 +1112,7 @@ public class TenantResource {
 		String url = DFPropertiesFoundry.getDFProperties().get(Constant.DATAFOUNDRY_URL);
 		String token = DFPropertiesFoundry.getDFProperties().get(Constant.DATAFOUNDRY_TOKEN);
 		String dfRestUrl = url + "/oapi/v1/namespaces/" + tenantId + "/backingserviceinstances/" + instanceName
-				+ ":instance_name/binding";
+				+ "/binding";
 
 		JsonObject reqBody = new JsonObject();
 		reqBody.addProperty("apiVersion", "v1");

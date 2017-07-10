@@ -28,7 +28,7 @@ import com.asiainfo.ocmanager.rest.resource.utils.DashboardPersistenceWrapper;
 
 @Path("/dashboard")
 public class DashboardResource {
-	
+
 	private static Logger logger = Logger.getLogger(TenantResource.class);
 
 	/**
@@ -37,7 +37,7 @@ public class DashboardResource {
 	 */
 	@GET
 	@Path("link")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	public Response getAllDashboardLinks() {
 		try {
 			List<Dashboard> dashboard = DashboardPersistenceWrapper.getAllLinks();
@@ -45,8 +45,8 @@ public class DashboardResource {
 			return Response.ok().entity(dashboard).build();
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("getAllDashboardLinks -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 	}
 
@@ -57,7 +57,7 @@ public class DashboardResource {
 	 */
 	@GET
 	@Path("link/{name}")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	public Response getDashboardLink(@PathParam("name") String name) {
 		try {
 			Dashboard dashboard = DashboardPersistenceWrapper.getLinkByName(name);
@@ -65,8 +65,8 @@ public class DashboardResource {
 			return Response.ok().entity(dashboard).build();
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("getDashboardLink -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 	}
 
@@ -77,7 +77,7 @@ public class DashboardResource {
 	 */
 	@POST
 	@Path("link")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response addDashboardLink(Dashboard dashboard) {
 		try {
@@ -86,8 +86,8 @@ public class DashboardResource {
 			return Response.ok().entity(new AdapterResponseBean("successful", "Add successfully", 200)).build();
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("addDashboardLink -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 	}
 
@@ -98,7 +98,7 @@ public class DashboardResource {
 	 */
 	@PUT
 	@Path("link/{id}")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response updateDashboardLink(Dashboard dashboard, @PathParam("id") int id) {
 		try {
@@ -108,8 +108,8 @@ public class DashboardResource {
 			return Response.ok().entity(new AdapterResponseBean("successful", "Update successfully", 200)).build();
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("updateDashboardLink -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 	}
 
@@ -120,7 +120,7 @@ public class DashboardResource {
 	 */
 	@DELETE
 	@Path("link/{id}")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response deleteDashboardLink(@PathParam("id") int id) {
 		try {
@@ -129,8 +129,8 @@ public class DashboardResource {
 			return Response.ok().entity(new AdapterResponseBean("successful", "Delete successfully", 200)).build();
 		} catch (Exception e) {
 			// system out the exception into the console log
-			logger.info(e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.getStackTrace().toString()).build();
+			logger.info("deleteDashboardLink -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
 		}
 	}
 
