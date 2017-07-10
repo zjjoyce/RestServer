@@ -135,14 +135,12 @@ public class quotaQuery {
      */
     public static Map getKafkaQuota(String topicName) {
         Map result = new HashMap();
+        List<Quota> items = new ArrayList<>();
 
-        Quota topicQuota = new Quota("topicQuota","100","20","180","kafka topic used space");
-        topicQuota = kafkaUtils.getKafkaQuota(topicName);
-        List<Quota> items = new ArrayList<Quota>();
-        String partitionNumStr = String.valueOf("1");
-        Quota partitionQuota= new Quota("partitionQuota",partitionNumStr,"","","kafka topic partiton num");
-        items.add(partitionQuota);
-        items.add(topicQuota);
+        Quota topicPartitionQuota = kafkaUtils.getKafkaPartitionNumQuota(topicName);
+        Quota kafkaSpaceQuota = kafkaUtils.getKafkaSpaceQuota(topicName);
+        items.add(topicPartitionQuota);
+        items.add(kafkaSpaceQuota);
         result.put("items",items);
         return result;
     }
