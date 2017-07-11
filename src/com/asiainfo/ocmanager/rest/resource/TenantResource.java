@@ -148,7 +148,7 @@ public class TenantResource {
 
 	/**
 	 * Get the role based on the tenant and user
-	 * 
+	 *
 	 * @param tenantId
 	 * @param userName
 	 * @return
@@ -458,8 +458,8 @@ public class TenantResource {
 								if (updateRes.getResCodel() == 200) {
 
 									logger.info("createServiceInstanceInTenant -> wait update complete");
-									TenantResource.watiInstanceUpdateComplete(updateRes, tenantId, instanceName);
-									logger.info("createServiceInstanceInTenant -> update complete");
+                                    TenantResource.watiInstanceUpdateComplete(updateRes, tenantId, instanceName);
+                                    logger.info("createServiceInstanceInTenant -> update complete");
 
 									logger.info("createServiceInstanceInTenant -> begin to binding");
 									for (int i = 0; i < userNameList.size(); i++) {
@@ -471,6 +471,7 @@ public class TenantResource {
 											TenantResource.watiInstanceBindingComplete(bindingRes, tenantId,
 													instanceName);
 											logger.info("createServiceInstanceInTenant -> binding complete");
+                                            DacpAllResult.getAllResult(tenantId);
 										}
 									}
 								}
@@ -498,7 +499,7 @@ public class TenantResource {
 	 *
 	 * @param tenantId
 	 * @param instanceName
-	 * @param reqBodyStr
+	 * @param parametersStr
 	 * @return
 	 */
 	@PUT
@@ -647,6 +648,7 @@ public class TenantResource {
 					if (statusCode == 200) {
 						ServiceInstancePersistenceWrapper.deleteServiceInstance(tenantId, instanceName);
 						logger.info("deleteServiceInstanceInTenant -> delete successfully");
+                        DacpAllResult.getAllResult(tenantId);
 					}
 					String bodyStr = EntityUtils.toString(response1.getEntity());
 
@@ -808,7 +810,9 @@ public class TenantResource {
 							AdapterResponseBean bindingRes = TenantResource.generateOCDPServiceCredentials(tenantId,
 									instanceName, userName);
 							if (bindingRes.getResCodel() == 201) {
+                                TenantResource.watiInstanceBindingComplete(bindingRes,tenantId,instanceName);
 								logger.info("assignRoleToUserInTenant -> binding successfully");
+                                DacpAllResult.getAllResult(tenantId);
 							}
 						}
 					}
@@ -816,8 +820,6 @@ public class TenantResource {
 			}
 
 			assignment = TURAssignmentPersistenceWrapper.assignRoleToUserInTenant(assignment);
-
-            String result = DacpAllResult.getAllResult(tenantId);
 
 			return Response.ok().entity(assignment).build();
 
@@ -976,7 +978,9 @@ public class TenantResource {
 								instanceName, UserPersistenceWrapper.getUserById(userId).getUsername());
 
 						if (bindingRes.getResCodel() == 201) {
+                            TenantResource.watiInstanceUnBindingComplete(bindingRes,tenantId,instanceName);
 							logger.info("unassignRoleFromUserInTenant -> unbinding successfully");
+                            DacpAllResult.getAllResult(tenantId);
 						}
 					}
 				}
