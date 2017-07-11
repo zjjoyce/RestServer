@@ -50,12 +50,17 @@ public interface TenantMapper {
 	 * @return
 	 */
 	public List<Tenant> selectAllRootTenants();
-	
+
 	/**
 	 * 
 	 * @param tenant
 	 */
 	public void updateTenantName(@Param("id") String id, @Param("name") String name);
-	
 
+	/**
+	 * 
+	 * @param level
+	 * @return
+	 */
+	public List<Tenant> selectTenantsByLevel(@Param("level") int level);
 }

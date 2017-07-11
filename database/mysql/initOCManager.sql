@@ -199,6 +199,11 @@ INSERT INTO `ocmanager`.`services_roles_permission` (service_servicename, role_i
 INSERT INTO `ocmanager`.`users` (id, username, password, email, description) VALUES("2ef26018-003d-4b2b-b786-0481d4ee9fa8", "admin", "admin", "admin@admin.com", "System Admin User");
 
 -- -----------------------------------------------------
+-- Init the root tenant into `ocmanager`.`tenants`
+-- -----------------------------------------------------
+INSERT INTO `ocmanager`.`tenants`(id, name, level, description) VALUES("ae783b6d-655a-11e7-aa10-fa163ed7d0ae","中信集团", 1, "中信集团租户根目录");
+
+-- -----------------------------------------------------
 -- Init the services type into the table `ocmanager`.`services`
 -- -----------------------------------------------------
 -- INSERT INTO `ocmanager`.`services`(id, servicename, description) VALUES("ae67d4ba-5c4e-4937-a68b-5b47cfe356d8", "HDFS", "Provide HDFS service");

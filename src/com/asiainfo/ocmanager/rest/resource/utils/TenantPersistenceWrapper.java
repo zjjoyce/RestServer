@@ -174,4 +174,26 @@ public class TenantPersistenceWrapper {
 		}
 	}
 
+	/**
+	 * 
+	 * @param level
+	 * @return
+	 */
+	public static List<Tenant> getTenantsByLevel(int level) {
+		SqlSession session = DBConnectorFactory.getSession();
+		List<Tenant> tenants = new ArrayList<Tenant>();
+		try {
+			TenantMapper mapper = session.getMapper(TenantMapper.class);
+			tenants = mapper.selectTenantsByLevel(level);
+			session.commit();
+		} catch (Exception e) {
+			session.rollback();
+			throw e;
+		} finally {
+			session.close();
+		}
+
+		return tenants;
+	}
+
 }
