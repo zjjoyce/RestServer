@@ -18,7 +18,7 @@ public class kafkaUtils {
     private static final Properties props = new Properties();
     public static Log logger = LogFactory.getLog(kafkaUtils.class);
 
-    public  static Quota  getKafkaQuota(String topicName){
+    public  static Quota  getKafkaPartitionNumQuota(String topicName){
         String currentClassPath = new kafkaUtils().getClass().getResource("/").getPath();
         String  jaasPath= currentClassPath.substring(0, currentClassPath.length() - 8) + "ocmanager/WEB-INF/conf/kafka-jaas.conf";
         String  krbPath = currentClassPath.substring(0,currentClassPath.length() - 8) + "ocmanager/WEB-INF/conf/krb5.conf";
@@ -48,73 +48,43 @@ public class kafkaUtils {
     }
     public static Quota getKafkaSpaceQuota(String topicName){
 
-        Quota quota = new Quota();
-        JSch jsch = new JSch();
-        Session session = null;
-        Channel channel = null;
-        String privateKeyPath = "\\C:\\users\\yujin\\yujing2_rsa_pub";
-        String shellCommand = "du -sm /hdfs/data1/kafka-logs/__consumer_offsets-42\n";
 
-        try{
-            jsch.addIdentity(privateKeyPath);
-            session = jsch.getSession("ai","zx-dn-10",22);
-            session.setConfig("PreferredAuthentications","publickey,keyboard-interactive,password");
-            Properties config = new Properties();
-            config.put("StrictHostKeyChecking","no");
-            session.setConfig(config);
-            session.connect(30000);
+        Quota partitionQuota = new Quota();
 
-            // 创建sftp通信通道
-            channel = (Channel) session.openChannel("shell");
-            channel.connect(1000);
+        //String shellCommand = "du -k /hdfs/data*/kafka-logs/"+topicName+"-*/\n";
 
 
-            //获取输入流和输出流
-            InputStream instream = channel.getInputStream();
-            OutputStream outstream = channel.getOutputStream();
-
-
-            // 发送需要执行的shell命令，需要用\n 结束，表示回车
-            outstream.write(shellCommand.getBytes());
-            outstream.flush();
-
-
-            //获取执行结果
-            if(instream.available() > 0){
-                byte[] data = new byte[instream.available()];
-                int nlen = instream.read(data);
-                if(nlen < 0){
-                    throw new Exception("network error.");
-                }
-                //转换输出结果并打印
-                String temp = new String(data,0,nlen,"iso8859-1");
-                System.out.println(temp);
-                String[] cmdResult = temp.split("\n");
-                String dirSize = cmdResult[1].split("\t")[0];
-                quota.setSize(dirSize);
-
+        //String shellCommand = "sh /home/ai/getKafakQuota.sh  "+topicName+"-*"+"\n";
+        //String shellCommand = "sh /home/ai/getKafakQuota1.sh\n";
+        Process process = null;
+        List<String> processList = new ArrayList<String>();
+        try {
+            process = Runtime.getRuntime().exec("sh /home/ai/getKafakQuota.sh  "+topicName+"-*"+"\n");
+            BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String line = "";
+            while ((line = input.readLine()) != null) {
+                processList.add(line);
             }
-//            outstream.close();
-//            instream.close();
-
-        }catch (JSchException e){
-            logger.error("Error during SSH command execution.Command is :"+shellCommand);
-        }catch (IOException e){
-            logger.error(e);
-        }catch (Exception ex){
-            logger.error(ex);
-            }finally {
-
-            channel.disconnect();
-            session.disconnect();
+            input.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        return quota;
+
+        for (String line : processList) {
+            System.out.println(line);
+        }
+
+
+
+        partitionQuota= new Quota("partitionQuota",String.valueOf("1"),"","","kafka topic partiton num");
+
+        return partitionQuota;
 
     }
     public static void main(String[] args){
         kafkaUtils kafka= new kafkaUtils();
-//        Quota quota = kafka.getKafkaQuota("__consumer_offsets");
-        Quota quota = kafka.getKafkaSpaceQuota("test");
-        logger.info("kafka quota is:"+quota.getSize());
+        Quota quota = getKafkaSpaceQuota("__consumer_offsets");
+        System.out.println(quota.getSize());
+
     }
 }
