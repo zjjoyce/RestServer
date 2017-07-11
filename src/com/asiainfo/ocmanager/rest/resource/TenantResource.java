@@ -5,7 +5,6 @@ import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -146,6 +145,20 @@ public class TenantResource {
 		}
 	}
 
+	private static UserRoleView getRole(String tenantId, String userName) {
+
+		UserRoleView role = UserRoleViewPersistenceWrapper.getRoleBasedOnUserAndTenant(userName, tenantId);
+		if (role == null) {
+			Tenant tenant = TenantPersistenceWrapper.getTenantById(tenantId);
+			if (tenant.getParentId() == null) {
+				return null;
+			} else {
+				role = TenantResource.getRole(tenant.getParentId(), userName);
+			}
+		}
+		return role;
+	}
+
 	/**
 	 * Get the role based on the tenant and user
 	 * 
@@ -158,7 +171,11 @@ public class TenantResource {
 	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	public Response getRoleByTenantUserName(@PathParam("id") String tenantId, @PathParam("userName") String userName) {
 		try {
-			UserRoleView role = UserRoleViewPersistenceWrapper.getRoleBasedOnUserAndTenant(userName, tenantId);
+			UserRoleView role = TenantResource.getRole(tenantId, userName);
+			if (role != null) {
+				// set the tenant id to the passed tenant id
+				role.setTenantId(tenantId);
+			}
 			return Response.ok().entity(role).build();
 		} catch (Exception e) {
 			// system out the exception into the console log
@@ -1251,8 +1268,6 @@ public class TenantResource {
 		}
 	}
 
-	
-	
 	/**
 	 * specific method for citic
 	 * 
@@ -1341,5 +1356,5 @@ public class TenantResource {
 			logger.info("createTenantInternal -> " + e.getMessage());
 		}
 	}
-	
+
 }
