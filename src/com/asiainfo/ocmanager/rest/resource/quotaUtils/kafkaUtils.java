@@ -20,14 +20,18 @@ public class kafkaUtils {
 
     public  static Quota  getKafkaPartitionNumQuota(String topicName){
         String currentClassPath = new kafkaUtils().getClass().getResource("/").getPath();
-        String  jaasPath= currentClassPath.substring(0, currentClassPath.length() - 8) + "ocmanager/WEB-INF/conf/kafka-jaas.conf";
-        String  krbPath = currentClassPath.substring(0,currentClassPath.length() - 8) + "ocmanager/WEB-INF/conf/krb5.conf";
+        /*String  jaasPath= currentClassPath.substring(0, currentClassPath.length() - 8) + "ocmanager/WEB-INF/conf/kafka-jaas.conf";
+        String  krbPath = currentClassPath.substring(0,currentClassPath.length() - 8) + "ocmanager/WEB-INF/conf/krb5.conf";*/
+
+        String  jaasPath= currentClassPath.substring(0, currentClassPath.length() - 8) + "conf/kafka-jaas.conf";
+        String  krbPath = currentClassPath.substring(0,currentClassPath.length() - 8) + "conf/krb5.conf";
         System.setProperty("java.security.auth.login.config",jaasPath);
         System.setProperty("java.security.krb5.conf", krbPath);
         //System.setProperty("sun.security.krb5.debug", "true");
         props.put("security.protocol", "SASL_PLAINTEXT");
         System.out.println("begin to register for kerberos");
-        props.put("bootstrap.servers", "zx-dn-10:6667,zx-dn-11:6667,zx-dn-12:6667,zx-dn-13:6667,zx-dn-14:6667,zx-bdi-01:6667,zx-bdi-02:6667,zx-bdi-03:6667");
+        //props.put("bootstrap.servers", "zx-dn-10:6667,zx-dn-11:6667,zx-dn-12:6667,zx-dn-13:6667,zx-dn-14:6667,zx-bdi-01:6667,zx-bdi-02:6667,zx-bdi-03:6667");
+        props.put("bootstrap.servers", "zx-dn-10:6667,zx-dn-11:6667,zx-dn-12:6667,zx-dn-13:6667,zx-dn-14:6667");
         props.put("group.id", "group1");
         props.put("enable.auto.commit", "true");
         props.put("auto.commit.interval.ms", "1000");
@@ -71,20 +75,21 @@ public class kafkaUtils {
         }
 
         for (String line : processList) {
-            System.out.println(line);
+            System.out.println("kafka topic partiton num"+line);
         }
 
 
-
-        partitionQuota= new Quota("partitionQuota",String.valueOf("1"),"","","kafka topic partiton num");
+        partitionQuota= new Quota("partitionQuota",String.valueOf(processList.get(0)),"","","kafka topic partition used size");
 
         return partitionQuota;
 
     }
     public static void main(String[] args){
         kafkaUtils kafka= new kafkaUtils();
-        Quota quota = getKafkaSpaceQuota("__consumer_offsets");
-        System.out.println(quota.getSize());
+        //Quota quota = getKafkaSpaceQuota("__consumer_offsets");
+        Quota quota1 = getKafkaPartitionNumQuota("__consumer_offsets");
+        //System.out.println(quota.getSize());
+        System.out.println(quota1.getSize());
 
     }
 }
