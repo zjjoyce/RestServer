@@ -34,7 +34,7 @@ public class UserWrapper {
             if(ocdpRoleName.equals("project.admin")){
                 roleName = "TeamMgr";
             }else if(ocdpRoleName.equals("team.member")){
-                roleName = "SysOper";
+                roleName = "TeamDev";
             }
             //if result already has this user
             if(userInfoMap.containsKey(userId)){
