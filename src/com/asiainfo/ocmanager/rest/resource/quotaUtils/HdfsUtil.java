@@ -42,17 +42,17 @@ public class HdfsUtil {
             ContentSummary contentSum = fs.getContentSummary(new Path(path));
             long Quota = contentSum.getQuota();
             long FileCount = contentSum.getFileCount();
-            filesquota.setName("hdfsQuota");
+            filesquota.setName("nameSpaceQuota");
             filesquota.setSize(String.valueOf(Quota));
             filesquota.setUsed(String.valueOf(FileCount));
             filesquota.setAvailable(String.valueOf(Quota-FileCount));
             filesquota.setDesc("hdfs quota");
             long spaceQuota = contentSum.getSpaceQuota();
             long spaceConsumed = contentSum.getSpaceConsumed();
-            spacequota.setName("hdfsSpaceQuota");
-            spacequota.setSize(String.valueOf(spaceQuota));
-            spacequota.setUsed(String.valueOf(spaceConsumed));
-            spacequota.setAvailable(String.valueOf(spaceQuota-spaceConsumed));
+            spacequota.setName("storageSpaceQuota");
+            spacequota.setSize(String.valueOf(spaceQuota/1024/1024/1024));
+            spacequota.setUsed(String.valueOf(spaceConsumed/1024/1024/1024));
+            spacequota.setAvailable(String.valueOf((spaceQuota-spaceConsumed)/1024/1024/1024));
             spacequota.setDesc("hdfs space quota");
         } catch (IOException e) {
             logger.error("IOException :" +e);
