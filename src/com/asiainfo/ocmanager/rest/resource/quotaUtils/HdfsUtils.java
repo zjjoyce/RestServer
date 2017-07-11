@@ -67,7 +67,7 @@ public class HdfsUtils {
 
   public static List<Quota> getContenSummary(Path filePath) {
       List quotaList = new ArrayList<Quota>();
-    Quota spaceQuota = new Quota("hdfs space quota","","","","hdfs space quota");
+    Quota spaceQuota = new Quota("storageSpaceQuota","","","","hdfs space quota");
     Quota fileQuota = new Quota("hdfs file count quota","","","","hdfs file count quota");
 
       try {
@@ -76,9 +76,9 @@ public class HdfsUtils {
       // space quota
       Long spaceConsumed = contentSum.getSpaceConsumed();
       Long spaceQuota1 = contentSum.getSpaceQuota();
-      spaceQuota.setUsed(String.valueOf(spaceConsumed));
-      spaceQuota.setSize(String.valueOf(spaceQuota1));
-      spaceQuota.setAvailable(String.valueOf(spaceQuota1 - spaceConsumed));
+      spaceQuota.setUsed(String.valueOf(spaceConsumed/1024/1024/1024));
+      spaceQuota.setSize(String.valueOf(spaceQuota1/1024/1024/1024));
+      spaceQuota.setAvailable(String.valueOf((spaceQuota1 - spaceConsumed)/1024/1024/1024));
       //file count quota
       fileQuota.setUsed(String.valueOf(contentSum.getFileCount()));
       fileQuota.setSize(String.valueOf(contentSum.getQuota()));

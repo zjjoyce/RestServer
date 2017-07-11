@@ -61,9 +61,9 @@ public class HbaseUtil {
         Quota tabquota = new Quota();
         Quota regquota = new Quota();
 
-        tabquota.setName("hbase tableUsed");
+        tabquota.setName("maximumTablesQuota");
         tabquota.setUsed(String.valueOf(tabnum));
-        regquota.setName("hbase regionUsed");
+        regquota.setName("maximumRegionsQuota");
         regquota.setUsed(String.valueOf(regnum));
 
         List<Quota> result = new ArrayList<Quota>();
