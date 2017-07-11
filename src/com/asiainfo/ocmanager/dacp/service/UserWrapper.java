@@ -29,7 +29,13 @@ public class UserWrapper {
         while(iterator.hasNext()){
             UserRoleView iter = iterator.next();
             String userId = iter.getUserId();
-            String roleName = iter.getRoleName();
+            String ocdpRoleName = iter.getRoleName();
+            String roleName = "";
+            if(ocdpRoleName.equals("project.admin")){
+                roleName = "TeamMgr";
+            }else if(ocdpRoleName.equals("team.member")){
+                roleName = "TeamDev";
+            }
             //if result already has this user
             if(userInfoMap.containsKey(userId)){
                 UserInfo userInfo = (UserInfo)userInfoMap.get(userId);
