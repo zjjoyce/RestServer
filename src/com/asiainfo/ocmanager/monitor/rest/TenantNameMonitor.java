@@ -48,7 +48,7 @@ public class TenantNameMonitor {
 	
 	private void syncTenantName(){
 		HashMap<String, Tenant> tenantsMappings = new HashMap<String, Tenant>();
-		List<Tenant> tenants = TenantPersistenceWrapper.getAllRootTenants();
+		List<Tenant> tenants = TenantPersistenceWrapper.getAllTenants();
 		for(Tenant t: tenants){
 			tenantsMappings.put(t.getId(), t);
 		}

@@ -63,6 +63,16 @@ public class TestTenant {
 			System.out.println("=== update tenant name ===");
 			mapper.updateTenantName("t1", "aaaaaaaa");
 			
+			
+			List<Tenant> levels = mapper.selectTenantsByLevel(3);
+			for (Tenant r : levels) {
+				System.out.println(r.getId());
+				System.out.println(r.getName());
+				System.out.println(r.getDescription());
+				System.out.println(r.getParentId());
+				System.out.println(r.getLevel());
+			}
+			
 			session.commit();
 		} catch (Exception e) {
 			session.rollback();

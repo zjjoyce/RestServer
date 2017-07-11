@@ -5,6 +5,7 @@ import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -1250,4 +1251,95 @@ public class TenantResource {
 		}
 	}
 
+	
+	
+	/**
+	 * specific method for citic
+	 * 
+	 * @param parentId
+	 * @param tenantId
+	 */
+	private static void checkApp(String appId) {
+		Tenant tenant = TenantPersistenceWrapper.getTenantById(appId);
+		if (tenant == null) {
+			List<Tenant> list = TenantResource.getTenantAndAPPByAppId(appId);
+
+			TenantResource.checkTenant(list.get(0));
+
+			Tenant newTenant = new Tenant(list.get(1).getId(), list.get(1).getName(), list.get(1).getDescription(),
+					list.get(0).getId(), 3);
+			TenantResource.createTenantInternal(newTenant);
+		}
+
+	}
+
+	private static List<Tenant> getTenantAndAPPByAppId(String appId) {
+		return new ArrayList<Tenant>();
+	}
+
+	private static void checkTenant(Tenant tenant) {
+		Tenant DBtenant = TenantPersistenceWrapper.getTenantById(tenant.getId());
+		if (DBtenant == null) {
+			Tenant newTenant = new Tenant(tenant.getId(), tenant.getName(), tenant.getDescription(),
+					"ae783b6d-655a-11e7-aa10-fa163ed7d0ae", 2);
+			TenantResource.createTenantInternal(newTenant);
+		}
+	}
+
+	private static void createTenantInternal(Tenant tenant) {
+
+		try {
+			String url = DFPropertiesFoundry.getDFProperties().get(Constant.DATAFOUNDRY_URL);
+			String token = DFPropertiesFoundry.getDFProperties().get(Constant.DATAFOUNDRY_TOKEN);
+			String dfRestUrl = url + "/oapi/v1/projectrequests";
+
+			JsonObject jsonObj1 = new JsonObject();
+			jsonObj1.addProperty("apiVersion", "v1");
+			jsonObj1.addProperty("kind", "ProjectRequest");
+			// mapping DF tenant display name with adapter tenant name
+			jsonObj1.addProperty("displayName", tenant.getName());
+			if (tenant.getDescription() != null) {
+				jsonObj1.addProperty("description", tenant.getDescription());
+			}
+
+			JsonObject jsonObj2 = new JsonObject();
+			jsonObj2.addProperty("name", tenant.getId());
+			jsonObj1.add("metadata", jsonObj2);
+			String reqBody = jsonObj1.toString();
+
+			SSLConnectionSocketFactory sslsf = SSLSocketIgnoreCA.createSSLSocketFactory();
+
+			CloseableHttpClient httpclient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
+			try {
+				HttpPost httpPost = new HttpPost(dfRestUrl);
+				httpPost.addHeader("Content-type", "application/json");
+				httpPost.addHeader("Authorization", "bearer " + token);
+
+				StringEntity se = new StringEntity(reqBody);
+				se.setContentType("application/json");
+				httpPost.setEntity(se);
+
+				logger.info("createTenantInternal -> start create");
+				CloseableHttpResponse response2 = httpclient.execute(httpPost);
+
+				try {
+					int statusCode = response2.getStatusLine().getStatusCode();
+
+					if (statusCode == 201) {
+						logger.info("createTenantInternal -> start successfully");
+						TenantPersistenceWrapper.createTenant(tenant);
+					}
+					String bodyStr = EntityUtils.toString(response2.getEntity());
+				} finally {
+					response2.close();
+				}
+			} finally {
+				httpclient.close();
+			}
+		} catch (Exception e) {
+			// system out the exception into the console log
+			logger.info("createTenantInternal -> " + e.getMessage());
+		}
+	}
+	
 }
