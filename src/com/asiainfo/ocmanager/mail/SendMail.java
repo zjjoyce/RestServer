@@ -100,7 +100,7 @@ public class SendMail {
     public static void main(String[] args){
         SendMail send = new SendMail();
         String username = "yujing2";
-        String passwd = "765@asiainfo";
+        String passwd = "********";
         String recipientEmail = "yujing2@asiainfo.com,zhangfq3@asiainfo.com";
         String title = "test send email to myself";
         String message = "hello world";
