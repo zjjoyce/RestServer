@@ -23,7 +23,7 @@ public class HdfsUtil {
 
     public static final Configuration conf = new Configuration();
 
-    public static List<Quota> getHDFSData(String path){
+    static {
         String currentClassPath = new HdfsUtil().getClass().getResource("/").getPath();
         String  keytabPath= currentClassPath.substring(0, currentClassPath.length() - 8) + "conf/shixiuru.keytab";
         String  krbPath = currentClassPath.substring(0,currentClassPath.length() - 8) + "conf/krb5.conf";
@@ -34,26 +34,58 @@ public class HdfsUtil {
         conf.set(AUTHENTICATION,"kerberos");
         System.setProperty("java.security.krb5.conf",krbPath);
         UserGroupInformation.setConfiguration(conf);
-        Quota filesquota = new Quota("hdfsFileQuota","","","","hdfs file quota");
-        Quota spacequota = new Quota("hdfsSpaceQuota","","","","hdfs space quota");
         try {
             UserGroupInformation.loginUserFromKeytab("shixiuru@EXAMPLE.COM",keytabPath);
+        } catch (IOException e) {
+            logger.error("IOException :" +e);
+            e.printStackTrace();
+        }
+
+    }
+
+    public static List<Quota> getHDFSData(String path){
+        /*String currentClassPath = new HdfsUtil().getClass().getResource("/").getPath();
+        String  keytabPath= currentClassPath.substring(0, currentClassPath.length() - 8) + "conf/shixiuru.keytab";
+        String  krbPath = currentClassPath.substring(0,currentClassPath.length() - 8) + "conf/krb5.conf";
+        String dfsurl = AmbariUtil.getUrl("hdfs");
+
+        conf.set(KEYTAB_FILE_KEY, keytabPath);
+        conf.set(DEFAULT_FS,dfsurl);
+        conf.set(AUTHENTICATION,"kerberos");
+        System.setProperty("java.security.krb5.conf",krbPath);
+        UserGroupInformation.setConfiguration(conf);*/
+        Quota filesquota = new Quota("nameSpaceQuota","","","","hdfs file quota");
+        Quota spacequota = new Quota("storageSpaceQuota","","","","hdfs space quota");
+        try {
+//            UserGroupInformation.loginUserFromKeytab("shixiuru@EXAMPLE.COM",keytabPath);
             FileSystem fs = FileSystem.get(conf);
             ContentSummary contentSum = fs.getContentSummary(new Path(path));
             long Quota = contentSum.getQuota();
             long FileCount = contentSum.getFileCount();
-            filesquota.setName("nameSpaceQuota");
-            filesquota.setSize(String.valueOf(Quota));
-            filesquota.setUsed(String.valueOf(FileCount));
-            filesquota.setAvailable(String.valueOf(Quota-FileCount));
-            filesquota.setDesc("hdfs quota");
+            if(Quota==-1){
+                filesquota.setSize("");
+                filesquota.setUsed(String.valueOf(FileCount));
+                filesquota.setAvailable("");
+            }else {
+//                filesquota.setName("nameSpaceQuota");
+                filesquota.setSize(String.valueOf(Quota));
+                filesquota.setUsed(String.valueOf(FileCount));
+                filesquota.setAvailable(String.valueOf(Quota-FileCount));
+//                filesquota.setDesc("hdfs quota");
+            }
             long spaceQuota = contentSum.getSpaceQuota();
             long spaceConsumed = contentSum.getSpaceConsumed();
-            spacequota.setName("storageSpaceQuota");
-            spacequota.setSize(String.valueOf(spaceQuota/1024/1024/1024));
-            spacequota.setUsed(String.valueOf(spaceConsumed/1024/1024/1024));
-            spacequota.setAvailable(String.valueOf((spaceQuota-spaceConsumed)/1024/1024/1024));
-            spacequota.setDesc("hdfs space quota");
+            if(spaceQuota==-1){
+                spacequota.setSize("");
+                spacequota.setUsed(String.valueOf(spaceConsumed/1024/1024/1024));
+                spacequota.setAvailable("");
+            }else {
+//                spacequota.setName("storageSpaceQuota");
+                spacequota.setSize(String.valueOf(spaceQuota/1024/1024/1024));
+                spacequota.setUsed(String.valueOf(spaceConsumed/1024/1024/1024));
+                spacequota.setAvailable(String.valueOf((spaceQuota-spaceConsumed)/1024/1024/1024));
+//                spacequota.setDesc("hdfs space quota");
+            }
         } catch (IOException e) {
             logger.error("IOException :" +e);
             e.printStackTrace();

@@ -74,6 +74,7 @@ public class SendMail {
         /*String username = "yujing2@asiainfo.com";
         String passwd = "765@asiainfo";
         String recipientEmail = "yanls@asiainfo.com";
+
         String title = "test send email to myself";
         String message = "hello world";
         Send(username, passwd, recipientEmail, title, message);*/

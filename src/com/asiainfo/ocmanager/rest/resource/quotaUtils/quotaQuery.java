@@ -6,9 +6,11 @@ import java.util.*;
 
 import com.asiainfo.ocmanager.mail.ParamQuery;
 import com.asiainfo.ocmanager.persistence.model.Quota;
+
 import com.asiainfo.ocmanager.rest.resource.quotaUtils.HdfsUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.apache.hadoop.fs.Path;
 
 import com.mongodb.MongoClient;
@@ -106,8 +108,10 @@ public class quotaQuery {
         /*
         todo :move hive quota code to here
          */
-        HdfsUtils hdfsUtils = new HdfsUtils();
-        List<Quota> hdfsQuota = hdfsUtils.getHdfsQuota(new Path("/apps/hive/warehouse/"+dbname+".db"));
+        String path = "/apps/hive/warehouse/"+dbname+".db";
+        List<Quota> hdfsQuota = HdfsUtil.getHDFSData(path);
+//        HdfsUtils hdfsUtils = new HdfsUtils();
+//        List<Quota> hdfsQuota = hdfsUtils.getHdfsQuota(new Path("/apps/hive/warehouse/"+dbname+".db"));
         List<Quota> queueQuota = YarnUtil.getYarnData(queuename);
         //yarn quota
         Iterator<Quota> iterator = queueQuota.iterator();
