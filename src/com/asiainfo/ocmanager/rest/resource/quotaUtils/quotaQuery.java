@@ -158,7 +158,7 @@ public class quotaQuery {
             Statement st = db1.createStatement();
             ResultSet rs = st.executeQuery("select  sum((pg_relation_size(relid)))from pg_stat_user_tables");
             while (rs.next()) {
-                useplace = Long.valueOf(rs.getString(1))/1024/1024;
+                useplace = Long.valueOf(rs.getString(1));
             }
             String used = String.valueOf(useplace);
             volumeSize= new Quota("volumeSize","",used,"","greenplum database used Size");
@@ -195,7 +195,6 @@ public class quotaQuery {
             for(Document colloctio:database.listCollections()){
                 useplace+=colloctio.toJson().getBytes().length;
             }
-            useplace = useplace/1024/1024;
             String used = String.valueOf(useplace);
             volumSize= new Quota("volumeSize","",used,"","mongodb database used size");
         }catch (Exception e){
