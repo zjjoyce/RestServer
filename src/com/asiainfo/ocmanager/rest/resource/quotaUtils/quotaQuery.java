@@ -1,22 +1,19 @@
 package com.asiainfo.ocmanager.rest.resource.quotaUtils;
 
+import java.io.IOException;
 import java.sql.*;
 import java.util.*;
 
+import com.asiainfo.ocmanager.mail.ParamQuery;
 import com.asiainfo.ocmanager.persistence.model.Quota;
 import com.asiainfo.ocmanager.rest.resource.quotaUtils.HdfsUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.fs.Path;
 
 import com.mongodb.MongoClient;
 import com.mongodb.client.*;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.bson.Document;
-
-
-import org.apache.kafka.common.PartitionInfo;
-import java.util.Properties;
 
 /**
  *
@@ -24,6 +21,9 @@ import java.util.Properties;
  *
  */
 public class quotaQuery {
+
+
+    public static Log logger = LogFactory.getLog(quotaQuery.class);
 
 
     /**
@@ -149,27 +149,30 @@ public class quotaQuery {
         Map result = new HashMap();
         List<Quota> items = new ArrayList<Quota>();
         long useplace = 0;
+        Quota volumeSize= new Quota("volumeSize","","0","","greenplum database used Size");
         try {
             Class.forName("org.postgresql.Driver");
+            String hostport = ParamQuery.getCFProperties().get(ParamQuery.GREENPLUM_HOST_PORT);
             //Connection db = DriverManager.getConnection("jdbc:postgresql://10.247.32.84:5432/d778303ea916d266", "u09f42e1eaa08a8b", "pa465990aee497b4");
-            Connection db1 = DriverManager.getConnection("jdbc:postgresql://10.247.32.84:5432/" + database, "gpadmin", "asiainfoldp");
+            Connection db1 = DriverManager.getConnection("jdbc:postgresql://"+hostport+"/" + database, "gpadmin", "asiainfoldp");
             Statement st = db1.createStatement();
             ResultSet rs = st.executeQuery("select  sum((pg_relation_size(relid)))from pg_stat_user_tables");
             while (rs.next()) {
                 useplace = Long.valueOf(rs.getString(1))/1024/1024;
-                System.out.println("xxxxx库已使用空间大小："+useplace+"G");
             }
+            String used = String.valueOf(useplace);
+            volumeSize= new Quota("volumeSize","",used,"","greenplum database used Size");
             rs.close();
             st.close();
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            logger.info("quotaQuery getGpQuota ClassNotFoundException" + e.getMessage());
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.info("quotaQuery getGpQuota SQLException" + e.getMessage());
+        } catch (IOException e) {
+            logger.info("quotaQuery getGpQuota IOException" + e.getMessage());
         }
-        String used = String.valueOf(useplace);
-        Quota volumeSize= new Quota("volumeSize","",used,"","greenplum database used Size");
         items.add(volumeSize);
-        result.put("items",items);
+        result.put("items", items);
         return result;
     }
 
@@ -180,22 +183,24 @@ public class quotaQuery {
      */
     public static Map getMongoQuota(String databasename) {
         Map result = new HashMap();
-        // 获取链接
-        MongoClient mongoClient = new MongoClient("10.247.32.97", 27021);
-        // 获取数据库
-        //MongoDatabase database = mongoClient.getDatabase("e7cd929a-3aa5-11e7-a678-00163e00009d");
-        MongoDatabase database = mongoClient.getDatabase(databasename);
-
-        long useplace = 0;
-        for(Document colloctio:database.listCollections()){
-            //System.out.println(colloctio.toJson().getBytes().length);
-            useplace+=colloctio.toJson().getBytes().length;
-        }
-        useplace = useplace/1024/1024;
-        String used = String.valueOf(useplace);
-        //System.out.println("xxxxx库已使用空间大小："+userplace+"M");
-        Quota volumSize= new Quota("volumeSize","",used,"","mongodb database used size");
         List<Quota> items = new ArrayList<Quota>();
+        Quota volumSize= new Quota("volumeSize","","0","","mongodb database used size");
+        long useplace = 0;
+        try {
+            String host = ParamQuery.getCFProperties().get(ParamQuery.MONGO_HOST);
+            String port = ParamQuery.getCFProperties().get(ParamQuery.MONGO_PORT);
+            //MongoClient mongoClient = new MongoClient("10.247.32.97", 27021);
+            MongoClient mongoClient = new MongoClient(host, Integer.valueOf(port));
+            MongoDatabase database = mongoClient.getDatabase(databasename);
+            for(Document colloctio:database.listCollections()){
+                useplace+=colloctio.toJson().getBytes().length;
+            }
+            useplace = useplace/1024/1024;
+            String used = String.valueOf(useplace);
+            volumSize= new Quota("volumeSize","",used,"","mongodb database used size");
+        }catch (Exception e){
+            logger.info("quotaQuery getMongoQuota Exception "+e.getMessage());
+        }
         items.add(volumSize);
         result.put("items",items);
         return result;
