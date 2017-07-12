@@ -77,7 +77,7 @@ public class SendMail {
         String title = "test send email to myself";
         String message = "hello world";
         Send(username, passwd, recipientEmail, title, message);*/
-        //Map quota = quotaQuery.getMongoQuota("e7cd929a-3aa5-11e7-a678-00163e00009d");
+        //Map quota = quotaQuery.getMongoQuota("50dadbf3-d3f5-11e6-bf26-00163e00009d");
         //Map quota = quotaQuery.getGpQuota("d778303ea916d266");
         //Map quota = quotaQuery.getKafkaQuota("__consumer_offsets");
 
