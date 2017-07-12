@@ -155,7 +155,12 @@ public class TenantResource {
 
 		UserRoleView role = UserRoleViewPersistenceWrapper.getRoleBasedOnUserAndTenant(userName, tenantId);
 		if (role == null) {
+			logger.info("getRole -> start get tenant");
 			Tenant tenant = TenantPersistenceWrapper.getTenantById(tenantId);
+			logger.info("getRole -> finish get tenant");
+			if(tenant == null){
+				return null;
+			}
 			if (tenant.getParentId() == null) {
 				return null;
 			} else {
