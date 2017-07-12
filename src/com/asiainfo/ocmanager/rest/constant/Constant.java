@@ -23,6 +23,7 @@ public class Constant {
 	/************************** monitor const ************************/
 	/*****************************************************************/
 	
+	public final static String TENANT_MONITOR_ENABLE = "tenant.monitor.enable";
 	public final static String TENANT_MONITOR_PERIOD = "tenant.monitor.period";
 	public final static String TENANT_MONITOR_URL = "tenant.monitor.url";
 
