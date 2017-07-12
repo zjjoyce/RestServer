@@ -6,10 +6,8 @@ import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
-import javax.persistence.Entity;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -38,6 +36,7 @@ import org.apache.log4j.Logger;
 
 import com.asiainfo.ocmanager.monitor.client.RestClient;
 import com.asiainfo.ocmanager.monitor.entity.AppEntity;
+import com.asiainfo.ocmanager.monitor.entity.AppExtraEntity;
 import com.asiainfo.ocmanager.monitor.entity.TenantEntity;
 import com.asiainfo.ocmanager.persistence.model.ServiceInstance;
 import com.asiainfo.ocmanager.persistence.model.ServiceRolePermission;
@@ -1353,7 +1352,7 @@ public class TenantResource {
 				throw new RuntimeException("Create tenant in DataFoundary failed with status code: " + dfResponse.getStatusLine().getStatusCode());
 			}
 		} catch (Exception e) {
-			logger.info("Error while creating tenant: " + tenant.getId(), e);
+			logger.error("Error while creating tenant: " + tenant.getId(), e);
 			throw new RuntimeException(e);
 		}
 		finally{
@@ -1372,7 +1371,7 @@ public class TenantResource {
 		List<Tenant> list = new ArrayList<>();
 		try {
 			client = new RestClient();
-			transform(list, appId, client.fetchTenantByAppId(appId));
+			transform(list, appId, client.fetchTenantAndAppByAppId(appId));
 			return list;
 		} catch (Exception e) {
 			logger.error("Error while fetching tenants info from CITIC RestServer by AppID: " + appId, e);
@@ -1385,14 +1384,11 @@ public class TenantResource {
 		}
 	}
 
-	private void transform(List<Tenant> list, String appId, TenantEntity citicEntity) {
+	private void transform(List<Tenant> list, String appId, AppExtraEntity appExtraEntity) {
 		// citic tenant corresponds to level 2 tenant
-		list.add(new Tenant(citicEntity.getOrg_id(), citicEntity.getOrg_name(), "Synchronized from CITIC Cloud", "ae783b6d-655a-11e7-aa10-fa163ed7d0ae", 2));
-		List<AppEntity> apps = citicEntity.getApp_list();
-		for (AppEntity app : apps) {
-			// citic app corresponds to level 3 tenant
-			list.add(new Tenant(app.getId(), app.getAbbreviation(), "Synchronized from CITIC Cloud", app.getOrg_id(), 3));
-		}
+		list.add(new Tenant(appExtraEntity.getOrg_id(), appExtraEntity.getOrg_name(), "Synchronized from CITIC Cloud", "ae783b6d-655a-11e7-aa10-fa163ed7d0ae", 2));
+		// citic app corresponds to level 3 tenant
+		list.add(new Tenant(appExtraEntity.getId(), appExtraEntity.getAbbreviation(), "Synchronized from CITIC Cloud", appExtraEntity.getOrg_id(), 3));
 		logger.info("Tenants synchronized from CITIC by Appid(" + appId + "): " + list);
 	}
 

@@ -18,8 +18,10 @@ import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 
 import com.asiainfo.ocmanager.monitor.entity.AppEntity;
-import com.asiainfo.ocmanager.monitor.entity.RspEntity;
+import com.asiainfo.ocmanager.monitor.entity.AppExtraEntity;
+import com.asiainfo.ocmanager.monitor.entity.TenantsAppsEntity;
 import com.asiainfo.ocmanager.monitor.entity.TenantEntity;
+import com.asiainfo.ocmanager.monitor.entity.TenantExtraEntity;
 import com.asiainfo.ocmanager.monitor.util.Configuration;
 import com.asiainfo.ocmanager.rest.constant.Constant;
 import com.google.gson.Gson;
@@ -62,7 +64,7 @@ public class RestClient implements Closeable{
 	 * @param appId
 	 * @return
 	 */
-	public TenantEntity fetchTenantByAppId(String appId)
+	public AppExtraEntity fetchTenantAndAppByAppId(String appId)
 	{
 		CloseableHttpResponse rsp = null;
 		String postfix = new StringBuilder().append("/").append(appId).append("/get_tenant_info_by_app_base_id.do").toString();
@@ -84,13 +86,9 @@ public class RestClient implements Closeable{
 		}
 	}
 	
-	private TenantEntity getTeant(CloseableHttpResponse rsp, String appId) throws ParseException, IOException {
-		List<TenantEntity> tenants = toEntity(rsp).getData();
-		if (tenants.isEmpty() || tenants.size() != 1) {
-			LOG.error("Tenant not exist or multiple Tenants corresponding to App: " + appId + ", Tenants: " + tenants);
-			throw new RuntimeException("Tenant not exist or multiple Tenants corresponding to App: " + appId + ", Tenants: " + tenants);
-		}
-		return tenants.get(0);
+	private AppExtraEntity getTeant(CloseableHttpResponse rsp, String appId) throws ParseException, IOException {
+		AppExtraEntity tenant = toEntity(rsp, TenantExtraEntity.class).getData();
+		return tenant;
 	}
 
 	/**
@@ -127,7 +125,7 @@ public class RestClient implements Closeable{
 	 * @throws IOException
 	 */
 	private List<AppEntity> listTenantsAndApps(CloseableHttpResponse rsp) throws ParseException, IOException {
-		List<TenantEntity> tenants = toEntity(rsp).getData();
+		List<TenantEntity> tenants = toEntity(rsp, TenantsAppsEntity.class).getData();
 		List<AppEntity> list = new ArrayList<>();
 		for(TenantEntity tenant : tenants)
 		{
@@ -138,10 +136,10 @@ public class RestClient implements Closeable{
 		return list;
 	}
 
-	private RspEntity toEntity(CloseableHttpResponse rsp) throws ParseException, IOException {
+	private <T> T toEntity(CloseableHttpResponse rsp, Class<T> clz) throws ParseException, IOException {
 		String entityStr = EntityUtils.toString(rsp.getEntity());
 		LOG.debug("Entity string of citic response: " + entityStr);
-		return gson.fromJson(entityStr, RspEntity.class);
+		return gson.fromJson(entityStr, clz);
 	}
 
 	public static void main(String[] args) {
