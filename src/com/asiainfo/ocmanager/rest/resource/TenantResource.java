@@ -1,12 +1,15 @@
 package com.asiainfo.ocmanager.rest.resource;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
+import javax.persistence.Entity;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -33,6 +36,9 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 
+import com.asiainfo.ocmanager.monitor.client.RestClient;
+import com.asiainfo.ocmanager.monitor.entity.AppEntity;
+import com.asiainfo.ocmanager.monitor.entity.TenantEntity;
 import com.asiainfo.ocmanager.persistence.model.ServiceInstance;
 import com.asiainfo.ocmanager.persistence.model.ServiceRolePermission;
 import com.asiainfo.ocmanager.persistence.model.Tenant;
@@ -329,6 +335,11 @@ public class TenantResource {
 	public Response createServiceInstanceInTenant(@PathParam("id") String tenantId, String reqBodyStr) {
 
 		try {
+			if (!exist(tenantId)) {
+				logger.warn("Tenant not exist: " + tenantId);
+				List<Tenant> tenants = fetchTenants(tenantId);
+				createTenants(tenants);
+			}
 			String url = DFPropertiesFoundry.getDFProperties().get(Constant.DATAFOUNDRY_URL);
 			String token = DFPropertiesFoundry.getDFProperties().get(Constant.DATAFOUNDRY_TOKEN);
 			String dfRestUrl = url + "/oapi/v1/namespaces/" + tenantId + "/backingserviceinstances";
@@ -1008,7 +1019,7 @@ public class TenantResource {
 		}
 
 	}
-
+	
 	private static void watiInstanceUnBindingComplete(AdapterResponseBean unBindingRes, String tenantId,
 			String instanceName) throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException,
 			IOException, InterruptedException {
@@ -1268,92 +1279,135 @@ public class TenantResource {
 		}
 	}
 
+	private void initRequest(HttpPost request, Tenant tenant) throws IOException {
+		String token = DFPropertiesFoundry.getDFProperties().get(Constant.DATAFOUNDRY_TOKEN);
+		
+		request.addHeader("Content-type", "application/json");
+		request.addHeader("Authorization", "bearer " + token);
+		
+		StringEntity entity = new StringEntity(getJson(tenant).toString());
+		entity.setContentType("application/json");
+		request.setEntity(entity);		
+	}
+
+	private JsonObject getJson(Tenant tenant) {
+		JsonObject json = new JsonObject();
+		json.addProperty("apiVersion", "v1");
+		json.addProperty("kind", "ProjectRequest");
+		json.addProperty("displayName", tenant.getName());
+		
+		if (tenant.getDescription() != null) {
+			json.addProperty("description", tenant.getDescription());
+		}
+		
+		JsonObject innerJson = new JsonObject();
+		innerJson.addProperty("name", tenant.getId());
+		json.add("metadata", innerJson);
+		
+		return json;
+	}
+	
 	/**
-	 * specific method for citic
-	 * 
-	 * @param parentId
-	 * @param tenantId
+	 * Create tenants in DB and DF respectively.
+	 * @param tenants
 	 */
-	private static void checkApp(String appId) {
-		Tenant tenant = TenantPersistenceWrapper.getTenantById(appId);
-		if (tenant == null) {
-			List<Tenant> list = TenantResource.getTenantAndAPPByAppId(appId);
-
-			TenantResource.checkTenant(list.get(0));
-
-			Tenant newTenant = new Tenant(list.get(1).getId(), list.get(1).getName(), list.get(1).getDescription(),
-					list.get(0).getId(), 3);
-			TenantResource.createTenantInternal(newTenant);
+	private void createTenants(List<Tenant> tenants) {
+		for(Tenant t : tenants)
+		{
+			doCreate(t);
 		}
-
+		logger.info("Tenants been created: " + tenants);
 	}
-
-	private static List<Tenant> getTenantAndAPPByAppId(String appId) {
-		return new ArrayList<Tenant>();
-	}
-
-	private static void checkTenant(Tenant tenant) {
-		Tenant DBtenant = TenantPersistenceWrapper.getTenantById(tenant.getId());
-		if (DBtenant == null) {
-			Tenant newTenant = new Tenant(tenant.getId(), tenant.getName(), tenant.getDescription(),
-					"ae783b6d-655a-11e7-aa10-fa163ed7d0ae", 2);
-			TenantResource.createTenantInternal(newTenant);
-		}
-	}
-
-	private static void createTenantInternal(Tenant tenant) {
-
+	
+	/**
+	 * Create specified tenant in both DataFoundary and Mysql.
+	 * @param tenant
+	 */
+	private void doCreate(Tenant tenant) {
+		CloseableHttpClient httpclient = null;
+		CloseableHttpResponse dfResponse = null;
 		try {
-			String url = DFPropertiesFoundry.getDFProperties().get(Constant.DATAFOUNDRY_URL);
-			String token = DFPropertiesFoundry.getDFProperties().get(Constant.DATAFOUNDRY_TOKEN);
-			String dfRestUrl = url + "/oapi/v1/projectrequests";
-
-			JsonObject jsonObj1 = new JsonObject();
-			jsonObj1.addProperty("apiVersion", "v1");
-			jsonObj1.addProperty("kind", "ProjectRequest");
-			// mapping DF tenant display name with adapter tenant name
-			jsonObj1.addProperty("displayName", tenant.getName());
-			if (tenant.getDescription() != null) {
-				jsonObj1.addProperty("description", tenant.getDescription());
-			}
-
-			JsonObject jsonObj2 = new JsonObject();
-			jsonObj2.addProperty("name", tenant.getId());
-			jsonObj1.add("metadata", jsonObj2);
-			String reqBody = jsonObj1.toString();
-
+			String base_url = DFPropertiesFoundry.getDFProperties().get(Constant.DATAFOUNDRY_URL);
+			
+			HttpPost request = new HttpPost(base_url + "/oapi/v1/projectrequests");
+			initRequest(request, tenant);
+			
 			SSLConnectionSocketFactory sslsf = SSLSocketIgnoreCA.createSSLSocketFactory();
+			httpclient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
+			
+			dfResponse = httpclient.execute(request);
+			logger.debug("Create tenant(" + tenant.getId() + ") in DataFoundary finished with response: " + dfResponse);
 
-			CloseableHttpClient httpclient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
-			try {
-				HttpPost httpPost = new HttpPost(dfRestUrl);
-				httpPost.addHeader("Content-type", "application/json");
-				httpPost.addHeader("Authorization", "bearer " + token);
-
-				StringEntity se = new StringEntity(reqBody);
-				se.setContentType("application/json");
-				httpPost.setEntity(se);
-
-				logger.info("createTenantInternal -> start create");
-				CloseableHttpResponse response2 = httpclient.execute(httpPost);
-
-				try {
-					int statusCode = response2.getStatusLine().getStatusCode();
-
-					if (statusCode == 201) {
-						logger.info("createTenantInternal -> start successfully");
-						TenantPersistenceWrapper.createTenant(tenant);
-					}
-					String bodyStr = EntityUtils.toString(response2.getEntity());
-				} finally {
-					response2.close();
-				}
-			} finally {
-				httpclient.close();
+			if (dfResponse.getStatusLine().getStatusCode() == 201) {
+				TenantPersistenceWrapper.createTenant(tenant);
+				logger.debug("Create tenant in both DataFoundary and DB successful: " + tenant.getId());
+				return;
+			}
+			else{
+				logger.error("Create tenant(" + tenant.getId() + ") in DataFoundary failed! " + dfResponse);
+				throw new RuntimeException("Create tenant in DataFoundary failed with status code: " + dfResponse.getStatusLine().getStatusCode());
 			}
 		} catch (Exception e) {
-			// system out the exception into the console log
-			logger.info("createTenantInternal -> " + e.getMessage());
+			logger.info("Error while creating tenant: " + tenant.getId(), e);
+			throw new RuntimeException(e);
+		}
+		finally{
+			close(httpclient);
+			close(dfResponse);
+		}
+	}
+
+	/**
+	 * Fetch tenants info from citic_cloud
+	 * @param appId
+	 * @return
+	 */
+	private List<Tenant> fetchTenants(String appId) {
+		RestClient client = null;
+		List<Tenant> list = new ArrayList<>();
+		try {
+			client = new RestClient();
+			transform(list, appId, client.fetchTenantByAppId(appId));
+			return list;
+		} catch (Exception e) {
+			logger.error("Error while fetching tenants info from CITIC RestServer by AppID: " + appId, e);
+			throw new RuntimeException("Error while fetching tenants info from CITIC RestServer: ", e);
+		}
+		finally{
+			if (client != null) {
+				client.close();
+			}
+		}
+	}
+
+	private void transform(List<Tenant> list, String appId, TenantEntity citicEntity) {
+		// citic tenant corresponds to level 2 tenant
+		list.add(new Tenant(citicEntity.getOrg_id(), citicEntity.getOrg_name(), "Synchronized from CITIC Cloud", "ae783b6d-655a-11e7-aa10-fa163ed7d0ae", 2));
+		List<AppEntity> apps = citicEntity.getApp_list();
+		for (AppEntity app : apps) {
+			// citic app corresponds to level 3 tenant
+			list.add(new Tenant(app.getId(), app.getAbbreviation(), "Synchronized from CITIC Cloud", app.getOrg_id(), 3));
+		}
+		logger.info("Tenants synchronized from CITIC by Appid(" + appId + "): " + list);
+	}
+
+	/**
+	 * whether tenant exist in db.
+	 * @param tenantId
+	 * @return
+	 */
+	private boolean exist(String tenantId) {
+		Tenant t = TenantPersistenceWrapper.getTenantById(tenantId);
+		return t != null;
+	}
+
+	private void close(Closeable c) {
+		try {
+			if (c != null) {
+				c.close();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 

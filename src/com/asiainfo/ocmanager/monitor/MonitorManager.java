@@ -77,7 +77,7 @@ public class MonitorManager {
 			try {
 				restCli = new RestClient();
 				LOG.info("Tenant sych-up monitor starting... Tenants in cache: " + cache.getAllTenants());
-				List<AppEntity> tenants = restCli.fetchTenants();
+				List<AppEntity> tenants = restCli.fetchAllTenantsApps();
 				cache.pull();
 				cache.updateCache(tenants);
 				cache.commit();
