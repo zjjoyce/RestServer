@@ -35,9 +35,7 @@ import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 
 import com.asiainfo.ocmanager.monitor.client.RestClient;
-import com.asiainfo.ocmanager.monitor.entity.AppEntity;
 import com.asiainfo.ocmanager.monitor.entity.AppExtraEntity;
-import com.asiainfo.ocmanager.monitor.entity.TenantEntity;
 import com.asiainfo.ocmanager.persistence.model.ServiceInstance;
 import com.asiainfo.ocmanager.persistence.model.ServiceRolePermission;
 import com.asiainfo.ocmanager.persistence.model.Tenant;
@@ -341,7 +339,7 @@ public class TenantResource {
 		try {
 			if (!exist(tenantId)) {
 				logger.warn("Tenant not exist: " + tenantId);
-				List<Tenant> tenants = fetchTenants(tenantId);
+				List<Tenant> tenants = fetchTenants(tenantId); // returned list tend to have 2 elements, corresponding to Subsidiary and Project.
 				createTenants(tenants);
 			}
 			String url = DFPropertiesFoundry.getDFProperties().get(Constant.DATAFOUNDRY_URL);
