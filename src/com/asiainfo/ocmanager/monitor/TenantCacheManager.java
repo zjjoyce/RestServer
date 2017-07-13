@@ -77,10 +77,11 @@ public class TenantCacheManager {
 				Tenant tenant = map.get(en.getId());
 				if (!tenant.getName().equals(en.getAbbreviation())) {
 					tenant.setName(en.getAbbreviation());// use abbreviation as tenant name.
-					LOG.debug("Updated tenant: " + tenant);
+					LOG.debug("Updated tenant in cache: " + tenant);
 				}
 				else{
 					map.remove(en.getId());// remove item from cache which has same tenant name with CITIC
+					LOG.debug("Tenant no need be updated. Removing from cache: " + tenant);
 				}
 			}
 		}
@@ -109,10 +110,11 @@ public class TenantCacheManager {
 	 */
 	public synchronized void commit()
 	{
+		LOG.info("Tenants going to be committed into Mysql: " + map.values());
 		for(Tenant t : map.values())
 		{
 			TenantPersistenceWrapper.updateTenantName(t.getId(), t.getName());
-			LOG.info("Committed tenant to Mysql: " + t);
+			LOG.info("Tenant committed to Mysql: " + t);
 		}
 	}
 	
