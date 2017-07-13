@@ -5,6 +5,7 @@ import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -149,10 +150,10 @@ public class TenantResource {
 
 		UserRoleView role = UserRoleViewPersistenceWrapper.getRoleBasedOnUserAndTenant(userName, tenantId);
 		if (role == null) {
-			logger.info("getRole -> start get tenant");
+			logger.debug("getRole -> start get tenant");
 			Tenant tenant = TenantPersistenceWrapper.getTenantById(tenantId);
-			logger.info("getRole -> finish get tenant");
-			if(tenant == null){
+			logger.debug("getRole -> finish get tenant");
+			if (tenant == null) {
 				return null;
 			}
 			if (tenant.getParentId() == null) {
@@ -1028,7 +1029,7 @@ public class TenantResource {
 		int currentBound = instJson.getAsJsonObject().getAsJsonObject("spec").get("bound").getAsInt();
 
 		while (currentBound == bound) {
-			logger.info("watiInstanceUnBindingComplete -> waiting");
+			logger.debug("watiInstanceUnBindingComplete -> waiting");
 			Thread.sleep(500);
 			instStr = TenantResource.getTenantServiceInstancesFromDf(tenantId, instanceName);
 			instJson = new JsonParser().parse(instStr);
@@ -1051,7 +1052,7 @@ public class TenantResource {
 		int currentBound = instJson.getAsJsonObject().getAsJsonObject("spec").get("bound").getAsInt();
 
 		while (currentBound == bound) {
-			logger.info("watiInstanceBindingComplete -> waiting");
+			logger.debug("watiInstanceBindingComplete -> waiting");
 			Thread.sleep(500);
 			instStr = TenantResource.getTenantServiceInstancesFromDf(tenantId, instanceName);
 			instJson = new JsonParser().parse(instStr);
@@ -1070,7 +1071,7 @@ public class TenantResource {
 		JsonElement patch = updateInstJson.getAsJsonObject().getAsJsonObject("status").get("patch");
 
 		while (patch != null) {
-			logger.info("watiInstanceUpdateComplete -> waiting");
+			logger.debug("watiInstanceUpdateComplete -> waiting");
 			Thread.sleep(500);
 			updateInstStr = TenantResource.getTenantServiceInstancesFromDf(tenantId, instanceName);
 			updateInstJson = new JsonParser().parse(updateInstStr);
@@ -1223,11 +1224,32 @@ public class TenantResource {
 			CloseableHttpResponse response1 = httpclient.execute(httpGet);
 
 			try {
-				// int statusCode =
-				// response1.getStatusLine().getStatusCode();
+				int statusCode = response1.getStatusLine().getStatusCode();
 
 				String bodyStr = EntityUtils.toString(response1.getEntity());
 
+				// filter the _ToDelete instances
+				if (statusCode == 200) {
+					JsonElement jsonE = new JsonParser().parse(bodyStr);
+					JsonObject jsonO = jsonE.getAsJsonObject();
+
+					JsonArray items = jsonO.getAsJsonArray(("items"));
+
+					Iterator<JsonElement> it = items.iterator();
+					while (it.hasNext()) {
+						JsonElement je = it.next();
+						JsonObject status = je.getAsJsonObject().getAsJsonObject("status");
+						JsonElement action = status.get("action");
+
+						if (action != null) {
+							if (action.getAsString().equals(Constant._TODELETE)) {
+								it.remove();
+							}
+						}
+					}
+					bodyStr = jsonO.toString();
+				}
+				logger.info("getTenantAllServiceInstancesFromDf -> " +  bodyStr);
 				return bodyStr;
 			} finally {
 				response1.close();
