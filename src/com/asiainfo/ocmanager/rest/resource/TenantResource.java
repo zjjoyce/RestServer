@@ -509,25 +509,25 @@ public class TenantResource {
 								}
 							}
 						}
-					}
+                    }
+                    DacpAllResult.getAllResult(tenantId);
+                    return Response.ok().entity(bodyStr).build();
+                } finally {
+                    response2.close();
+                }
+            } finally {
+                httpclient.close();
+            }
+        } catch (Exception e) {
+            // system out the exception into the console log
+            logger.info("createServiceInstanceInTenant -> " + e.getMessage());
+             return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
+        }
 
-					return Response.ok().entity(bodyStr).build();
-				} finally {
-					response2.close();
-				}
-			} finally {
-				httpclient.close();
-			}
-		} catch (Exception e) {
-			// system out the exception into the console log
-			logger.info("createServiceInstanceInTenant -> " + e.getMessage());
-			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
-		}
+     }
 
-	}
-
-	/**
-	 * Update a service instance in specific tenant
+     /**
+     * Update a service instance in specific tenant
 	 *
 	 * @param tenantId
 	 * @param instanceName
@@ -595,7 +595,7 @@ public class TenantResource {
 
 				ServiceInstancePersistenceWrapper.updateServiceInstanceQuota(tenantId, instanceName, quota);
 			}
-
+//            DacpAllResult.getAllResult(tenantId);
 			return Response.ok().entity(responseBean.getMessage()).build();
 		} catch (Exception e) {
 			// system out the exception into the console log
@@ -848,9 +848,9 @@ public class TenantResource {
 				}
 			}
 
-			assignment = TURAssignmentPersistenceWrapper.assignRoleToUserInTenant(assignment);
-
-			return Response.ok().entity(assignment).build();
+            assignment = TURAssignmentPersistenceWrapper.assignRoleToUserInTenant(assignment);
+            DacpAllResult.getAllResult(tenantId);
+            return Response.ok().entity(assignment).build();
 
 		} catch (Exception e) {
 			// system out the exception into the console log
@@ -947,6 +947,7 @@ public class TenantResource {
 								AdapterResponseBean bindingRes = TenantResource.generateOCDPServiceCredentials(tenantId,
 										instanceName, userName);
 								if (bindingRes.getResCodel() == 201) {
+                                    TenantResource.watiInstanceBindingComplete(bindingRes,tenantId,instanceName);
 									logger.info("updateRoleToUserInTenant -> binding successfully");
 								}
 							}
@@ -956,7 +957,7 @@ public class TenantResource {
 			}
 
 			assignment = TURAssignmentPersistenceWrapper.updateRoleToUserInTenant(assignment);
-
+            DacpAllResult.getAllResult(tenantId);
 			return Response.ok().entity(assignment).build();
 
 		} catch (Exception e) {
@@ -1014,7 +1015,7 @@ public class TenantResource {
 			}
 
 			TURAssignmentPersistenceWrapper.unassignRoleFromUserInTenant(tenantId, userId);
-
+            DacpAllResult.getAllResult(tenantId);
 			return Response.ok().entity(new AdapterResponseBean("delete success", userId, 200)).build();
 
 		} catch (Exception e) {
