@@ -200,7 +200,7 @@ public class UserResource {
 					if (level1 != null) {
 						tenantList.add(level1);
 					} else {
-						logger.info("getTenantsById level1 -> orphan tenant");
+						logger.debug("getTenantsById level1 -> orphan tenant");
 					}
 				} else {
 					// level 3 add itself, its parent and its parents parent
@@ -212,10 +212,10 @@ public class UserResource {
 						if (level1 != null) {
 							tenantList.add(level1);
 						} else {
-							logger.info("getTenantsById level2 level1 -> orphan tenant");
+							logger.debug("getTenantsById level2 level1 -> orphan tenant");
 						}
 					} else {
-						logger.info("getTenantsById level2-> orphan tenant");
+						logger.debug("getTenantsById level2-> orphan tenant");
 					}
 				}
 			}
@@ -267,7 +267,7 @@ public class UserResource {
 					if (level1 != null) {
 						tenantList.add(level1);
 					} else {
-						logger.info("getTenantsByName level1 -> orphan tenant");
+						logger.debug("getTenantsByName level1 -> orphan tenant");
 					}
 				} else {
 					// level 3 add itself, its parent and its parents parent
@@ -279,10 +279,10 @@ public class UserResource {
 						if (level1 != null) {
 							tenantList.add(level1);
 						} else {
-							logger.info("getTenantsByName  level2 level1 -> orphan tenant");
+							logger.debug("getTenantsByName  level2 level1 -> orphan tenant");
 						}
 					} else {
-						logger.info("getTenantsByName level2 -> orphan tenant");
+						logger.debug("getTenantsByName level2 -> orphan tenant");
 					}
 				}
 			}
