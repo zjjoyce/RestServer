@@ -7,9 +7,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.http.ParseException;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -21,9 +19,9 @@ import org.apache.log4j.Logger;
 
 import com.asiainfo.ocmanager.monitor.entity.AppEntity;
 import com.asiainfo.ocmanager.monitor.entity.AppExtraEntity;
-import com.asiainfo.ocmanager.monitor.entity.TenantsAppsEntity;
 import com.asiainfo.ocmanager.monitor.entity.TenantEntity;
 import com.asiainfo.ocmanager.monitor.entity.TenantExtraEntity;
+import com.asiainfo.ocmanager.monitor.entity.TenantsAppsEntity;
 import com.asiainfo.ocmanager.monitor.util.Configuration;
 import com.asiainfo.ocmanager.rest.constant.Constant;
 import com.google.gson.Gson;
@@ -93,25 +91,12 @@ public class RestClient implements Closeable{
 		return tenant;
 	}
 	
-	public static void main(String[] args) {
-		Map<String, String> map = new HashMap<>();
-		map.put("k1", "v1");
-		map.put("k2", "v2");
-		map.put("k3", "v3");
-		for (String key : map.keySet()) {
-			if (key.equals("k2")) {
-				map.remove(key);
-			}
-		}
-		System.out.println(">>>map: " + map);
+	public static void main(String[] args) throws ParseException, IOException {
+		String body = testString();
+		Gson parser = new GsonBuilder().create();
+		AppExtraEntity result = parser.fromJson(body, TenantExtraEntity.class).getData();
+		System.out.println(">>> result: " + result);
 	}
-
-//	public static void main(String[] args) throws ParseException, IOException {
-//		String body = testString();
-//		Gson parser = new GsonBuilder().create();
-//		AppExtraEntity result = parser.fromJson(body, TenantExtraEntity.class).getData();
-//		System.out.println(">>> result: " + result);
-//	}
 	
 	/**
 	 * Fetch all tenants and apps from Citic RestServer.
