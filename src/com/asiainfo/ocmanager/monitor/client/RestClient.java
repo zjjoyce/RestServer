@@ -70,7 +70,7 @@ public class RestClient implements Closeable{
 		String postfix = new StringBuilder().append("/").append(appId).append("/get_tenant_info_by_app_base_id.do").toString();
 		try {
 			rsp = client.execute(new HttpGet(URI.create(base_url + postfix)));
-			return getTeant(rsp, appId);
+			return getAppExtraEntity(rsp);
 		} catch (Exception e) {
 			LOG.error("Fetch Tenant by AppId failed: " + base_url + postfix, e);
 			throw new RuntimeException("Fetch Tenants by url failed: " + base_url + postfix, e);
@@ -86,11 +86,18 @@ public class RestClient implements Closeable{
 		}
 	}
 	
-	private AppExtraEntity getTeant(CloseableHttpResponse rsp, String appId) throws ParseException, IOException {
+	private AppExtraEntity getAppExtraEntity(CloseableHttpResponse rsp) throws ParseException, IOException {
 		AppExtraEntity tenant = toEntity(rsp, TenantExtraEntity.class).getData();
 		return tenant;
 	}
 
+	public static void main(String[] args) throws ParseException, IOException {
+		String body = testString();
+		Gson parser = new GsonBuilder().create();
+		AppExtraEntity result = parser.fromJson(body, TenantExtraEntity.class).getData();
+		System.out.println(">>> result: " + result);
+	}
+	
 	/**
 	 * Fetch all tenants and apps from Citic RestServer.
 	 * @return
@@ -142,14 +149,7 @@ public class RestClient implements Closeable{
 		return gson.fromJson(entityStr, clz);
 	}
 
-	public static void main(String[] args) {
-		RestClient cli = new RestClient();
-		String testStr = cli.testString();
-		cli.close();
-		System.out.println(">>> demo input: " + testStr);
-	}
-	
-	private String testString() {
+	private static String testString() {
 		try {
 			StringBuilder sb = new StringBuilder();
 			FileReader reader = new FileReader(new File("D:\\git\\RestServer\\src\\com\\asiainfo\\ocmanager\\monitor\\client\\citic_rsp.demo"));

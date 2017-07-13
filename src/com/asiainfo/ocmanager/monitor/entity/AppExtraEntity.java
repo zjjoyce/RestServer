@@ -27,4 +27,9 @@ public class AppExtraEntity {
 	public String getAbbreviation() {
 		return abbreviation;
 	}
+	
+	public String toString()
+	{
+		return "org_id:" + org_id + "	org_name:" + org_name + "	id:" + id + "	abbreviation:" + abbreviation;
+	}
 }
