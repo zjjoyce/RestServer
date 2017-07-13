@@ -1,6 +1,7 @@
 package com.asiainfo.ocmanager.monitor;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -71,29 +72,45 @@ public class TenantCacheManager {
 	 */
 	public synchronized void updateCache(List<AppEntity> tenants)
 	{
-		for(AppEntity en : tenants)
+		// mapping id to abbreviation
+		Map<String, String> citic = transform(tenants);
+		List<String> toDelete = new ArrayList<>();
+		for(String key : map.keySet())
 		{
-			if (inCache(en)) {
-				Tenant tenant = map.get(en.getId());
-				if (!tenant.getName().equals(en.getAbbreviation())) {
-					tenant.setName(en.getAbbreviation());// use abbreviation as tenant name.
-					LOG.debug("Updated tenant in cache: " + tenant);
-				}
-				else{
-					map.remove(en.getId());// remove item from cache which has same tenant name with CITIC
-					LOG.debug("Tenant no need be updated. Removing from cache: " + tenant);
-				}
+			String citicName = citic.get(key);
+			Tenant tenant = map.get(key);
+			if (citicName != null && diffName(tenant, citicName)) {
+				tenant.setName(citicName);// use abbreviation as tenant name.
+				LOG.debug("Updated tenant in cache: " + map.get(key));
+			}
+			else{
+				// remove from cache when:
+				//1. tenant name is same as CITIC tenant name.
+				//2. tenant not in CITIC tenants list.
+				toDelete.add(key);
 			}
 		}
+		deleteAction(toDelete);
 	}
 	
-	/**
-	 * Exist in cache
-	 * @param en
-	 * @return
-	 */
-	private boolean inCache(AppEntity en) {
-		return map.containsKey(en.getId());
+	private void deleteAction(List<String> toDelete) {
+		for (String key : toDelete) {
+			LOG.debug("Tenant no need be updated. Removing from cache: " + map.get(key));
+			map.remove(key);
+		}
+	}
+
+	private boolean diffName(Tenant tenant, String citicName) {
+		return !tenant.getName().equals(citicName);
+	}
+
+	private Map<String, String> transform(List<AppEntity> tenants) {
+		// transform to tenantID, tenantName mapping
+		Map<String, String> map = new HashMap<>();
+		for (AppEntity t : tenants) {
+			map.put(t.getId(), t.getAbbreviation());// use abbreviation as tenant name.
+		}
+		return map;
 	}
 
 	/**
