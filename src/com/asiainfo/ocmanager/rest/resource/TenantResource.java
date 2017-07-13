@@ -682,7 +682,7 @@ public class TenantResource {
 						logger.info("deleteServiceInstanceInTenant -> delete successfully");
 					}
 					String bodyStr = EntityUtils.toString(response1.getEntity());
-
+                    DacpAllResult.getAllResult(tenantId);
 					return Response.ok().entity(bodyStr).build();
 				} finally {
 					response1.close();
