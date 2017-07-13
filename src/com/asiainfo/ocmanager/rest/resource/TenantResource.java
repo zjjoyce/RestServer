@@ -341,7 +341,12 @@ public class TenantResource {
 		try {
 			if (!exist(tenantId)) {
 				logger.warn("Tenant not exist: " + tenantId);
-				List<Tenant> tenants = fetchTenants(tenantId); // returned list tend to have 2 elements, corresponding to Subsidiary and Project.
+				List<Tenant> tenants = fetchTenants(tenantId); // returned list
+																// tend to have
+																// 2 elements,
+																// corresponding
+																// to Subsidiary
+																// and Project.
 				createTenants(tenants);
 			}
 			String url = DFPropertiesFoundry.getDFProperties().get(Constant.DATAFOUNDRY_URL);
@@ -481,7 +486,8 @@ public class TenantResource {
 
 								provisioning.getAsJsonObject("parameters").addProperty("accesses",
 										permission.getServicePermission());
-								logger.debug("createServiceInstanceInTenant -> permission.getServicePermission(): " + permission.getServicePermission());
+								logger.debug("createServiceInstanceInTenant -> permission.getServicePermission(): "
+										+ permission.getServicePermission());
 								JsonObject status = OCDPServiceInstanceJson.getAsJsonObject().getAsJsonObject("status");
 								status.addProperty("patch", Constant.UPDATE);
 
@@ -572,26 +578,26 @@ public class TenantResource {
 			JsonElement parameterJon = new JsonParser().parse(parametersStr);
 			JsonObject parameterObj = parameterJon.getAsJsonObject().getAsJsonObject("parameters");
 
-   			//check whether parameters format is legal
+			// check whether parameters format is legal
 			try {
 				for (Map.Entry<String, JsonElement> entry : parameterObj.entrySet()) {
 					String key = entry.getKey();
 					JsonElement value = entry.getValue();
-					if (value.isJsonPrimitive() ) {
+					if (value.isJsonPrimitive()) {
 						// if value is not int, will throw Exception
 						value.getAsInt();
-						logger.info("parameters" +  key + ":" + value.toString());
-					}
-					else {
-						Response.status(Status.BAD_REQUEST).entity("BadRequest: the parameter value format is illegal! Error:" + value.toString())
+						logger.info("parameters" + key + ":" + value.toString());
+					} else {
+						Response.status(Status.BAD_REQUEST)
+								.entity("BadRequest: the parameter value format is illegal! Error:" + value.toString())
 								.build();
 					}
 				}
 			} catch (Exception e) {
 				logger.info("The parameter format check error:" + e.getMessage());
-				return Response.status(Status.BAD_REQUEST).entity("BadRequest: the parameter value format is illegal! Error:" + e.toString()).build();
+				return Response.status(Status.BAD_REQUEST)
+						.entity("BadRequest: the parameter value format is illegal! Error:" + e.toString()).build();
 			}
-
 
 			// add into the update json
 			provisioning.add("parameters", parameterObj);
@@ -652,35 +658,27 @@ public class TenantResource {
 			// get status phase
 			String phase = instance.getAsJsonObject("status").get("phase").getAsString();
 
+			JsonObject spec = instance.getAsJsonObject("spec");
+
+			JsonElement binding = spec.get("binding");
+
 			// if the instance is Failure do not need to unbound
 			if (!phase.equals(Constant.FAILURE)) {
-				// get all the users under the tenant
-				List<UserRoleView> users = UserRoleViewPersistenceWrapper.getUsersInTenant(tenantId);
-				for (UserRoleView u : users) {
-					logger.debug("deleteServiceInstanceInTenant -> u.getUserName(): " + u.getUserName());
-					// ignore the users who not have the service permissions
-					// align with create service instance
-					ServiceRolePermission permission = ServiceRolePermissionWrapper
-							.getServicePermissionByRoleId(serviceName, u.getRoleId());
-					// only the has service permission users
-					// can be assign
-					if (permission == null) {
-						logger.debug("deleteServiceInstanceInTenant -> ignore: " + u.getUserName());
-						continue;
-					}
+				if (Constant.list.contains(serviceName.toLowerCase())) {
+					if (!binding.isJsonNull()) {
+						JsonArray bindingArray = spec.getAsJsonArray("binding");
+						for (JsonElement je : bindingArray) {
+							String userName = je.getAsJsonObject().get("bind_hadoop_user").getAsString();
+							logger.debug("deleteServiceInstanceInTenant -> userName" + userName);
+							logger.info("deleteServiceInstanceInTenant -> begin to unbinding");
+							AdapterResponseBean unBindingRes = TenantResource.removeOCDPServiceCredentials(tenantId,
+									instanceName, userName);
 
-					if (Constant.list.contains(serviceName.toLowerCase())) {
-
-						// only the Unbound service instances can be delete
-						// so unbinding the service instance first
-						logger.info("deleteServiceInstanceInTenant -> begin to unbinding");
-						AdapterResponseBean unBindingRes = TenantResource.removeOCDPServiceCredentials(tenantId,
-								instanceName, UserPersistenceWrapper.getUserById(u.getUserId()).getUsername());
-
-						if (unBindingRes.getResCodel() == 201) {
-							logger.info("deleteServiceInstanceInTenant -> wait unbinding complete");
-							TenantResource.watiInstanceUnBindingComplete(unBindingRes, tenantId, instanceName);
-							logger.info("deleteServiceInstanceInTenant -> unbinding complete");
+							if (unBindingRes.getResCodel() == 201) {
+								logger.info("deleteServiceInstanceInTenant -> wait unbinding complete");
+								TenantResource.watiInstanceUnBindingComplete(unBindingRes, tenantId, instanceName);
+								logger.info("deleteServiceInstanceInTenant -> unbinding complete");
+							}
 						}
 					}
 				}
@@ -1053,7 +1051,7 @@ public class TenantResource {
 		}
 
 	}
-	
+
 	private static void watiInstanceUnBindingComplete(AdapterResponseBean unBindingRes, String tenantId,
 			String instanceName) throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException,
 			IOException, InterruptedException {
@@ -1069,7 +1067,7 @@ public class TenantResource {
 
 		while (currentBound == bound) {
 			logger.debug("watiInstanceUnBindingComplete -> waiting");
-			Thread.sleep(500);
+			Thread.sleep(1000);
 			instStr = TenantResource.getTenantServiceInstancesFromDf(tenantId, instanceName);
 			instJson = new JsonParser().parse(instStr);
 			currentBound = instJson.getAsJsonObject().getAsJsonObject("spec").get("bound").getAsInt();
@@ -1092,7 +1090,7 @@ public class TenantResource {
 
 		while (currentBound == bound) {
 			logger.debug("watiInstanceBindingComplete -> waiting");
-			Thread.sleep(500);
+			Thread.sleep(1000);
 			instStr = TenantResource.getTenantServiceInstancesFromDf(tenantId, instanceName);
 			instJson = new JsonParser().parse(instStr);
 			currentBound = instJson.getAsJsonObject().getAsJsonObject("spec").get("bound").getAsInt();
@@ -1111,7 +1109,7 @@ public class TenantResource {
 
 		while (patch != null) {
 			logger.debug("watiInstanceUpdateComplete -> waiting");
-			Thread.sleep(500);
+			Thread.sleep(1000);
 			updateInstStr = TenantResource.getTenantServiceInstancesFromDf(tenantId, instanceName);
 			updateInstJson = new JsonParser().parse(updateInstStr);
 
@@ -1288,7 +1286,7 @@ public class TenantResource {
 					}
 					bodyStr = jsonO.toString();
 				}
-				logger.debug("getTenantAllServiceInstancesFromDf -> " +  bodyStr);
+				logger.debug("getTenantAllServiceInstancesFromDf -> " + bodyStr);
 				return bodyStr;
 			} finally {
 				response1.close();
@@ -1336,13 +1334,13 @@ public class TenantResource {
 
 	private void initRequest(HttpPost request, Tenant tenant) throws IOException {
 		String token = DFPropertiesFoundry.getDFProperties().get(Constant.DATAFOUNDRY_TOKEN);
-		
+
 		request.addHeader("Content-type", "application/json");
 		request.addHeader("Authorization", "bearer " + token);
-		
+
 		StringEntity entity = new StringEntity(getJson(tenant).toString());
 		entity.setContentType("application/json");
-		request.setEntity(entity);		
+		request.setEntity(entity);
 	}
 
 	private JsonObject getJson(Tenant tenant) {
@@ -1350,32 +1348,33 @@ public class TenantResource {
 		json.addProperty("apiVersion", "v1");
 		json.addProperty("kind", "ProjectRequest");
 		json.addProperty("displayName", tenant.getName());
-		
+
 		if (tenant.getDescription() != null) {
 			json.addProperty("description", tenant.getDescription());
 		}
-		
+
 		JsonObject innerJson = new JsonObject();
 		innerJson.addProperty("name", tenant.getId());
 		json.add("metadata", innerJson);
-		
+
 		return json;
 	}
-	
+
 	/**
 	 * Create tenants in DB and DF respectively.
+	 * 
 	 * @param tenants
 	 */
 	private void createTenants(List<Tenant> tenants) {
-		for(Tenant t : tenants)
-		{
+		for (Tenant t : tenants) {
 			doCreate(t);
 		}
 		logger.info("Tenants been created: " + tenants);
 	}
-	
+
 	/**
 	 * Create specified tenant in both DataFoundary and Mysql.
+	 * 
 	 * @param tenant
 	 */
 	private void doCreate(Tenant tenant) {
@@ -1383,13 +1382,13 @@ public class TenantResource {
 		CloseableHttpResponse dfResponse = null;
 		try {
 			String base_url = DFPropertiesFoundry.getDFProperties().get(Constant.DATAFOUNDRY_URL);
-			
+
 			HttpPost request = new HttpPost(base_url + "/oapi/v1/projectrequests");
 			initRequest(request, tenant);
-			
+
 			SSLConnectionSocketFactory sslsf = SSLSocketIgnoreCA.createSSLSocketFactory();
 			httpclient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
-			
+
 			dfResponse = httpclient.execute(request);
 			logger.debug("Create tenant(" + tenant.getId() + ") in DataFoundary finished with response: " + dfResponse);
 
@@ -1397,16 +1396,15 @@ public class TenantResource {
 				TenantPersistenceWrapper.createTenant(tenant);
 				logger.debug("Create tenant in both DataFoundary and DB successful: " + tenant.getId());
 				return;
-			}
-			else{
+			} else {
 				logger.error("Create tenant(" + tenant.getId() + ") in DataFoundary failed! " + dfResponse);
-				throw new RuntimeException("Create tenant in DataFoundary failed with status code: " + dfResponse.getStatusLine().getStatusCode());
+				throw new RuntimeException("Create tenant in DataFoundary failed with status code: "
+						+ dfResponse.getStatusLine().getStatusCode());
 			}
 		} catch (Exception e) {
 			logger.error("Error while creating tenant: " + tenant.getId(), e);
 			throw new RuntimeException(e);
-		}
-		finally{
+		} finally {
 			close(httpclient);
 			close(dfResponse);
 		}
@@ -1414,6 +1412,7 @@ public class TenantResource {
 
 	/**
 	 * Fetch tenants info from citic_cloud
+	 * 
 	 * @param appId
 	 * @return
 	 */
@@ -1427,8 +1426,7 @@ public class TenantResource {
 		} catch (Exception e) {
 			logger.error("Error while fetching tenants info from CITIC RestServer by AppID: " + appId, e);
 			throw new RuntimeException("Error while fetching tenants info from CITIC RestServer: ", e);
-		}
-		finally{
+		} finally {
 			if (client != null) {
 				client.close();
 			}
@@ -1437,14 +1435,17 @@ public class TenantResource {
 
 	private void transform(List<Tenant> list, String appId, AppExtraEntity appExtraEntity) {
 		// citic tenant corresponds to level 2 tenant
-		list.add(new Tenant(appExtraEntity.getOrg_id(), appExtraEntity.getOrg_name(), "Synchronized from CITIC Cloud", "ae783b6d-655a-11e7-aa10-fa163ed7d0ae", 2));
+		list.add(new Tenant(appExtraEntity.getOrg_id(), appExtraEntity.getOrg_name(), "Synchronized from CITIC Cloud",
+				"ae783b6d-655a-11e7-aa10-fa163ed7d0ae", 2));
 		// citic app corresponds to level 3 tenant
-		list.add(new Tenant(appExtraEntity.getId(), appExtraEntity.getAbbreviation(), "Synchronized from CITIC Cloud", appExtraEntity.getOrg_id(), 3));
+		list.add(new Tenant(appExtraEntity.getId(), appExtraEntity.getAbbreviation(), "Synchronized from CITIC Cloud",
+				appExtraEntity.getOrg_id(), 3));
 		logger.info("Tenants synchronized from CITIC by Appid(" + appId + "): " + list);
 	}
 
 	/**
 	 * whether tenant exist in db.
+	 * 
 	 * @param tenantId
 	 * @return
 	 */
