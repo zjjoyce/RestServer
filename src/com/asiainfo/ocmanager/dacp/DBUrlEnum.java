@@ -1,11 +1,16 @@
 package com.asiainfo.ocmanager.dacp;
 
+import com.asiainfo.ocmanager.mail.ParamQuery;
+
+import java.io.IOException;
+
 /**
  * Created by YANLSH on 2017/7/3.
  */
 public enum DBUrlEnum {
+
     /*hiveuri hiveStr hiveEndStr*/
-    HIVE(";dacp.java.security.krb5.realm=EXAMPLE.COM;dacp.java.security.krb5.kdc=10.247.11.9;dacp.hadoop.security.authentication=Kerberos;","hive"),
+    HIVE("dacp.java.security.krb5.realm=EXAMPLE.COM;dacp.java.security.krb5.kdc=10.247.11.9;dacp.hadoop.security.authentication=Kerberos;","hive"),
     POSTGRE("jdbc:postgresql://","postgresql"),         //postgresqlStr ip:port  /  dbname
     ORACLE("jdbc:oracle:thin:@","oracle"),              //oracleStr ip:port :  dbname
     MySQL("jdbc:mysql://","mysql"),                     //mysqlStr ip:port /  dbname
@@ -16,9 +21,16 @@ public enum DBUrlEnum {
     MONGODB("","mongodb");
 
 
+
     static String hiveEndStr = "dacp.keytab.file=/home/dacp/dacp03dn;dacp.kerberos.principal=dacp/ZX-DN-03@EXAMPLE.COM";
     static String greenplumEndStr = ";DatabaseName=";//greenplumStr ip:port greenplumEndStr dbname
     static String sqlserverEndStr = ";Database=";//sqlserverStr ip:port sqlserverEndStr dbname
+    static String dacpSecurityKrb5Realm;
+    static String dacpSecutityKrb5Kdc;
+    static String dacpHadoopSecurityAuth;
+    static String dacpKeytabFile;
+    static String dacpKerosPrincipal;
+    static String hiveUrl;
 
     String driveUrl;
 
@@ -34,7 +46,18 @@ public enum DBUrlEnum {
         for (DBUrlEnum c : DBUrlEnum.values()) {
             if (c.getDriveType().equals(driveTypeStr)) {
                 if("hive".equals(driveTypeStr)){
-                    return uri + c.driveUrl + hiveEndStr;
+                    try {
+                        dacpSecurityKrb5Realm = ParamQuery.getCFProperties().get(ParamQuery.DACP_JAVA_SECURITY_KRB5_REALM);
+                        dacpSecutityKrb5Kdc = ParamQuery.getCFProperties().get(ParamQuery.DACP_JAVA_SECURITY_KRB5_KDC);
+                        dacpHadoopSecurityAuth = ParamQuery.getCFProperties().get(ParamQuery.DACP_HADOOP_SECURITY_AUTHENTICATION);
+                        dacpKeytabFile = ParamQuery.getCFProperties().get(ParamQuery.DACP_KEYTAB_FILE);
+                        dacpKerosPrincipal = ParamQuery.getCFProperties().get(ParamQuery.DACP_KERBEROS_PRINCIPAL);
+                        hiveUrl = uri + ";"+ dacpSecurityKrb5Realm + dacpSecutityKrb5Kdc + dacpHadoopSecurityAuth + dacpKeytabFile + dacpKerosPrincipal;
+                    } catch (IOException e) {
+                        System.out.println("DBUrlEnum IOException "+e.getMessage());
+                        hiveUrl = uri + ";"+ c.driveUrl + hiveEndStr;
+                    }
+                    return hiveUrl;
                 }else if("postgresql".equals(driveTypeStr)){
                     return c.driveUrl + ip + ":" + port + "/" + dbname; //jdbc:postgresql://x.x.x.x:3433/odsdb
                 }else if("oracle".equals(driveTypeStr)){
