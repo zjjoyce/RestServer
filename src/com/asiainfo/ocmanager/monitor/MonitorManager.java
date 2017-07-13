@@ -1,6 +1,7 @@
 package com.asiainfo.ocmanager.monitor;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -23,6 +24,11 @@ public class MonitorManager {
 	private static final Logger LOG = Logger.getLogger(MonitorManager.class);
 
 	private ScheduledExecutorService scheduler;
+	
+	public static void main(String[] args) {
+		new MonitorManager().start();
+		System.out.println(">>>> main end!");
+	}
 
 	public void start() {
 		try {
@@ -77,7 +83,7 @@ public class MonitorManager {
 			try {
 				restCli = new RestClient();
 				LOG.info("Tenant sych-up monitor starting... Tenants in cache: " + cache.getAllTenants());
-				List<AppEntity> tenants = restCli.fetchTenants();
+				List<AppEntity> tenants = restCli.fetchAllTenantsApps();
 				cache.pull();
 				cache.updateCache(tenants);
 				cache.commit();

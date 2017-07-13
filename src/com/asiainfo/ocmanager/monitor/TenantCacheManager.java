@@ -12,7 +12,7 @@ import com.asiainfo.ocmanager.persistence.model.Tenant;
 import com.asiainfo.ocmanager.rest.resource.utils.TenantPersistenceWrapper;
 
 /**
- * Used to sych-up tenants info between local cache and Mysql. Sych-up local cache from Mysql if {@link #pull()} was called. And push cache into Mysql if {@link #commit()}
+ * Used to sych-up tenants info between local cache and Mysql. Sych-up local cache from Mysql if {@link #pull()} was called. And push updated cache into Mysql if {@link #commit()}
  * was called.
  * @author EthanWang
  *
@@ -62,7 +62,9 @@ public class TenantCacheManager {
 	}
 	
 	/**
-	 * batch update tenants cache, in which only existing tenants would be updated.
+	 * Update tenants cache in batch. Updating would only be performed to existing tenants. And
+	 * tenants whose name is in accordance with CITIC would be removed from cache, to reduce
+	 * IO frequency when {@link #commit()} is called.
 	 * @param id
 	 * @param name
 	 * @param level
@@ -71,14 +73,28 @@ public class TenantCacheManager {
 	{
 		for(AppEntity en : tenants)
 		{
-			if (map.containsKey(en.getId())) {
-				Tenant t = map.get(en.getId());
-				t.setName(en.getAbbreviation());// use abbreviation as tenant name.
-				LOG.debug("Updated tenant: " + t);
+			if (inCache(en)) {
+				Tenant tenant = map.get(en.getId());
+				if (!tenant.getName().equals(en.getAbbreviation())) {
+					tenant.setName(en.getAbbreviation());// use abbreviation as tenant name.
+					LOG.debug("Updated tenant: " + tenant);
+				}
+				else{
+					map.remove(en.getId());// remove item from cache which has same tenant name with CITIC
+				}
 			}
 		}
 	}
 	
+	/**
+	 * Exist in cache
+	 * @param en
+	 * @return
+	 */
+	private boolean inCache(AppEntity en) {
+		return map.containsKey(en.getId());
+	}
+
 	/**
 	 * Sych-up local cache with Mysql.
 	 */

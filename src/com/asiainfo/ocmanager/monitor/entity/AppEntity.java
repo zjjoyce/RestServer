@@ -13,6 +13,10 @@ public class AppEntity {
 	
 	public AppEntity(){}
 	
+	public String getOrg_id() {
+		return org_id;
+	}
+
 	public AppEntity(String id, String abbreviation)
 	{
 		this.id = id;
