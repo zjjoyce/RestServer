@@ -447,6 +447,8 @@ public class TenantResource {
 							for (UserRoleView u : users) {
 								ServiceRolePermission permission = ServiceRolePermissionWrapper
 										.getServicePermissionByRoleId(serviceName, u.getRoleId());
+								// only the has service permission users
+								// can be assign
 								if (!(permission == null)) {
 									userNameList.add(u.getUserName());
 								}
@@ -467,7 +469,7 @@ public class TenantResource {
 								}
 								// remove first comma
 								userNameListStr = userNameListStr.substring(1, userNameListStr.length());
-
+								logger.debug("createServiceInstanceInTenant -> userNameListStr: " + userNameListStr);
 								provisioning.getAsJsonObject("parameters").addProperty("user_name", userNameListStr);
 
 								// hard code the role id here
@@ -479,7 +481,7 @@ public class TenantResource {
 
 								provisioning.getAsJsonObject("parameters").addProperty("accesses",
 										permission.getServicePermission());
-
+								logger.debug("createServiceInstanceInTenant -> permission.getServicePermission(): " + permission.getServicePermission());
 								JsonObject status = OCDPServiceInstanceJson.getAsJsonObject().getAsJsonObject("status");
 								status.addProperty("patch", Constant.UPDATE);
 
@@ -655,12 +657,15 @@ public class TenantResource {
 				// get all the users under the tenant
 				List<UserRoleView> users = UserRoleViewPersistenceWrapper.getUsersInTenant(tenantId);
 				for (UserRoleView u : users) {
-
+					logger.debug("deleteServiceInstanceInTenant -> u.getUserName(): " + u.getUserName());
 					// ignore the users who not have the service permissions
 					// align with create service instance
 					ServiceRolePermission permission = ServiceRolePermissionWrapper
 							.getServicePermissionByRoleId(serviceName, u.getRoleId());
+					// only the has service permission users
+					// can be assign
 					if (permission == null) {
+						logger.debug("deleteServiceInstanceInTenant -> ignore: " + u.getUserName());
 						continue;
 					}
 
@@ -828,9 +833,10 @@ public class TenantResource {
 						ServiceRolePermission permission = ServiceRolePermissionWrapper
 								.getServicePermissionByRoleId(serviceName, assignment.getRoleId());
 
+						// only the has service permission users
+						// can be assign
 						if (permission == null) {
-							permission = new ServiceRolePermission();
-							permission.setServicePermission("");
+							continue;
 						}
 
 						// parse the update request body
@@ -934,9 +940,10 @@ public class TenantResource {
 							ServiceRolePermission permission = ServiceRolePermissionWrapper
 									.getServicePermissionByRoleId(serviceName, assignment.getRoleId());
 
+							// only the has service permission users
+							// can be assign
 							if (permission == null) {
-								permission = new ServiceRolePermission();
-								permission.setServicePermission("");
+								continue;
 							}
 
 							// parse the update request body
@@ -1281,7 +1288,7 @@ public class TenantResource {
 					}
 					bodyStr = jsonO.toString();
 				}
-				logger.info("getTenantAllServiceInstancesFromDf -> " +  bodyStr);
+				logger.debug("getTenantAllServiceInstancesFromDf -> " +  bodyStr);
 				return bodyStr;
 			} finally {
 				response1.close();
