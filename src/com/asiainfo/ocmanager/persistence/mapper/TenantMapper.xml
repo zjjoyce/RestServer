@@ -38,4 +38,8 @@
 		name = #{name}
 		where id = #{id}
 	</update>
+	<!-- get tenants based on level -->
+	<select id="selectTenantsByLevel" resultType="com.asiainfo.ocmanager.persistence.model.Tenant">
+		select * from tenants where level=#{level}
+	</select>
 </mapper>
