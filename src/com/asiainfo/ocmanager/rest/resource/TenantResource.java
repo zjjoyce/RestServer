@@ -8,6 +8,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -569,8 +570,31 @@ public class TenantResource {
 
 			// parse the input parameters json
 			JsonElement parameterJon = new JsonParser().parse(parametersStr);
+			JsonObject parameterObj = parameterJon.getAsJsonObject().getAsJsonObject("parameters");
+
+   			//check whether parameters format is legal
+			try {
+				for (Map.Entry<String, JsonElement> entry : parameterObj.entrySet()) {
+					String key = entry.getKey();
+					JsonElement value = entry.getValue();
+					if (value.isJsonPrimitive() ) {
+						// if value is not int, will throw Exception
+						value.getAsInt();
+						logger.info("parameters" +  key + ":" + value.toString());
+					}
+					else {
+						Response.status(Status.BAD_REQUEST).entity("BadRequest: the parameter value format is illegal! Error:" + value.toString())
+								.build();
+					}
+				}
+			} catch (Exception e) {
+				logger.info("The parameter format check error:" + e.getMessage());
+				return Response.status(Status.BAD_REQUEST).entity("BadRequest: the parameter value format is illegal! Error:" + e.toString()).build();
+			}
+
+
 			// add into the update json
-			provisioning.add("parameters", parameterJon.getAsJsonObject().getAsJsonObject("parameters"));
+			provisioning.add("parameters", parameterObj);
 
 			// add the patch Updating into the request body
 			JsonObject status = serviceInstanceJson.getAsJsonObject().getAsJsonObject("status");
