@@ -19,9 +19,9 @@ import org.apache.log4j.Logger;
 
 import com.asiainfo.ocmanager.monitor.entity.AppEntity;
 import com.asiainfo.ocmanager.monitor.entity.AppExtraEntity;
-import com.asiainfo.ocmanager.monitor.entity.TenantsAppsEntity;
 import com.asiainfo.ocmanager.monitor.entity.TenantEntity;
 import com.asiainfo.ocmanager.monitor.entity.TenantExtraEntity;
+import com.asiainfo.ocmanager.monitor.entity.TenantsAppsEntity;
 import com.asiainfo.ocmanager.monitor.util.Configuration;
 import com.asiainfo.ocmanager.rest.constant.Constant;
 import com.google.gson.Gson;
@@ -90,7 +90,7 @@ public class RestClient implements Closeable{
 		AppExtraEntity tenant = toEntity(rsp, TenantExtraEntity.class).getData();
 		return tenant;
 	}
-
+	
 	public static void main(String[] args) throws ParseException, IOException {
 		String body = testString();
 		Gson parser = new GsonBuilder().create();
