@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -41,6 +43,11 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 
+import com.asiainfo.ocmanager.persistence.model.ServiceInstance;
+import com.asiainfo.ocmanager.persistence.model.ServiceRolePermission;
+import com.asiainfo.ocmanager.persistence.model.Tenant;
+import com.asiainfo.ocmanager.persistence.model.TenantUserRoleAssignment;
+import com.asiainfo.ocmanager.persistence.model.UserRoleView;
 import com.asiainfo.ocmanager.rest.bean.AdapterResponseBean;
 import com.asiainfo.ocmanager.rest.constant.Constant;
 import com.asiainfo.ocmanager.rest.resource.utils.ServiceInstancePersistenceWrapper;
@@ -51,9 +58,12 @@ import com.asiainfo.ocmanager.rest.resource.utils.UserPersistenceWrapper;
 import com.asiainfo.ocmanager.rest.resource.utils.UserRoleViewPersistenceWrapper;
 import com.asiainfo.ocmanager.rest.utils.DFPropertiesFoundry;
 import com.asiainfo.ocmanager.rest.utils.SSLSocketIgnoreCA;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.asiainfo.ocmanager.rest.resource.utils.TenantPersistenceWrapper;
 import org.codehaus.jettison.json.JSONArray;
-
 /**
  *
  * @author zhaoyim
@@ -107,7 +117,7 @@ public class TenantResource {
 	/**
 	 * Get the child tenants
 	 *
-	 * @param parentTenantId
+	 * @param tenantId
 	 *            tenant id
 	 * @return tenant list
 	 */
@@ -146,6 +156,25 @@ public class TenantResource {
 		}
 	}
 
+	private static UserRoleView getRole(String tenantId, String userName) {
+
+		UserRoleView role = UserRoleViewPersistenceWrapper.getRoleBasedOnUserAndTenant(userName, tenantId);
+		if (role == null) {
+			logger.debug("getRole -> start get tenant");
+			Tenant tenant = TenantPersistenceWrapper.getTenantById(tenantId);
+			logger.debug("getRole -> finish get tenant");
+			if (tenant == null) {
+				return null;
+			}
+			if (tenant.getParentId() == null) {
+				return null;
+			} else {
+				role = TenantResource.getRole(tenant.getParentId(), userName);
+			}
+		}
+		return role;
+	}
+
 	/**
 	 * Get the role based on the tenant and user
 	 *
@@ -158,7 +187,11 @@ public class TenantResource {
 	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	public Response getRoleByTenantUserName(@PathParam("id") String tenantId, @PathParam("userName") String userName) {
 		try {
-			UserRoleView role = UserRoleViewPersistenceWrapper.getRoleBasedOnUserAndTenant(userName, tenantId);
+			UserRoleView role = TenantResource.getRole(tenantId, userName);
+			if (role != null) {
+				// set the tenant id to the passed tenant id
+				role.setTenantId(tenantId);
+			}
 			return Response.ok().entity(role).build();
 		} catch (Exception e) {
 			// system out the exception into the console log
@@ -458,8 +491,8 @@ public class TenantResource {
 								if (updateRes.getResCodel() == 200) {
 
 									logger.info("createServiceInstanceInTenant -> wait update complete");
-                                    TenantResource.watiInstanceUpdateComplete(updateRes, tenantId, instanceName);
-                                    logger.info("createServiceInstanceInTenant -> update complete");
+									TenantResource.watiInstanceUpdateComplete(updateRes, tenantId, instanceName);
+									logger.info("createServiceInstanceInTenant -> update complete");
 
 									logger.info("createServiceInstanceInTenant -> begin to binding");
 									for (int i = 0; i < userNameList.size(); i++) {
@@ -471,7 +504,6 @@ public class TenantResource {
 											TenantResource.watiInstanceBindingComplete(bindingRes, tenantId,
 													instanceName);
 											logger.info("createServiceInstanceInTenant -> binding complete");
-                                            DacpAllResult.getAllResult(tenantId);
 										}
 									}
 								}
@@ -499,7 +531,7 @@ public class TenantResource {
 	 *
 	 * @param tenantId
 	 * @param instanceName
-	 * @param parametersStr
+	 * @param reqBodyStr
 	 * @return
 	 */
 	@PUT
@@ -597,7 +629,7 @@ public class TenantResource {
 			String phase = instance.getAsJsonObject("status").get("phase").getAsString();
 
 			// if the instance is Failure do not need to unbound
-			if (phase.equals(Constant.FAILURE)) {
+			if (!phase.equals(Constant.FAILURE)) {
 				// get all the users under the tenant
 				List<UserRoleView> users = UserRoleViewPersistenceWrapper.getUsersInTenant(tenantId);
 				for (UserRoleView u : users) {
@@ -648,7 +680,6 @@ public class TenantResource {
 					if (statusCode == 200) {
 						ServiceInstancePersistenceWrapper.deleteServiceInstance(tenantId, instanceName);
 						logger.info("deleteServiceInstanceInTenant -> delete successfully");
-                        DacpAllResult.getAllResult(tenantId);
 					}
 					String bodyStr = EntityUtils.toString(response1.getEntity());
 
@@ -810,9 +841,7 @@ public class TenantResource {
 							AdapterResponseBean bindingRes = TenantResource.generateOCDPServiceCredentials(tenantId,
 									instanceName, userName);
 							if (bindingRes.getResCodel() == 201) {
-                                TenantResource.watiInstanceBindingComplete(bindingRes,tenantId,instanceName);
 								logger.info("assignRoleToUserInTenant -> binding successfully");
-                                DacpAllResult.getAllResult(tenantId);
 							}
 						}
 					}
@@ -978,9 +1007,7 @@ public class TenantResource {
 								instanceName, UserPersistenceWrapper.getUserById(userId).getUsername());
 
 						if (bindingRes.getResCodel() == 201) {
-                            TenantResource.watiInstanceUnBindingComplete(bindingRes,tenantId,instanceName);
 							logger.info("unassignRoleFromUserInTenant -> unbinding successfully");
-                            DacpAllResult.getAllResult(tenantId);
 						}
 					}
 				}
@@ -1012,7 +1039,7 @@ public class TenantResource {
 		int currentBound = instJson.getAsJsonObject().getAsJsonObject("spec").get("bound").getAsInt();
 
 		while (currentBound == bound) {
-			logger.info("watiInstanceUnBindingComplete -> waiting");
+			logger.debug("watiInstanceUnBindingComplete -> waiting");
 			Thread.sleep(500);
 			instStr = TenantResource.getTenantServiceInstancesFromDf(tenantId, instanceName);
 			instJson = new JsonParser().parse(instStr);
@@ -1035,7 +1062,7 @@ public class TenantResource {
 		int currentBound = instJson.getAsJsonObject().getAsJsonObject("spec").get("bound").getAsInt();
 
 		while (currentBound == bound) {
-			logger.info("watiInstanceBindingComplete -> waiting");
+			logger.debug("watiInstanceBindingComplete -> waiting");
 			Thread.sleep(500);
 			instStr = TenantResource.getTenantServiceInstancesFromDf(tenantId, instanceName);
 			instJson = new JsonParser().parse(instStr);
@@ -1054,7 +1081,7 @@ public class TenantResource {
 		JsonElement patch = updateInstJson.getAsJsonObject().getAsJsonObject("status").get("patch");
 
 		while (patch != null) {
-			logger.info("watiInstanceUpdateComplete -> waiting");
+			logger.debug("watiInstanceUpdateComplete -> waiting");
 			Thread.sleep(500);
 			updateInstStr = TenantResource.getTenantServiceInstancesFromDf(tenantId, instanceName);
 			updateInstJson = new JsonParser().parse(updateInstStr);
@@ -1207,11 +1234,32 @@ public class TenantResource {
 			CloseableHttpResponse response1 = httpclient.execute(httpGet);
 
 			try {
-				// int statusCode =
-				// response1.getStatusLine().getStatusCode();
+				int statusCode = response1.getStatusLine().getStatusCode();
 
 				String bodyStr = EntityUtils.toString(response1.getEntity());
 
+				// filter the _ToDelete instances
+				if (statusCode == 200) {
+					JsonElement jsonE = new JsonParser().parse(bodyStr);
+					JsonObject jsonO = jsonE.getAsJsonObject();
+
+					JsonArray items = jsonO.getAsJsonArray(("items"));
+
+					Iterator<JsonElement> it = items.iterator();
+					while (it.hasNext()) {
+						JsonElement je = it.next();
+						JsonObject status = je.getAsJsonObject().getAsJsonObject("status");
+						JsonElement action = status.get("action");
+
+						if (action != null) {
+							if (action.getAsString().equals(Constant._TODELETE)) {
+								it.remove();
+							}
+						}
+					}
+					bodyStr = jsonO.toString();
+				}
+				logger.info("getTenantAllServiceInstancesFromDf -> " +  bodyStr);
 				return bodyStr;
 			} finally {
 				response1.close();
@@ -1254,6 +1302,95 @@ public class TenantResource {
 			}
 		} finally {
 			httpclient.close();
+		}
+	}
+
+	/**
+	 * specific method for citic
+	 *
+	 * @param parentId
+	 * @param tenantId
+	 */
+	private static void checkApp(String appId) {
+		Tenant tenant = TenantPersistenceWrapper.getTenantById(appId);
+		if (tenant == null) {
+			List<Tenant> list = TenantResource.getTenantAndAPPByAppId(appId);
+
+			TenantResource.checkTenant(list.get(0));
+
+			Tenant newTenant = new Tenant(list.get(1).getId(), list.get(1).getName(), list.get(1).getDescription(),
+					list.get(0).getId(), 3);
+			TenantResource.createTenantInternal(newTenant);
+		}
+
+	}
+
+	private static List<Tenant> getTenantAndAPPByAppId(String appId) {
+		return new ArrayList<Tenant>();
+	}
+
+	private static void checkTenant(Tenant tenant) {
+		Tenant DBtenant = TenantPersistenceWrapper.getTenantById(tenant.getId());
+		if (DBtenant == null) {
+			Tenant newTenant = new Tenant(tenant.getId(), tenant.getName(), tenant.getDescription(),
+					"ae783b6d-655a-11e7-aa10-fa163ed7d0ae", 2);
+			TenantResource.createTenantInternal(newTenant);
+		}
+	}
+
+	private static void createTenantInternal(Tenant tenant) {
+
+		try {
+			String url = DFPropertiesFoundry.getDFProperties().get(Constant.DATAFOUNDRY_URL);
+			String token = DFPropertiesFoundry.getDFProperties().get(Constant.DATAFOUNDRY_TOKEN);
+			String dfRestUrl = url + "/oapi/v1/projectrequests";
+
+			JsonObject jsonObj1 = new JsonObject();
+			jsonObj1.addProperty("apiVersion", "v1");
+			jsonObj1.addProperty("kind", "ProjectRequest");
+			// mapping DF tenant display name with adapter tenant name
+			jsonObj1.addProperty("displayName", tenant.getName());
+			if (tenant.getDescription() != null) {
+				jsonObj1.addProperty("description", tenant.getDescription());
+			}
+
+			JsonObject jsonObj2 = new JsonObject();
+			jsonObj2.addProperty("name", tenant.getId());
+			jsonObj1.add("metadata", jsonObj2);
+			String reqBody = jsonObj1.toString();
+
+			SSLConnectionSocketFactory sslsf = SSLSocketIgnoreCA.createSSLSocketFactory();
+
+			CloseableHttpClient httpclient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
+			try {
+				HttpPost httpPost = new HttpPost(dfRestUrl);
+				httpPost.addHeader("Content-type", "application/json");
+				httpPost.addHeader("Authorization", "bearer " + token);
+
+				StringEntity se = new StringEntity(reqBody);
+				se.setContentType("application/json");
+				httpPost.setEntity(se);
+
+				logger.info("createTenantInternal -> start create");
+				CloseableHttpResponse response2 = httpclient.execute(httpPost);
+
+				try {
+					int statusCode = response2.getStatusLine().getStatusCode();
+
+					if (statusCode == 201) {
+						logger.info("createTenantInternal -> start successfully");
+						TenantPersistenceWrapper.createTenant(tenant);
+					}
+					String bodyStr = EntityUtils.toString(response2.getEntity());
+				} finally {
+					response2.close();
+				}
+			} finally {
+				httpclient.close();
+			}
+		} catch (Exception e) {
+			// system out the exception into the console log
+			logger.info("createTenantInternal -> " + e.getMessage());
 		}
 	}
 

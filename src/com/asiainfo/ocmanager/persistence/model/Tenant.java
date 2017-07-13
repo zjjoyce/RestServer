@@ -74,4 +74,8 @@ public class  Tenant {
 		this.dacpTeamCode = dacpTeamCode;
 	}
 
+	public String toString()
+	{
+		return "id:" + this.id + "	name:" + this.name + "	level:" + this.level;
+	}
 }
