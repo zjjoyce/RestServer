@@ -619,7 +619,7 @@ public class TenantResource {
 			String phase = instance.getAsJsonObject("status").get("phase").getAsString();
 
 			// if the instance is Failure do not need to unbound
-			if (phase.equals(Constant.FAILURE)) {
+			if (!phase.equals(Constant.FAILURE)) {
 				// get all the users under the tenant
 				List<UserRoleView> users = UserRoleViewPersistenceWrapper.getUsersInTenant(tenantId);
 				for (UserRoleView u : users) {
