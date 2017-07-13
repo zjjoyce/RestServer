@@ -150,9 +150,9 @@ public class TenantResource {
 
 		UserRoleView role = UserRoleViewPersistenceWrapper.getRoleBasedOnUserAndTenant(userName, tenantId);
 		if (role == null) {
-			logger.info("getRole -> start get tenant");
+			logger.debug("getRole -> start get tenant");
 			Tenant tenant = TenantPersistenceWrapper.getTenantById(tenantId);
-			logger.info("getRole -> finish get tenant");
+			logger.debug("getRole -> finish get tenant");
 			if (tenant == null) {
 				return null;
 			}
@@ -1029,7 +1029,7 @@ public class TenantResource {
 		int currentBound = instJson.getAsJsonObject().getAsJsonObject("spec").get("bound").getAsInt();
 
 		while (currentBound == bound) {
-			logger.info("watiInstanceUnBindingComplete -> waiting");
+			logger.debug("watiInstanceUnBindingComplete -> waiting");
 			Thread.sleep(500);
 			instStr = TenantResource.getTenantServiceInstancesFromDf(tenantId, instanceName);
 			instJson = new JsonParser().parse(instStr);
@@ -1052,7 +1052,7 @@ public class TenantResource {
 		int currentBound = instJson.getAsJsonObject().getAsJsonObject("spec").get("bound").getAsInt();
 
 		while (currentBound == bound) {
-			logger.info("watiInstanceBindingComplete -> waiting");
+			logger.debug("watiInstanceBindingComplete -> waiting");
 			Thread.sleep(500);
 			instStr = TenantResource.getTenantServiceInstancesFromDf(tenantId, instanceName);
 			instJson = new JsonParser().parse(instStr);
@@ -1071,7 +1071,7 @@ public class TenantResource {
 		JsonElement patch = updateInstJson.getAsJsonObject().getAsJsonObject("status").get("patch");
 
 		while (patch != null) {
-			logger.info("watiInstanceUpdateComplete -> waiting");
+			logger.debug("watiInstanceUpdateComplete -> waiting");
 			Thread.sleep(500);
 			updateInstStr = TenantResource.getTenantServiceInstancesFromDf(tenantId, instanceName);
 			updateInstJson = new JsonParser().parse(updateInstStr);
