@@ -7,7 +7,7 @@ import java.util.*;
 import com.asiainfo.ocmanager.mail.ParamQuery;
 import com.asiainfo.ocmanager.persistence.model.Quota;
 
-import com.asiainfo.ocmanager.rest.resource.quotaUtils.HdfsUtils;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

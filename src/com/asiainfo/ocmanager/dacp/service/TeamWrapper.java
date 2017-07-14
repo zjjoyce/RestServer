@@ -33,7 +33,7 @@ public class TeamWrapper {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String dateNowStr = sdf.format(d);
         String teamName = tenant.getName();
-        Team team = new Team(xmlId,teamCode,teamName,teamType,"","ON","/dacp-res/dps/img/team1.png","");
+        Team team = new Team(xmlId,teamCode,teamName,teamType,dateNowStr,"ON","/dacp-res/dps/img/team1.png","");
         return team;
     }
 
