@@ -168,7 +168,6 @@ __response:__
   {
     "description": "hdfs description",
     "id": "100",
-    "origin": "ocdp",
     "servicename": "hdfs"
   },
   ...
@@ -184,7 +183,6 @@ __response:__
 {
   "description": "hdfs description",
   "id": "100",
-  "origin": "ocdp",
   "servicename": "hdfs"
 }
 ```
@@ -237,7 +235,7 @@ __response:__
 
 4. 删除Service broker（删除服务， 服务是注册在service broker 里面的，因此会删除service broker 中注册的所有服务）
 ```
-DELETE /ocmanager/v1/api/service/broker/{name}
+POST /ocmanager/v1/api/service/broker/{name}
 ```
 
 __response:__
@@ -576,8 +574,7 @@ __request body:__
       "provisioning":
         {
           "backingservice_name":"ETCD",
-          "backingservice_plan_guid":"204F8288-F8D9-4806-8661-EB48D94504B3",
-          "parameters":{"ETCDStorageQuota":"1024","ETCDQueueQuota":"10"}
+          "backingservice_plan_guid":"204F8288-F8D9-4806-8661-EB48D94504B3"
         }
     }
 }
@@ -833,87 +830,6 @@ __response:__
 }
 ```
 
-14. 更新租户单个服务实例
-```
-PUT /ocmanager/v1/api/tenant/{id}/service/instance/{instanceName}
-```
-
-__request body:__
-```
-{      
-    "parameters": 
-        {
-            "hiveStorageQuota": "99999",
-            "yarnQueueQuota": "88888"
-        }
-}
-```
-
-
-__response:__
-```
-{
-  "kind": "BackingServiceInstance",
-  "apiVersion": "v1",
-  "metadata": {
-    "name": "hive-instance",
-    "namespace": "zhaoyim",
-    "selfLink": "/oapi/v1/namespaces/zhaoyim/backingserviceinstances/hive-instance",
-    "uid": "f1a993d6-57c8-11e7-9a0f-fa163efdbea8",
-    "resourceVersion": "17465724",
-    "creationTimestamp": "2017-06-23T04:03:41Z"
-  },
-  "spec": {
-    "provisioning": {
-      "dashboard_url": "",
-      "backingservice_name": "Hive",
-      "backingservice_spec_id": "2ef26018-003d-4b2b-b786-0481d4ee9fa3",
-      "backingservice_plan_guid": "aa7e364f-fdbf-4187-b60a-218b6fa398ed",
-      "backingservice_plan_name": "shared",
-      "parameters": {
-            "hiveStorageQuota": "99999",
-            "yarnQueueQuota": "88888"
-      },
-      "credentials": {
-        "Hive database": "14ea4d0557c911e79a0ffa163efdbea8",
-        "host": "zx-dn-03",
-        "password": "e6510d82-2ed3-48f5-8668-b82d572aaac1",
-        "port": "10000",
-        "uri": "jdbc:hive2://zx-dn-03:10000/14ea4d0557c911e79a0ffa163efdbea8;principal=hive/zx-dn-03@EXAMPLE.COM",
-        "username": "zhaoyim@EXAMPLE.COM"
-      }
-    },
-    "userprovidedservice": {
-      "credentials": null
-    },
-    "binding": null,
-    "bound": 0,
-    "instance_id": "14ea4d05-57c9-11e7-9a0f-fa163efdbea8",
-    "tags": null
-  },
-  "status": {
-    "phase": "Unbound",
-    "action": "",
-    "last_operation": null
-  }
-}
-``` 
-
-
-15. 获取角色根据租户和用户名
-```
-GET /ocmanager/v1/api/tenant/{tenantId}/user/{userName}/role
-```
-__response:__
-```
-{
-  "roleId": "r1Id",
-  "tenantId": "t1Id",
-  "userId": "u1Id",
-  "userName": "u1Name"
-}
-```
-
 
 ### Single Sign on APIs
 1. 获取当前用户(所要用户信息需要设置在request header中)
@@ -1021,7 +937,7 @@ __response:__
 }
 ``` 
 
-5. 删除多租户平台首页连接通过连接名
+5. 获取多租户平台首页连接通过连接名
 ```
 DELETE /ocmanager/v1/api/dashboard/link/{id}
 ```

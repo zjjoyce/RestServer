@@ -8,7 +8,7 @@ Amount API 由前端／适配器调用，返回某个服务实例的资源统计
 业务基本流程：amount API先从DF获取到instance的服务类型等信息，然后从对应的Agent获取用量并返回。
 
 ```
-GET /sapi/v1/namespaces/:name/instances/:instance_name
+GET /sapi/v1/namespaces/:name/serviceinstances/:instance_name
 ```
 
 ### 路径参数
@@ -86,7 +86,7 @@ GET /sapi/v1/namespaces/:name/instances/:instance_name
  ### 示例
 
 ```
-GET /sapi/v1/namespaces/san/instances/hbase-instance
+GET /sapi/v1/namespaces/san/serviceisntances/hbase-instance
 ```
 ```json
 {"items":[

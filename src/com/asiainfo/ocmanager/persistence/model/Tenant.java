@@ -1,11 +1,11 @@
 package com.asiainfo.ocmanager.persistence.model;
 
 /**
- * 
+ *
  * @author zhaoyim
  *
  */
-public class Tenant {
+public class  Tenant {
 
 	private String id;
 	private String name;
