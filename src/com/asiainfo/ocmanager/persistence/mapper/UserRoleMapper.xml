@@ -17,7 +17,7 @@
 		  TUR.tenant_id as "tenantId"
 		  from
 		      tenants_users_roles_assignment as TUR, users as U, roles as R where
-		      TUR.user_id=U.id and TUR.role_id=R.id and TUR.tenant_id=#{tenantId}
+		      TUR.user_id=U.id and TUR.role_id=R.id and TUR.tenant_id=#{tenantId} order by U.username
 	</select>
 	<!-- select the role based on the given tenant and user -->
 	<select id="selectRoleBasedOnUserAndTenant" parameterType="java.lang.String"
