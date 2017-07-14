@@ -60,7 +60,7 @@ public class RestClient implements Closeable{
 	}
 	
 	/**
-	 * Fetch tenant by appId.
+	 * Fetch tenant by appId. Return null if app not exist.
 	 * @param appId
 	 * @return
 	 */

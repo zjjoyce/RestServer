@@ -1374,6 +1374,18 @@ public class TenantResource {
 				logger.debug("Create tenant in both DataFoundary and DB successful: " + tenant.getId());
 				return;
 			}
+			else if(dfResponse.getStatusLine().getStatusCode() == 409){
+				logger.warn("Tenant already exist in DataFoundary: " + tenant.getId());
+				try {
+					TenantPersistenceWrapper.createTenant(tenant);
+					logger.debug("Create tenant in both DataFoundary and DB successful: " + tenant.getId());
+					return;
+				} catch (Exception e) {
+					// tenant might exist in Mysql already. eg: level-2 tenants created when the 1st time level-3 was created.
+					logger.warn("Creating tentant " +  tenant.getId() + " in Mysql with error(ignore and proceed): " + e.getMessage());
+					return;
+				}
+			}
 			else{
 				logger.error("Create tenant(" + tenant.getId() + ") in DataFoundary failed! " + dfResponse);
 				throw new RuntimeException("Create tenant in DataFoundary failed with status code: " + dfResponse.getStatusLine().getStatusCode());
@@ -1412,11 +1424,15 @@ public class TenantResource {
 	}
 
 	private void transform(List<Tenant> list, String appId, AppExtraEntity appExtraEntity) {
+		if (appExtraEntity == null) {
+			logger.error("App not exist in CITIC Cloud: " + appId);
+			throw new RuntimeException("App not exist in CITIC Cloud: " + appId);
+		}
 		// citic tenant corresponds to level 2 tenant
-		list.add(new Tenant(appExtraEntity.getOrg_id(), appExtraEntity.getOrg_name(), "Synchronized from CITIC Cloud", "ae783b6d-655a-11e7-aa10-fa163ed7d0ae", 2));
+		list.add(new Tenant(appExtraEntity.getOrg_id(), appExtraEntity.getOrg_name(), "Synchronized from CITIC Cloud", "b7f71984-5e00-11e7-aa10-fa163ed7d0ae", 2));
 		// citic app corresponds to level 3 tenant
 		list.add(new Tenant(appExtraEntity.getId(), appExtraEntity.getAbbreviation(), "Synchronized from CITIC Cloud", appExtraEntity.getOrg_id(), 3));
-		logger.info("Tenants synchronized from CITIC by Appid(" + appId + "): " + list);
+		logger.info("Tenant and App fetched from CITIC by Appid(" + appId + "): " + list);
 	}
 
 	/**
