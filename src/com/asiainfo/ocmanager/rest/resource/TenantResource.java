@@ -657,9 +657,16 @@ public class TenantResource {
 					.get("backingservice_name").getAsString();
 			// get status phase
 			String phase = instance.getAsJsonObject("status").get("phase").getAsString();
+			
+			if (phase.equals(Constant.PROVISIONING)) {
+				logger.info(
+						"deleteServiceInstanceInTenant -> The instance can not be deleted when it is Provisioning!");
+				return Response.status(Status.BAD_REQUEST)
+						.entity("The instance can not be deleted when it is Provisioning!").build();
+			}
 
+			// get binding info
 			JsonObject spec = instance.getAsJsonObject("spec");
-
 			JsonElement binding = spec.get("binding");
 
 			// if the instance is Failure do not need to unbound
