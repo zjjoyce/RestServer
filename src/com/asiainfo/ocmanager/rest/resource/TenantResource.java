@@ -45,6 +45,8 @@ import com.asiainfo.ocmanager.persistence.model.TenantUserRoleAssignment;
 import com.asiainfo.ocmanager.persistence.model.UserRoleView;
 import com.asiainfo.ocmanager.rest.bean.AdapterResponseBean;
 import com.asiainfo.ocmanager.rest.constant.Constant;
+import com.asiainfo.ocmanager.rest.resource.executor.TenantResourceAssignRoleExecutor;
+import com.asiainfo.ocmanager.rest.resource.executor.TenantResourceUpdateRoleExecutor;
 import com.asiainfo.ocmanager.rest.resource.utils.ServiceInstancePersistenceWrapper;
 import com.asiainfo.ocmanager.rest.resource.utils.ServiceRolePermissionWrapper;
 import com.asiainfo.ocmanager.rest.resource.utils.TURAssignmentPersistenceWrapper;
@@ -817,68 +819,72 @@ public class TenantResource {
 
 			JsonArray allServiceInstancesArray = allServiceInstancesJson.getAsJsonObject().getAsJsonArray("items");
 			for (int i = 0; i < allServiceInstancesArray.size(); i++) {
-				// TODO should consider the resource version changed need to
-				// call get instance by id
-				JsonObject instance = allServiceInstancesArray.get(i).getAsJsonObject();
-				// get service name
-				String serviceName = instance.getAsJsonObject("spec").getAsJsonObject("provisioning")
-						.get("backingservice_name").getAsString();
-
-				String phase = instance.getAsJsonObject("status").get("phase").getAsString();
-				if (!phase.equals(Constant.PROVISIONING) && !phase.equals(Constant.FAILURE)) {
-					// Because the Provisioning will make the update failed
-					if (Constant.list.contains(serviceName.toLowerCase())) {
-						// get service instance name
-						String instanceName = instance.getAsJsonObject("metadata").get("name").getAsString();
-						String OCDPServiceInstanceStr = TenantResource.getTenantServiceInstancesFromDf(tenantId,
-								instanceName);
-
-						// get the service permission based on the service name
-						// and role
-						ServiceRolePermission permission = ServiceRolePermissionWrapper
-								.getServicePermissionByRoleId(serviceName, assignment.getRoleId());
-
-						// only the has service permission users
-						// can be assign
-						if (permission == null) {
-							continue;
-						}
-
-						// parse the update request body
-						JsonElement OCDPServiceInstanceJson = new JsonParser().parse(OCDPServiceInstanceStr);
-						// get the provisioning json
-						JsonObject provisioning = OCDPServiceInstanceJson.getAsJsonObject().getAsJsonObject("spec")
-								.getAsJsonObject("provisioning");
-						// add the user name to the parameters for update
-						String userName = UserPersistenceWrapper.getUserById(assignment.getUserId()).getUsername();
-						provisioning.getAsJsonObject("parameters").addProperty("user_name", userName);
-
-						// add the accesses fields into the request body
-						provisioning.getAsJsonObject("parameters").addProperty("accesses",
-								permission.getServicePermission());
-
-						// add the patch Updating into the request body
-						JsonObject status = OCDPServiceInstanceJson.getAsJsonObject().getAsJsonObject("status");
-						status.addProperty("patch", Constant.UPDATE);
-
-						logger.info("assignRoleToUserInTenant -> begin to update");
-						AdapterResponseBean updateRes = TenantResource.updateTenantServiceInstanceInDf(tenantId,
-								instanceName, OCDPServiceInstanceJson.toString());
-
-						if (updateRes.getResCodel() == 200) {
-							logger.info("assignRoleToUserInTenant -> wait update complete");
-							TenantResource.watiInstanceUpdateComplete(updateRes, tenantId, instanceName);
-							logger.info("assignRoleToUserInTenant -> update complete");
-
-							logger.info("assignRoleToUserInTenant -> begin to binding");
-							AdapterResponseBean bindingRes = TenantResource.generateOCDPServiceCredentials(tenantId,
-									instanceName, userName);
-							if (bindingRes.getResCodel() == 201) {
-								logger.info("assignRoleToUserInTenant -> binding successfully");
-							}
-						}
-					}
-				}
+				TenantResourceAssignRoleExecutor runnable = new TenantResourceAssignRoleExecutor(tenantId,
+						allServiceInstancesArray, assignment, i);
+				Thread thread = new Thread(runnable);
+				thread.start();
+//				// TODO should consider the resource version changed need to
+//				// call get instance by id
+//				JsonObject instance = allServiceInstancesArray.get(i).getAsJsonObject();
+//				// get service name
+//				String serviceName = instance.getAsJsonObject("spec").getAsJsonObject("provisioning")
+//						.get("backingservice_name").getAsString();
+//
+//				String phase = instance.getAsJsonObject("status").get("phase").getAsString();
+//				if (!phase.equals(Constant.PROVISIONING) && !phase.equals(Constant.FAILURE)) {
+//					// Because the Provisioning will make the update failed
+//					if (Constant.list.contains(serviceName.toLowerCase())) {
+//						// get service instance name
+//						String instanceName = instance.getAsJsonObject("metadata").get("name").getAsString();
+//						String OCDPServiceInstanceStr = TenantResource.getTenantServiceInstancesFromDf(tenantId,
+//								instanceName);
+//
+//						// get the service permission based on the service name
+//						// and role
+//						ServiceRolePermission permission = ServiceRolePermissionWrapper
+//								.getServicePermissionByRoleId(serviceName, assignment.getRoleId());
+//
+//						// only the has service permission users
+//						// can be assign
+//						if (permission == null) {
+//							continue;
+//						}
+//
+//						// parse the update request body
+//						JsonElement OCDPServiceInstanceJson = new JsonParser().parse(OCDPServiceInstanceStr);
+//						// get the provisioning json
+//						JsonObject provisioning = OCDPServiceInstanceJson.getAsJsonObject().getAsJsonObject("spec")
+//								.getAsJsonObject("provisioning");
+//						// add the user name to the parameters for update
+//						String userName = UserPersistenceWrapper.getUserById(assignment.getUserId()).getUsername();
+//						provisioning.getAsJsonObject("parameters").addProperty("user_name", userName);
+//
+//						// add the accesses fields into the request body
+//						provisioning.getAsJsonObject("parameters").addProperty("accesses",
+//								permission.getServicePermission());
+//
+//						// add the patch Updating into the request body
+//						JsonObject status = OCDPServiceInstanceJson.getAsJsonObject().getAsJsonObject("status");
+//						status.addProperty("patch", Constant.UPDATE);
+//
+//						logger.info("assignRoleToUserInTenant -> begin to update");
+//						AdapterResponseBean updateRes = TenantResource.updateTenantServiceInstanceInDf(tenantId,
+//								instanceName, OCDPServiceInstanceJson.toString());
+//
+//						if (updateRes.getResCodel() == 200) {
+//							logger.info("assignRoleToUserInTenant -> wait update complete");
+//							TenantResource.watiInstanceUpdateComplete(updateRes, tenantId, instanceName);
+//							logger.info("assignRoleToUserInTenant -> update complete");
+//
+//							logger.info("assignRoleToUserInTenant -> begin to binding");
+//							AdapterResponseBean bindingRes = TenantResource.generateOCDPServiceCredentials(tenantId,
+//									instanceName, userName);
+//							if (bindingRes.getResCodel() == 201) {
+//								logger.info("assignRoleToUserInTenant -> binding successfully");
+//							}
+//						}
+//					}
+//				}
 			}
 
 			assignment = TURAssignmentPersistenceWrapper.assignRoleToUserInTenant(assignment);
@@ -916,77 +922,81 @@ public class TenantResource {
 
 			JsonArray allServiceInstancesArray = allServiceInstancesJson.getAsJsonObject().getAsJsonArray("items");
 			for (int i = 0; i < allServiceInstancesArray.size(); i++) {
-				JsonObject instance = allServiceInstancesArray.get(i).getAsJsonObject();
-				// get service name
-				String serviceName = instance.getAsJsonObject("spec").getAsJsonObject("provisioning")
-						.get("backingservice_name").getAsString();
-				String phase = instance.getAsJsonObject("status").get("phase").getAsString();
-
-				if (!phase.equals(Constant.PROVISIONING) && !phase.equals(Constant.FAILURE)) {
-					if (Constant.list.contains(serviceName.toLowerCase())) {
-
-						// get service instance name
-						String instanceName = instance.getAsJsonObject("metadata").get("name").getAsString();
-						String userName = UserPersistenceWrapper.getUserById(assignment.getUserId()).getUsername();
-
-						logger.info("updateRoleToUserInTenant -> begin to unbinding");
-						AdapterResponseBean unBindingRes = TenantResource.removeOCDPServiceCredentials(tenantId,
-								instanceName, userName);
-
-						if (unBindingRes.getResCodel() == 201) {
-							logger.info("updateRoleToUserInTenant -> wait unbinding compelte");
-							TenantResource.watiInstanceUnBindingComplete(unBindingRes, tenantId, instanceName);
-							logger.info("updateRoleToUserInTenant -> unbinding compelte");
-
-							String OCDPServiceInstanceStr = TenantResource.getTenantServiceInstancesFromDf(tenantId,
-									instanceName);
-
-							// get the service permission
-							ServiceRolePermission permission = ServiceRolePermissionWrapper
-									.getServicePermissionByRoleId(serviceName, assignment.getRoleId());
-
-							// only the has service permission users
-							// can be assign
-							if (permission == null) {
-								continue;
-							}
-
-							// parse the update request body
-							JsonElement OCDPServiceInstanceJson = new JsonParser().parse(OCDPServiceInstanceStr);
-							// get the provisioning json
-							JsonObject provisioning = OCDPServiceInstanceJson.getAsJsonObject().getAsJsonObject("spec")
-									.getAsJsonObject("provisioning");
-
-							provisioning.getAsJsonObject("parameters").addProperty("user_name", userName);
-
-							// add the accesses fields into the request body
-							provisioning.getAsJsonObject("parameters").addProperty("accesses",
-									permission.getServicePermission());
-
-							// add the patch Updating into the request body
-							JsonObject status = OCDPServiceInstanceJson.getAsJsonObject().getAsJsonObject("status");
-							status.addProperty("patch", Constant.UPDATE);
-
-							logger.info("updateRoleToUserInTenant -> begin to update");
-							AdapterResponseBean updateRes = TenantResource.updateTenantServiceInstanceInDf(tenantId,
-									instanceName, OCDPServiceInstanceJson.toString());
-
-							if (updateRes.getResCodel() == 200) {
-
-								logger.info("updateRoleToUserInTenant -> wait update compete");
-								TenantResource.watiInstanceUpdateComplete(updateRes, tenantId, instanceName);
-								logger.info("updateRoleToUserInTenant -> update compete");
-
-								logger.info("updateRoleToUserInTenant -> begin to binding");
-								AdapterResponseBean bindingRes = TenantResource.generateOCDPServiceCredentials(tenantId,
-										instanceName, userName);
-								if (bindingRes.getResCodel() == 201) {
-									logger.info("updateRoleToUserInTenant -> binding successfully");
-								}
-							}
-						}
-					}
-				}
+				TenantResourceUpdateRoleExecutor runnable = new TenantResourceUpdateRoleExecutor(tenantId,
+						allServiceInstancesArray, assignment, i);
+				Thread thread = new Thread(runnable);
+				thread.start();
+//				JsonObject instance = allServiceInstancesArray.get(i).getAsJsonObject();
+//				// get service name
+//				String serviceName = instance.getAsJsonObject("spec").getAsJsonObject("provisioning")
+//						.get("backingservice_name").getAsString();
+//				String phase = instance.getAsJsonObject("status").get("phase").getAsString();
+//
+//				if (!phase.equals(Constant.PROVISIONING) && !phase.equals(Constant.FAILURE)) {
+//					if (Constant.list.contains(serviceName.toLowerCase())) {
+//
+//						// get service instance name
+//						String instanceName = instance.getAsJsonObject("metadata").get("name").getAsString();
+//						String userName = UserPersistenceWrapper.getUserById(assignment.getUserId()).getUsername();
+//
+//						logger.info("updateRoleToUserInTenant -> begin to unbinding");
+//						AdapterResponseBean unBindingRes = TenantResource.removeOCDPServiceCredentials(tenantId,
+//								instanceName, userName);
+//
+//						if (unBindingRes.getResCodel() == 201) {
+//							logger.info("updateRoleToUserInTenant -> wait unbinding compelte");
+//							TenantResource.watiInstanceUnBindingComplete(unBindingRes, tenantId, instanceName);
+//							logger.info("updateRoleToUserInTenant -> unbinding compelte");
+//
+//							String OCDPServiceInstanceStr = TenantResource.getTenantServiceInstancesFromDf(tenantId,
+//									instanceName);
+//
+//							// get the service permission
+//							ServiceRolePermission permission = ServiceRolePermissionWrapper
+//									.getServicePermissionByRoleId(serviceName, assignment.getRoleId());
+//
+//							// only the has service permission users
+//							// can be assign
+//							if (permission == null) {
+//								continue;
+//							}
+//
+//							// parse the update request body
+//							JsonElement OCDPServiceInstanceJson = new JsonParser().parse(OCDPServiceInstanceStr);
+//							// get the provisioning json
+//							JsonObject provisioning = OCDPServiceInstanceJson.getAsJsonObject().getAsJsonObject("spec")
+//									.getAsJsonObject("provisioning");
+//
+//							provisioning.getAsJsonObject("parameters").addProperty("user_name", userName);
+//
+//							// add the accesses fields into the request body
+//							provisioning.getAsJsonObject("parameters").addProperty("accesses",
+//									permission.getServicePermission());
+//
+//							// add the patch Updating into the request body
+//							JsonObject status = OCDPServiceInstanceJson.getAsJsonObject().getAsJsonObject("status");
+//							status.addProperty("patch", Constant.UPDATE);
+//
+//							logger.info("updateRoleToUserInTenant -> begin to update");
+//							AdapterResponseBean updateRes = TenantResource.updateTenantServiceInstanceInDf(tenantId,
+//									instanceName, OCDPServiceInstanceJson.toString());
+//
+//							if (updateRes.getResCodel() == 200) {
+//
+//								logger.info("updateRoleToUserInTenant -> wait update compete");
+//								TenantResource.watiInstanceUpdateComplete(updateRes, tenantId, instanceName);
+//								logger.info("updateRoleToUserInTenant -> update compete");
+//
+//								logger.info("updateRoleToUserInTenant -> begin to binding");
+//								AdapterResponseBean bindingRes = TenantResource.generateOCDPServiceCredentials(tenantId,
+//										instanceName, userName);
+//								if (bindingRes.getResCodel() == 201) {
+//									logger.info("updateRoleToUserInTenant -> binding successfully");
+//								}
+//							}
+//						}
+//					}
+//				}
 			}
 
 			assignment = TURAssignmentPersistenceWrapper.updateRoleToUserInTenant(assignment);
@@ -1059,7 +1069,7 @@ public class TenantResource {
 
 	}
 
-	private static void watiInstanceUnBindingComplete(AdapterResponseBean unBindingRes, String tenantId,
+	public static void watiInstanceUnBindingComplete(AdapterResponseBean unBindingRes, String tenantId,
 			String instanceName) throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException,
 			IOException, InterruptedException {
 
@@ -1082,7 +1092,7 @@ public class TenantResource {
 
 	}
 
-	private static void watiInstanceBindingComplete(AdapterResponseBean bindingRes, String tenantId,
+	public static void watiInstanceBindingComplete(AdapterResponseBean bindingRes, String tenantId,
 			String instanceName) throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException,
 			IOException, InterruptedException {
 
@@ -1105,7 +1115,7 @@ public class TenantResource {
 
 	}
 
-	private static void watiInstanceUpdateComplete(AdapterResponseBean updateRes, String tenantId, String instanceName)
+	public static void watiInstanceUpdateComplete(AdapterResponseBean updateRes, String tenantId, String instanceName)
 			throws InterruptedException, KeyManagementException, NoSuchAlgorithmException, KeyStoreException,
 			IOException {
 
@@ -1125,7 +1135,7 @@ public class TenantResource {
 
 	}
 
-	private static AdapterResponseBean removeOCDPServiceCredentials(String tenantId, String instanceName,
+	public static AdapterResponseBean removeOCDPServiceCredentials(String tenantId, String instanceName,
 			String userName) throws IOException, KeyManagementException, NoSuchAlgorithmException, KeyStoreException {
 		String url = DFPropertiesFoundry.getDFProperties().get(Constant.DATAFOUNDRY_URL);
 		String token = DFPropertiesFoundry.getDFProperties().get(Constant.DATAFOUNDRY_TOKEN);
@@ -1172,7 +1182,7 @@ public class TenantResource {
 
 	}
 
-	private static AdapterResponseBean generateOCDPServiceCredentials(String tenantId, String instanceName,
+	public static AdapterResponseBean generateOCDPServiceCredentials(String tenantId, String instanceName,
 			String userName) throws IOException, KeyManagementException, NoSuchAlgorithmException, KeyStoreException {
 		String url = DFPropertiesFoundry.getDFProperties().get(Constant.DATAFOUNDRY_URL);
 		String token = DFPropertiesFoundry.getDFProperties().get(Constant.DATAFOUNDRY_TOKEN);
@@ -1219,7 +1229,7 @@ public class TenantResource {
 
 	}
 
-	private static String getTenantServiceInstancesFromDf(String tenantId, String instanceName)
+	public static String getTenantServiceInstancesFromDf(String tenantId, String instanceName)
 			throws IOException, KeyManagementException, NoSuchAlgorithmException, KeyStoreException {
 		String url = DFPropertiesFoundry.getDFProperties().get(Constant.DATAFOUNDRY_URL);
 		String token = DFPropertiesFoundry.getDFProperties().get(Constant.DATAFOUNDRY_TOKEN);
@@ -1304,7 +1314,7 @@ public class TenantResource {
 
 	}
 
-	private static AdapterResponseBean updateTenantServiceInstanceInDf(String tenantId, String instanceName,
+	public static AdapterResponseBean updateTenantServiceInstanceInDf(String tenantId, String instanceName,
 			String reqBodyStr) throws IOException, KeyManagementException, NoSuchAlgorithmException, KeyStoreException {
 		String url = DFPropertiesFoundry.getDFProperties().get(Constant.DATAFOUNDRY_URL);
 		String token = DFPropertiesFoundry.getDFProperties().get(Constant.DATAFOUNDRY_TOKEN);
