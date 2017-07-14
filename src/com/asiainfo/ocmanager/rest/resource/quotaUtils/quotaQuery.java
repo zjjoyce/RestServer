@@ -7,7 +7,6 @@ import java.util.*;
 import com.asiainfo.ocmanager.mail.ParamQuery;
 import com.asiainfo.ocmanager.persistence.model.Quota;
 
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
