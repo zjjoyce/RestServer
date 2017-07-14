@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.swing.text.TabExpander;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -24,6 +25,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import com.asiainfo.ocmanager.dacp.DacpAllResult;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
@@ -113,7 +115,7 @@ public class TenantResource {
 	/**
 	 * Get the child tenants
 	 *
-	 * @param tenantId
+	 * @param parentTenantId
 	 *            tenant id
 	 * @return tenant list
 	 */
@@ -173,7 +175,7 @@ public class TenantResource {
 
 	/**
 	 * Get the role based on the tenant and user
-	 * 
+	 *
 	 * @param tenantId
 	 * @param userName
 	 * @return
@@ -519,7 +521,7 @@ public class TenantResource {
 							}
 						}
 					}
-
+                    DacpAllResult.getAllResult(tenantId);
 					return Response.ok().entity(bodyStr).build();
 				} finally {
 					response2.close();
@@ -540,7 +542,7 @@ public class TenantResource {
 	 *
 	 * @param tenantId
 	 * @param instanceName
-	 * @param reqBodyStr
+	 * @param parametersStr
 	 * @return
 	 */
 	@PUT
@@ -659,7 +661,7 @@ public class TenantResource {
 					.get("backingservice_name").getAsString();
 			// get status phase
 			String phase = instance.getAsJsonObject("status").get("phase").getAsString();
-			
+
 			if (phase.equals(Constant.PROVISIONING)) {
 				logger.info(
 						"deleteServiceInstanceInTenant -> The instance can not be deleted when it is Provisioning!");
@@ -716,7 +718,7 @@ public class TenantResource {
 						logger.info("deleteServiceInstanceInTenant -> delete successfully");
 					}
 					String bodyStr = EntityUtils.toString(response1.getEntity());
-
+                    DacpAllResult.getAllResult(tenantId);
 					return Response.ok().entity(bodyStr).build();
 				} finally {
 					response1.close();
@@ -919,6 +921,7 @@ public class TenantResource {
 								instanceName, UserPersistenceWrapper.getUserById(userId).getUsername());
 
 						if (bindingRes.getResCodel() == 201) {
+                            watiInstanceUnBindingComplete(bindingRes,tenantId,instanceName);
 							logger.info("unassignRoleFromUserInTenant -> unbinding successfully");
 						}
 					}
@@ -926,7 +929,7 @@ public class TenantResource {
 			}
 
 			TURAssignmentPersistenceWrapper.unassignRoleFromUserInTenant(tenantId, userId);
-
+            DacpAllResult.getAllResult(tenantId);
 			return Response.ok().entity(new AdapterResponseBean("delete success", userId, 200)).build();
 
 		} catch (Exception e) {
@@ -1247,7 +1250,7 @@ public class TenantResource {
 
 	/**
 	 * Create tenants in DB and DF respectively.
-	 * 
+	 *
 	 * @param tenants
 	 */
 	private void createTenants(List<Tenant> tenants) {
@@ -1259,7 +1262,7 @@ public class TenantResource {
 
 	/**
 	 * Create specified tenant in both DataFoundary and Mysql.
-	 * 
+	 *
 	 * @param tenant
 	 */
 	private void doCreate(Tenant tenant) {
@@ -1310,7 +1313,7 @@ public class TenantResource {
 
 	/**
 	 * Fetch tenants info from citic_cloud
-	 * 
+	 *
 	 * @param appId
 	 * @return
 	 */
@@ -1345,7 +1348,7 @@ public class TenantResource {
 
 	/**
 	 * whether tenant exist in db.
-	 * 
+	 *
 	 * @param tenantId
 	 * @return
 	 */
