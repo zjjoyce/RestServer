@@ -31,6 +31,18 @@ public class UserWrapper {
             String userId = iter.getUserId();
             String ocdpRoleName = iter.getRoleName();
             String roleName = "";
+            String password = iter.getUserPassword();
+            if (password==null){
+                password = "";
+            }
+            String phone = iter.getUserPhone();
+            if(phone==null){
+                phone = "";
+            }
+            String email = iter.getUserEmail();
+            if(email==null){
+                email = "";
+            }
             if(ocdpRoleName.equals("project.admin")){
                 roleName = "TeamMgr";
             }else if(ocdpRoleName.equals("team.member")){
@@ -46,7 +58,7 @@ public class UserWrapper {
             }else{
                 List<String> role = new ArrayList<String>();
                 role.add(roleName);
-                UserInfo userInfo = new UserInfo(iter.getUserName(),iter.getUserDescription(),iter.getUserPassword(),iter.getUserPhone(),"",iter.getUserEmail(),"",role);
+                UserInfo userInfo = new UserInfo(iter.getUserName(),iter.getUserDescription(),password,phone,"",email,"",role);
                 userInfoMap.put(userId,userInfo);
             }
 

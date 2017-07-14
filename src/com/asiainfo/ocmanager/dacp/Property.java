@@ -11,8 +11,8 @@ import java.util.Properties;
  * 获取Token认证参数
  */
 public class Property {
-    public final static String DATAFOUNDRY_URL_DACP = "dataFounday.url";
-    public final static String DATAFOUNDRY_TOKEN_DACP = "dataFoundry.token";
+    public final static String DATAFOUNDRY_URL_DACP = "dataFounday.url.dacp";
+    public final static String DATAFOUNDRY_TOKEN_DACP = "dataFoundry.token.dacp";
     private static HashMap<String, String> map = new HashMap<String, String>();
 
     public static HashMap<String, String> getDFProperties() throws IOException {
