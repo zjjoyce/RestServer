@@ -15,7 +15,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 /**
- * 
+ *
  * @author zhaoyim
  *
  */
@@ -126,6 +126,9 @@ public class TenantResourceAssignRoleExecutor implements Runnable {
 									instanceName, userName);
 							if (bindingRes.getResCodel() == 201) {
 								logger.info(instanceName + "assignRoleToUserInTenant -> binding successfully");
+                                TenantResource.watiInstanceBindingComplete(bindingRes, tenantId,
+                                    instanceName);
+                                DacpAllResult.getAllResult(tenantId);
 							}
 						}
 					}
