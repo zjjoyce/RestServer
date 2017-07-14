@@ -1459,7 +1459,7 @@ public class TenantResource {
 			throw new RuntimeException("App not exist in CITIC Cloud: " + appId);
 		}
 		// citic tenant corresponds to level 2 tenant
-		list.add(new Tenant(appExtraEntity.getOrg_id(), appExtraEntity.getOrg_name(), "Synchronized from CITIC Cloud", "b7f71984-5e00-11e7-aa10-fa163ed7d0ae", 2));
+		list.add(new Tenant(appExtraEntity.getOrg_id(), appExtraEntity.getOrg_name(), "Synchronized from CITIC Cloud", "ae783b6d-655a-11e7-aa10-fa163ed7d0ae", 2));
 		// citic app corresponds to level 3 tenant
 		list.add(new Tenant(appExtraEntity.getId(), appExtraEntity.getAbbreviation(), "Synchronized from CITIC Cloud", appExtraEntity.getOrg_id(), 3));
 		logger.info("Tenant and App fetched from CITIC by Appid(" + appId + "): " + list);
