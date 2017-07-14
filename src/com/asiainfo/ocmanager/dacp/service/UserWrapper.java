@@ -49,13 +49,13 @@ public class UserWrapper {
                 roleName = "TeamDev";
             }
             //if result already has this user
-            if(userInfoMap.containsKey(userId)){
+            if(userInfoMap.containsKey(userId)&&!roleName.equals("")){
                 UserInfo userInfo = (UserInfo)userInfoMap.get(userId);
                 List<String> userInfoRole = userInfo.getRole();
                 userInfoRole.add(roleName);
                 userInfo.setRole(userInfoRole);
                 userInfoMap.put(userId,userInfo);
-            }else{
+            }else if(!roleName.equals("")){
                 List<String> role = new ArrayList<String>();
                 role.add(roleName);
                 UserInfo userInfo = new UserInfo(iter.getUserName(),iter.getUserDescription(),password,phone,"",email,"",role);
