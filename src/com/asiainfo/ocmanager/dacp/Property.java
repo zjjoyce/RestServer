@@ -11,7 +11,7 @@ import java.util.Properties;
  * 获取Token认证参数
  */
 public class Property {
-    public final static String DATAFOUNDRY_URL_DACP = "dataFounday.url.dacp";
+    public final static String DATAFOUNDRY_URL_DACP = "dataFoundry.url.dacp";
     public final static String DATAFOUNDRY_TOKEN_DACP = "dataFoundry.token.dacp";
     private static HashMap<String, String> map = new HashMap<String, String>();
 
@@ -20,7 +20,7 @@ public class Property {
             synchronized (Property.class) {
                 if (map.size() == 0) {
                     String classPath = new Property().getClass().getResource("/").getPath();
-                    String currentClassesPath = classPath.substring(0, classPath.length() - 8)+ "conf/dataFoundry.properties";
+                    String currentClassesPath = classPath.substring(0, classPath.length() - 8)+ "ocmanager/WEB-INF/conf/dataFoundry.properties";
                     System.out.println(currentClassesPath);
                     InputStream inStream = new FileInputStream(new File(currentClassesPath ));
                     Properties prop = new Properties();
