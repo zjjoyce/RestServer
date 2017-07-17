@@ -23,6 +23,11 @@ public class MonitorManager {
 	private static final Logger LOG = Logger.getLogger(MonitorManager.class);
 
 	private ScheduledExecutorService scheduler;
+	
+	public static void main(String[] args) {
+		new MonitorManager().start();
+		System.out.println(">>>> main end!");
+	}
 
 	public void start() {
 		try {
@@ -75,13 +80,15 @@ public class MonitorManager {
 		public void run() {
 			RestClient restCli = null;
 			try {
-				restCli = new RestClient();
-				LOG.info("Tenant sych-up monitor starting... Tenants in cache: " + cache.getAllTenants());
-				List<AppEntity> tenants = restCli.fetchTenants();
 				cache.pull();
+				LOG.info("Sych-up monitor starting... Cached tenants [" + cache.getAllTenants().size() + "]: " + cache.getAllTenants());
+				
+				restCli = new RestClient();
+				List<AppEntity> tenants = restCli.fetchAllTenantsApps();
 				cache.updateCache(tenants);
+				
 				cache.commit();
-				LOG.info("Tenant sych-up monitor finished, Tenants in cache: " + cache.getAllTenants());
+				LOG.info("Sych-up monitor finished. Updated tenants [" +cache.getAllTenants().size() + "]: " + cache.getAllTenants());
 			} catch (Exception e) {
 				LOG.error("Error while sych-up Tenants: ", e);
 			}

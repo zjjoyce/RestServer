@@ -3,11 +3,11 @@ package com.asiainfo.ocmanager.monitor.entity;
 import java.util.List;
 
 /**
- * 中信云Rest接口返回响应最外层响应实体
+ * Entity of response from CITIC Rest request: <code>get_tenant_and_appBase_info.do</code>
  * @author EthanWang
  *
  */
-public class RspEntity {
+public class TenantsAppsEntity {
 	private String code;
 	private String msg;
 	private List<TenantEntity> data;
