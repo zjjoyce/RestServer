@@ -65,9 +65,7 @@ public class DacpAllResult {
 //            jsonObject.addProperty("hadoopaudit",HadoopRsourceStr);
 
             String infoStr = gson.toJson(jsonObject);
-            System.out.println(infoStr);
             String reinfoStr = infoStr.replace("\\","").replace("\"[","[").replace("]\"","]");
-            System.out.println(reinfoStr);
             info.put("info",reinfoStr);
             String restResult = restClient.post(prop.getProperty("dacp.url"),info);
             DacpResult dacpResult = gson.fromJson(restResult,DacpResult.class);

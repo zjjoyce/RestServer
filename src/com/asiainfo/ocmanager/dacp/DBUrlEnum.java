@@ -1,6 +1,7 @@
 package com.asiainfo.ocmanager.dacp;
 
 import com.asiainfo.ocmanager.mail.ParamQuery;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 
@@ -8,6 +9,7 @@ import java.io.IOException;
  * Created by YANLSH on 2017/7/3.
  */
 public enum DBUrlEnum {
+
 
     /*hiveuri hiveStr hiveEndStr*/
     HIVE("dacp.java.security.krb5.realm=EXAMPLE.COM;dacp.java.security.krb5.kdc=10.247.11.9;dacp.hadoop.security.authentication=Kerberos;","hive"),
@@ -43,6 +45,8 @@ public enum DBUrlEnum {
 
 
     public static String getDBUrlEnum(String driveTypeStr,String uri,String ip,String port,String dbname){
+         Logger logger = Logger.getLogger(DBUrlEnum.class);
+
         for (DBUrlEnum c : DBUrlEnum.values()) {
             if (c.getDriveType().equals(driveTypeStr)) {
                 if("hive".equals(driveTypeStr)){
@@ -54,7 +58,7 @@ public enum DBUrlEnum {
                         dacpKerosPrincipal = ParamQuery.getCFProperties().get(ParamQuery.DACP_KERBEROS_PRINCIPAL);
                         hiveUrl = uri + ";"+ dacpSecurityKrb5Realm + dacpSecutityKrb5Kdc + dacpHadoopSecurityAuth + dacpKeytabFile + dacpKerosPrincipal;
                     } catch (IOException e) {
-                        System.out.println("DBUrlEnum IOException "+e.getMessage());
+                        logger.error("DBUrlEnum IOException"+e.getMessage());
                         hiveUrl = uri + ";"+ c.driveUrl + hiveEndStr;
                     }
                     return hiveUrl;

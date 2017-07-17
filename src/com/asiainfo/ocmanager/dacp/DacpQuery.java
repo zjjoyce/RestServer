@@ -26,12 +26,6 @@ public class DacpQuery {
             String url = Property.getDFProperties().get(Property.DATAFOUNDRY_URL_DACP);
             String token = Property.getDFProperties().get(Property.DATAFOUNDRY_TOKEN_DACP);
             String dfRestUrl = url + "/oapi/v1/namespaces/"+name+"/backingserviceinstances";
-            /*System.out.println(url);
-            System.out.println(token);
-            System.out.println(dfRestUrl);*/
-            /*HttpPost httpPost = new HttpPost(dfRestUrl);
-            httpPost.addHeader("Content-type", "application/json");
-            httpPost.addHeader("Authorization", "bearer " + token);*/
             Authentication.trustAllHttpsCertificates();
             conn = (HttpsURLConnection) new URL(dfRestUrl).openConnection();
             conn.setDefaultHostnameVerifier(Authentication.hv);
@@ -41,7 +35,6 @@ public class DacpQuery {
             reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
             String line = "";
             while ((line = reader.readLine()) != null) {
-                //System.out.println(line);
                 restresult += line;
             }
         }catch (Exception e){
