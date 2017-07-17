@@ -30,6 +30,9 @@ public class YarnUtil {
         String restresult = "";
         String yarnresturl = "http://"+yarnurl+"/ws/v1/cluster/scheduler";
 
+        Quota memoryquota = new Quota("yarnQueueQuota","","","","queue memory quota(GB)");
+        Quota vcoresquota = new Quota("queueVcoreQuota","","","","queue vcore qutoa(GB)");
+
         try {
             conn = (HttpURLConnection)new URL(yarnresturl).openConnection();
             conn.setRequestMethod("GET");
@@ -47,11 +50,24 @@ public class YarnUtil {
             }
         } catch (MalformedURLException e) {
             logger.error(e.getMessage());
+            memoryquota.setName("queueMemoryQuota");
+            memoryquota.setUsed("-1");
+            vcoresquota.setName("queueVcoreQuota");
+            vcoresquota.setUsed("-1");
+            List<Quota> result = new ArrayList<Quota>();
+            result.add(memoryquota);
+            return result;
         } catch (IOException e) {
             e.printStackTrace();
+            memoryquota.setName("queueMemoryQuota");
+            memoryquota.setUsed("-1");
+            vcoresquota.setName("queueVcoreQuota");
+            vcoresquota.setUsed("-1");
+            List<Quota> result = new ArrayList<Quota>();
+            result.add(memoryquota);
+            return result;
         }
-        Quota memoryquota = new Quota("yarnQueueQuota","","","","queue memory quota(GB)");
-        Quota vcoresquota = new Quota("queueVcoreQuota","","","","queue vcore qutoa(GB)");
+
         try {
             JSONObject json1 = new JSONObject(restresult);
             String scheduler = json1.getString("scheduler");
@@ -80,6 +96,13 @@ public class YarnUtil {
             }
         } catch (JSONException e) {
             logger.error(e.getMessage());
+            memoryquota.setName("queueMemoryQuota");
+            memoryquota.setUsed("-1");
+            vcoresquota.setName("queueVcoreQuota");
+            vcoresquota.setUsed("-1");
+            List<Quota> result = new ArrayList<Quota>();
+            result.add(memoryquota);
+            return result;
         }
         List<Quota> result = new ArrayList<Quota>();
         result.add(memoryquota);
