@@ -26,6 +26,8 @@ public class kafkaUtils {
 
         String  jaasPath= currentClassPath.substring(0, currentClassPath.length() - 8) + "conf/kafka-jaas.conf";
         String  krbPath = currentClassPath.substring(0,currentClassPath.length() - 8) + "conf/krb5.conf";
+
+        logger.info("getKafkaPartitionNumQuota jaasPath: " + jaasPath);
         System.setProperty("java.security.auth.login.config", jaasPath);
         System.setProperty("java.security.krb5.conf", krbPath);
         //System.setProperty("sun.security.krb5.debug", "true");

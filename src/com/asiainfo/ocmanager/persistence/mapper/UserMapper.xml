@@ -5,7 +5,7 @@
 <mapper namespace="com.asiainfo.ocmanager.persistence.mapper.UserMapper">
 	<!-- get all users -->
 	<select id="selectAllUsers" resultType="com.asiainfo.ocmanager.persistence.model.User">
-		select * from users
+		select * from users order by username
 	</select>
 	<!-- get user by id -->
 	<select id="selectUserById" parameterType="java.lang.String"
