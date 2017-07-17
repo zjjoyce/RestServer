@@ -14,6 +14,7 @@ import org.apache.hadoop.hbase.client.Admin;
 import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.ConnectionFactory;
 import org.apache.hadoop.security.UserGroupInformation;
+import org.apache.log4j.Logger;
 
 public class HbaseUtil {
 
@@ -22,6 +23,8 @@ public class HbaseUtil {
     private static Admin admin;
     private static int tabnum;
     private static int regnum;
+
+    private static Logger logger = Logger.getLogger(HbaseUtil.class);
 
     static {
         String currentClassPath = new HbaseUtil().getClass().getResource("/").getPath();
@@ -37,37 +40,19 @@ public class HbaseUtil {
         conf.set("hbase.security.authentication", "kerberos");
         conf.set("hbase.master.kerberos.principal", "hbase/_HOST@EXAMPLE.COM");
         conf.set("hbase.regionserver.kerberos.principal", "hbase/_HOST@EXAMPLE.COM");
-        //System.setProperty("sun.security.krb5.debug", "true");
         System.setProperty("java.security.krb5.conf",krbPath);
         UserGroupInformation.setConfiguration(conf);
 
         try {
             UserGroupInformation.loginUserFromKeytab("shixiuru@EXAMPLE.COM", keytabPath);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
     }
 
     public static List<Quota> getHbaseData(String namespace){
 
-       /* String currentClassPath = new HbaseUtil().getClass().getResource("/").getPath();
-        String  keytabPath= currentClassPath.substring(0, currentClassPath.length() - 8) + "conf/shixiuru.keytab";
-        String  krbPath = currentClassPath.substring(0,currentClassPath.length() - 8) + "conf/krb5.conf";
-        String hbaseurl = AmbariUtil.getUrl("hbase");
-
-        conf.set("hbase.zookeeper.quorum", hbaseurl);
-        conf.set("hbase.zookeeper.property.clientPort", "2181");
-        conf.set("zookeeper.znode.parent", "/hbase-secure");
-
-        conf.set("hadoop.security.authentication", "kerberos");
-        conf.set("hbase.security.authentication", "kerberos");
-        conf.set("hbase.master.kerberos.principal", "hbase/_HOST@EXAMPLE.COM");
-        conf.set("hbase.regionserver.kerberos.principal", "hbase/_HOST@EXAMPLE.COM");
-        //System.setProperty("sun.security.krb5.debug", "true");
-        System.setProperty("java.security.krb5.conf",krbPath);
-        UserGroupInformation.setConfiguration(conf);*/
         try {
-//            UserGroupInformation.loginUserFromKeytab("shixiuru@EXAMPLE.COM", keytabPath);
             hconn = ConnectionFactory.createConnection(conf);
             admin = hconn.getAdmin();
             TableName[] tables = admin.listTableNamesByNamespace(namespace);
@@ -80,7 +65,7 @@ public class HbaseUtil {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
 
         Quota tabquota = new Quota();

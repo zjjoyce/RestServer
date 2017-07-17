@@ -14,7 +14,6 @@ public class Authentication {
 
     public static HostnameVerifier hv = new HostnameVerifier() {
         public boolean verify(String urlHostName, SSLSession session) {
-            System.out.println("Warning: URL Host: " + urlHostName + " vs. " + session.getPeerHost());
             return true;
         }
     };

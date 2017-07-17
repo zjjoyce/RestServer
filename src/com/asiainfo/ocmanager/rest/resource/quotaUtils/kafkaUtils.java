@@ -3,10 +3,9 @@ package com.asiainfo.ocmanager.rest.resource.quotaUtils;
 import com.asiainfo.ocmanager.mail.ParamQuery;
 import com.asiainfo.ocmanager.persistence.model.Quota;
 import com.jcraft.jsch.*;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.PartitionInfo;
+import org.apache.log4j.Logger;
 
 
 import java.io.*;
@@ -17,7 +16,8 @@ import java.util.*;
  */
 public class kafkaUtils {
     private static final Properties props = new Properties();
-    public static Log logger = LogFactory.getLog(kafkaUtils.class);
+    private static Logger logger = Logger.getLogger(kafkaUtils.class);
+
 
     public  static Quota  getKafkaPartitionNumQuota(String topicName){
 
@@ -30,7 +30,6 @@ public class kafkaUtils {
         logger.info("getKafkaPartitionNumQuota jaasPath: " + jaasPath);
         System.setProperty("java.security.auth.login.config", jaasPath);
         System.setProperty("java.security.krb5.conf", krbPath);
-        //System.setProperty("sun.security.krb5.debug", "true");
 
         try {
             String bootstrapServers = ParamQuery.getCFProperties().get(ParamQuery.BOOTSTRAP_SERVERS);
@@ -64,7 +63,7 @@ public class kafkaUtils {
             process = Runtime.getRuntime().exec("sh /home/ai/getKafakQuota.sh  "+topicName+"-*"+"\n");
             input = new BufferedReader(new InputStreamReader(process.getInputStream()));
         } catch (Exception e) {
-            System.out.print("KafkaUtils getKafkaSpaceQuota Exception"+e.getStackTrace());
+            logger.error("KafkaUtils getKafkaSpaceQuota Exception"+e.getStackTrace());
         } finally {
             try {
                 String line = "";
@@ -72,25 +71,17 @@ public class kafkaUtils {
                     processList.add(line);
                 }
                 for (String pro : processList) {
-                    System.out.println("kafka topic partiton num"+pro);
+                    logger.info("kafka topic partiton num"+pro);
                 }
                 partitionQuota= new Quota("partitionQuota",String.valueOf(processList.get(0)),"","","kafka topic partition used size");
                 input.close();
             }catch (IOException e){
-                System.out.print("KafkaUtils getKafkaSpaceQuota IOException"+e.getStackTrace());
+                logger.info("KafkaUtils getKafkaSpaceQuota IOException"+e.getStackTrace());
             }
 
         }
 
         return partitionQuota;
-
-    }
-    public static void main(String[] args){
-        kafkaUtils kafka= new kafkaUtils();
-        //Quota quota = getKafkaSpaceQuota("__consumer_offsets");
-        Quota quota1 = getKafkaPartitionNumQuota("__consumer_offsets");
-        //System.out.println(quota.getSize());
-        System.out.println(quota1.getSize());
 
     }
 }

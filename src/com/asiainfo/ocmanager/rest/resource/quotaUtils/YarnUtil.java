@@ -9,6 +9,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import com.asiainfo.ocmanager.persistence.model.Quota;
+import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -21,6 +22,7 @@ public class YarnUtil {
     private static HttpURLConnection conn;
     private static BufferedReader reader;
 
+    private static Logger logger = Logger.getLogger(YarnUtil.class);
     public static List<Quota> getYarnData(String queuename){
 
         String yarnurl = AmbariUtil.getUrl("yarn");
@@ -44,7 +46,7 @@ public class YarnUtil {
                 restresult = fsResult;
             }
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -77,11 +79,10 @@ public class YarnUtil {
                 }
             }
         } catch (JSONException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
         List<Quota> result = new ArrayList<Quota>();
         result.add(memoryquota);
-//        result.add(vcoresquota);
         return result;
     }
 }

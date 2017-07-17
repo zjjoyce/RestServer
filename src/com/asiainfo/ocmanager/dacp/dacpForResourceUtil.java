@@ -62,7 +62,7 @@ public class dacpForResourceUtil {
                         if (credentialsJsonObj.get("username") != null) {
                             username = credentialsJsonObj.get("username").getAsString();//username
                         }else{
-                            System.out.println("query for username is null");
+                            logger.info("query for username is null");
                             continue;
                         }
                         if (credentialsJsonObj.get("password") != null) {

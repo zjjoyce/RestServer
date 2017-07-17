@@ -29,7 +29,6 @@ public class TeamWrapper {
         int teamCode = tenant.getDacpTeamCode();
         int teamType = tenant.getLevel();
         Date d = new Date();
-        System.out.println(d);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String dateNowStr = sdf.format(d);
         String teamName = tenant.getName();

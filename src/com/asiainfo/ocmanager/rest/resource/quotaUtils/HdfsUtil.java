@@ -9,20 +9,20 @@ import org.apache.hadoop.fs.ContentSummary;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.security.UserGroupInformation;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
+
 /**
  * Created by Allen on 2017/6/27.
  */
 public class HdfsUtil {
-    private static Log logger = LogFactory.getLog(HdfsUtil.class);
+
     public static final String KEYTAB_FILE_KEY = "hdfs.keytab.file";
     public static final String USER_NAME_KEY = "hdfs.kerberos.principal";
     public static final String DEFAULT_FS = "fs.defaultFS";
     public static final String AUTHENTICATION = "hadoop.security.authentication";
 
     public static final Configuration conf = new Configuration();
-
+    private static Logger logger = Logger.getLogger(HdfsUtil.class);
     static {
         String currentClassPath = new HdfsUtil().getClass().getResource("/").getPath();
         String  keytabPath= currentClassPath.substring(0, currentClassPath.length() - 8) + "conf/shixiuru.keytab";
@@ -37,27 +37,17 @@ public class HdfsUtil {
         try {
             UserGroupInformation.loginUserFromKeytab("shixiuru@EXAMPLE.COM",keytabPath);
         } catch (IOException e) {
-            logger.error("IOException :" +e);
+            logger.error(e.getMessage());
             e.printStackTrace();
         }
 
     }
 
     public static List<Quota> getHDFSData(String path){
-        /*String currentClassPath = new HdfsUtil().getClass().getResource("/").getPath();
-        String  keytabPath= currentClassPath.substring(0, currentClassPath.length() - 8) + "conf/shixiuru.keytab";
-        String  krbPath = currentClassPath.substring(0,currentClassPath.length() - 8) + "conf/krb5.conf";
-        String dfsurl = AmbariUtil.getUrl("hdfs");
 
-        conf.set(KEYTAB_FILE_KEY, keytabPath);
-        conf.set(DEFAULT_FS,dfsurl);
-        conf.set(AUTHENTICATION,"kerberos");
-        System.setProperty("java.security.krb5.conf",krbPath);
-        UserGroupInformation.setConfiguration(conf);*/
         Quota filesquota = new Quota("nameSpaceQuota","","","","hdfs file quota");
         Quota spacequota = new Quota("storageSpaceQuota","","","","hdfs space quota");
         try {
-//            UserGroupInformation.loginUserFromKeytab("shixiuru@EXAMPLE.COM",keytabPath);
             FileSystem fs = FileSystem.get(conf);
             ContentSummary contentSum = fs.getContentSummary(new Path(path));
             long Quota = contentSum.getQuota();
@@ -67,11 +57,9 @@ public class HdfsUtil {
                 filesquota.setUsed(String.valueOf(FileCount));
                 filesquota.setAvailable("");
             }else {
-//                filesquota.setName("nameSpaceQuota");
                 filesquota.setSize(String.valueOf(Quota));
                 filesquota.setUsed(String.valueOf(FileCount));
                 filesquota.setAvailable(String.valueOf(Quota-FileCount));
-//                filesquota.setDesc("hdfs quota");
             }
             long spaceQuota = contentSum.getSpaceQuota();
             long spaceConsumed = contentSum.getSpaceConsumed();
@@ -80,11 +68,9 @@ public class HdfsUtil {
                 spacequota.setUsed(String.valueOf(spaceConsumed/1024/1024/1024));
                 spacequota.setAvailable("");
             }else {
-//                spacequota.setName("storageSpaceQuota");
                 spacequota.setSize(String.valueOf(spaceQuota/1024/1024/1024));
                 spacequota.setUsed(String.valueOf(spaceConsumed/1024/1024/1024));
                 spacequota.setAvailable(String.valueOf((spaceQuota-spaceConsumed)/1024/1024/1024));
-//                spacequota.setDesc("hdfs space quota");
             }
         } catch (IOException e) {
             logger.error("IOException :" +e);

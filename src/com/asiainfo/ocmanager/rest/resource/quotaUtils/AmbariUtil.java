@@ -5,6 +5,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 
@@ -19,6 +20,8 @@ public class AmbariUtil {
     private static final String HBASE_PATH = "hbase.zookeeper.quorum";
     private static HttpURLConnection conn;
     private static BufferedReader reader;
+
+    private static Logger logger = Logger.getLogger(AmbariUtil.class);
 
     public static String getUrl(String servicename){
 
@@ -38,7 +41,6 @@ public class AmbariUtil {
                 String line = "";
                 String fsResult = "";
                 while ((line = reader.readLine()) != null) {
-                    //System.out.println(line);
                     fsResult += line;
                 }
                 JSONObject json = new JSONObject(fsResult);
@@ -50,11 +52,9 @@ public class AmbariUtil {
             }
 
         } catch (Exception e) {
-            System.out.println("catch exception");
-            System.out.println(e);
+            logger.error(e.getMessage());
         } finally {
             conn.disconnect();
-
         }
         return result;
 
