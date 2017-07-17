@@ -21,7 +21,7 @@ public class kafkaUtils {
 
     public  static Quota  getKafkaPartitionNumQuota(String topicName){
 
-        Quota partitionQuota= new Quota("partitionQuota","0","","","kafka topic partiton num");
+        Quota partitionQuota;
         String currentClassPath = new kafkaUtils().getClass().getResource("/").getPath();
 
         String  jaasPath= currentClassPath.substring(0, currentClassPath.length() - 8) + "conf/kafka-jaas.conf";
@@ -50,12 +50,14 @@ public class kafkaUtils {
             logger.info("partitionQuota is:" + partitionNumStr);
         }catch (Exception e){
             logger.info("KafkaUtils getKafkaPartitionNumQuota Exception "+e.getStackTrace());
+            Quota partitionQuota1= new Quota("partitionQuota","-1","","","kafka topic partiton num");
+            return partitionQuota1;
         }
 
         return partitionQuota;
     }
     public static Quota getKafkaSpaceQuota(String topicName){
-        Quota partitionQuota= new Quota("partitionQuota",String.valueOf("0"),"","","kafka topic partition used size");
+        Quota partitionQuota;
         Process process = null;
         List<String> processList = new ArrayList<String>();
         BufferedReader input = null;
@@ -64,6 +66,8 @@ public class kafkaUtils {
             input = new BufferedReader(new InputStreamReader(process.getInputStream()));
         } catch (Exception e) {
             logger.error("KafkaUtils getKafkaSpaceQuota Exception"+e.getStackTrace());
+            Quota partitionQuota1= new Quota("partitionQuota","-1","","","kafka topic partition used size");
+            return partitionQuota1;
         } finally {
             try {
                 String line = "";
@@ -77,6 +81,8 @@ public class kafkaUtils {
                 input.close();
             }catch (IOException e){
                 logger.info("KafkaUtils getKafkaSpaceQuota IOException"+e.getStackTrace());
+                Quota partitionQuota2= new Quota("partitionQuota","-1","","","kafka topic partition used size");
+                return partitionQuota2;
             }
 
         }

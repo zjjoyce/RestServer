@@ -146,10 +146,22 @@ public class quotaQuery {
             st.close();
         } catch (ClassNotFoundException e) {
             logger.info("quotaQuery getGpQuota ClassNotFoundException" + e.getMessage());
+            volumeSize= new Quota("volumeSize","","-1","","greenplum database used Size");
+            items.add(volumeSize);
+            result.put("items", items);
+            return result;
         } catch (SQLException e) {
             logger.info("quotaQuery getGpQuota SQLException" + e.getMessage());
+            volumeSize= new Quota("volumeSize","","-1","","greenplum database used Size");
+            items.add(volumeSize);
+            result.put("items", items);
+            return result;
         } catch (IOException e) {
             logger.info("quotaQuery getGpQuota IOException" + e.getMessage());
+            volumeSize= new Quota("volumeSize","","-1","","greenplum database used Size");
+            items.add(volumeSize);
+            result.put("items", items);
+            return result;
         }
         items.add(volumeSize);
         result.put("items", items);
@@ -178,6 +190,10 @@ public class quotaQuery {
             volumSize= new Quota("volumeSize","",used,"","mongodb database used size");
         }catch (Exception e){
             logger.info("quotaQuery getMongoQuota Exception "+e.getMessage());
+            volumSize= new Quota("volumeSize","","-1","","mongodb database used size");
+            items.add(volumSize);
+            result.put("items",items);
+            return result;
         }
         items.add(volumSize);
         result.put("items",items);

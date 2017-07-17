@@ -66,6 +66,7 @@ public class DacpAllResult {
 
             String infoStr = gson.toJson(jsonObject);
             String reinfoStr = infoStr.replace("\\","").replace("\"[","[").replace("]\"","]");
+            logger.info(reinfoStr);
             info.put("info",reinfoStr);
             String restResult = restClient.post(prop.getProperty("dacp.url"),info);
             DacpResult dacpResult = gson.fromJson(restResult,DacpResult.class);

@@ -23,7 +23,9 @@ public class HdfsUtil {
 
     public static final Configuration conf = new Configuration();
     private static Logger logger = Logger.getLogger(HdfsUtil.class);
-    static {
+    private static Quota filesquota;
+    private static Quota spacequota;
+    /*static {
         String currentClassPath = new HdfsUtil().getClass().getResource("/").getPath();
         String  keytabPath= currentClassPath.substring(0, currentClassPath.length() - 8) + "conf/shixiuru.keytab";
         String  krbPath = currentClassPath.substring(0,currentClassPath.length() - 8) + "conf/krb5.conf";
@@ -41,13 +43,25 @@ public class HdfsUtil {
             e.printStackTrace();
         }
 
-    }
+    }*/
 
     public static List<Quota> getHDFSData(String path){
 
-        Quota filesquota = new Quota("nameSpaceQuota","","","","hdfs file quota");
-        Quota spacequota = new Quota("storageSpaceQuota","","","","hdfs space quota");
+        String currentClassPath = new HdfsUtil().getClass().getResource("/").getPath();
+        String  keytabPath= currentClassPath.substring(0, currentClassPath.length() - 8) + "conf/shixiuru.keytab";
+        String  krbPath = currentClassPath.substring(0,currentClassPath.length() - 8) + "conf/krb5.conf";
+        String dfsurl = AmbariUtil.getUrl("hdfs");
+
+        conf.set(KEYTAB_FILE_KEY, keytabPath);
+        conf.set(DEFAULT_FS,dfsurl);
+        conf.set(AUTHENTICATION,"kerberos");
+        System.setProperty("java.security.krb5.conf",krbPath);
+        UserGroupInformation.setConfiguration(conf);
+
+        filesquota = new Quota("nameSpaceQuota","","","","hdfs file quota");
+        spacequota = new Quota("storageSpaceQuota","","","","hdfs space quota");
         try {
+            UserGroupInformation.loginUserFromKeytab("shixiuru@EXAMPLE.COM",keytabPath);
             FileSystem fs = FileSystem.get(conf);
             ContentSummary contentSum = fs.getContentSummary(new Path(path));
             long Quota = contentSum.getQuota();
@@ -75,6 +89,16 @@ public class HdfsUtil {
         } catch (IOException e) {
             logger.error("IOException :" +e);
             e.printStackTrace();
+            filesquota.setSize("");
+            filesquota.setUsed(String.valueOf("-1"));
+            filesquota.setAvailable("");
+            spacequota.setSize("");
+            spacequota.setUsed(String.valueOf("-1"));
+            spacequota.setAvailable("");
+            List<Quota> result = new ArrayList<Quota>();
+            result.add(filesquota);
+            result.add(spacequota);
+            return result;
         }
         List<Quota> result = new ArrayList<Quota>();
         result.add(filesquota);
