@@ -1,6 +1,5 @@
 package com.asiainfo.ocmanager.rest.resource;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
@@ -36,8 +35,6 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 
-import com.asiainfo.ocmanager.monitor.client.RestClient;
-import com.asiainfo.ocmanager.monitor.entity.AppExtraEntity;
 import com.asiainfo.ocmanager.persistence.model.ServiceInstance;
 import com.asiainfo.ocmanager.persistence.model.ServiceRolePermission;
 import com.asiainfo.ocmanager.persistence.model.Tenant;
@@ -341,16 +338,6 @@ public class TenantResource {
 	public Response createServiceInstanceInTenant(@PathParam("id") String tenantId, String reqBodyStr) {
 
 		try {
-			if (!exist(tenantId)) {
-				logger.warn("Tenant not exist: " + tenantId);
-				List<Tenant> tenants = fetchTenants(tenantId); // returned list
-																// tend to have
-																// 2 elements,
-																// corresponding
-																// to Subsidiary
-																// and Project.
-				createTenants(tenants);
-			}
 			String url = DFPropertiesFoundry.getDFProperties().get(Constant.DATAFOUNDRY_URL);
 			String token = DFPropertiesFoundry.getDFProperties().get(Constant.DATAFOUNDRY_TOKEN);
 			String dfRestUrl = url + "/oapi/v1/namespaces/" + tenantId + "/backingserviceinstances";
@@ -1216,153 +1203,6 @@ public class TenantResource {
 			}
 		} finally {
 			httpclient.close();
-		}
-	}
-
-	private void initRequest(HttpPost request, Tenant tenant) throws IOException {
-		String token = DFPropertiesFoundry.getDFProperties().get(Constant.DATAFOUNDRY_TOKEN);
-
-		request.addHeader("Content-type", "application/json");
-		request.addHeader("Authorization", "bearer " + token);
-
-		StringEntity entity = new StringEntity(getJson(tenant).toString());
-		entity.setContentType("application/json");
-		request.setEntity(entity);
-	}
-
-	private JsonObject getJson(Tenant tenant) {
-		JsonObject json = new JsonObject();
-		json.addProperty("apiVersion", "v1");
-		json.addProperty("kind", "ProjectRequest");
-		json.addProperty("displayName", tenant.getName());
-
-		if (tenant.getDescription() != null) {
-			json.addProperty("description", tenant.getDescription());
-		}
-
-		JsonObject innerJson = new JsonObject();
-		innerJson.addProperty("name", tenant.getId());
-		json.add("metadata", innerJson);
-
-		return json;
-	}
-
-	/**
-	 * Create tenants in DB and DF respectively.
-	 * 
-	 * @param tenants
-	 */
-	private void createTenants(List<Tenant> tenants) {
-		for (Tenant t : tenants) {
-			doCreate(t);
-		}
-		logger.info("Tenants been created: " + tenants);
-	}
-
-	/**
-	 * Create specified tenant in both DataFoundary and Mysql.
-	 * 
-	 * @param tenant
-	 */
-	private void doCreate(Tenant tenant) {
-		CloseableHttpClient httpclient = null;
-		CloseableHttpResponse dfResponse = null;
-		try {
-			String base_url = DFPropertiesFoundry.getDFProperties().get(Constant.DATAFOUNDRY_URL);
-
-			HttpPost request = new HttpPost(base_url + "/oapi/v1/projectrequests");
-			initRequest(request, tenant);
-
-			SSLConnectionSocketFactory sslsf = SSLSocketIgnoreCA.createSSLSocketFactory();
-			httpclient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
-
-			dfResponse = httpclient.execute(request);
-			logger.debug("Create tenant(" + tenant.getId() + ") in DataFoundary finished with response: " + dfResponse);
-
-			if (dfResponse.getStatusLine().getStatusCode() == 201) {
-				TenantPersistenceWrapper.createTenant(tenant);
-				logger.debug("Create tenant in both DataFoundary and DB successful: " + tenant.getId());
-				return;
-			}
-			else if(dfResponse.getStatusLine().getStatusCode() == 409){
-				logger.warn("Tenant already exist in DataFoundary: " + tenant.getId());
-				try {
-					TenantPersistenceWrapper.createTenant(tenant);
-					logger.debug("Create tenant in both DataFoundary and DB successful: " + tenant.getId());
-					return;
-				} catch (Exception e) {
-					// tenant might exist in Mysql already. eg: level-2 tenants created when the 1st time level-3 was created.
-					logger.warn("Creating tentant " +  tenant.getId() + " in Mysql with error(ignore and proceed): " + e.getMessage());
-					return;
-				}
-			}
-			else{
-				logger.error("Create tenant(" + tenant.getId() + ") in DataFoundary failed! " + dfResponse);
-				throw new RuntimeException("Create tenant in DataFoundary failed with status code: "
-						+ dfResponse.getStatusLine().getStatusCode());
-			}
-		} catch (Exception e) {
-			logger.error("Error while creating tenant: " + tenant.getId(), e);
-			throw new RuntimeException(e);
-		} finally {
-			close(httpclient);
-			close(dfResponse);
-		}
-	}
-
-	/**
-	 * Fetch tenants info from citic_cloud
-	 * 
-	 * @param appId
-	 * @return
-	 */
-	private List<Tenant> fetchTenants(String appId) {
-		RestClient client = null;
-		List<Tenant> list = new ArrayList<>();
-		try {
-			client = new RestClient();
-			transform(list, appId, client.fetchTenantAndAppByAppId(appId));
-			return list;
-		} catch (Exception e) {
-			logger.error("Error while fetching tenants info from CITIC RestServer by AppID: " + appId, e);
-			throw new RuntimeException("Error while fetching tenants info from CITIC RestServer: ", e);
-		} finally {
-			if (client != null) {
-				client.close();
-			}
-		}
-	}
-
-	private void transform(List<Tenant> list, String appId, AppExtraEntity appExtraEntity) {
-		if (appExtraEntity == null) {
-			logger.error("App not exist in CITIC Cloud: " + appId);
-			throw new RuntimeException("App not exist in CITIC Cloud: " + appId);
-		}
-		// citic tenant corresponds to level 2 tenant
-		list.add(new Tenant(appExtraEntity.getOrg_id(), appExtraEntity.getOrg_name(), "Synchronized from CITIC Cloud", "ae783b6d-655a-11e7-aa10-fa163ed7d0ae", 2));
-		// citic app corresponds to level 3 tenant
-		list.add(new Tenant(appExtraEntity.getId(), appExtraEntity.getAbbreviation(), "Synchronized from CITIC Cloud", appExtraEntity.getOrg_id(), 3));
-		logger.info("Tenant and App fetched from CITIC by Appid(" + appId + "): " + list);
-	}
-
-	/**
-	 * whether tenant exist in db.
-	 * 
-	 * @param tenantId
-	 * @return
-	 */
-	private boolean exist(String tenantId) {
-		Tenant t = TenantPersistenceWrapper.getTenantById(tenantId);
-		return t != null;
-	}
-
-	private void close(Closeable c) {
-		try {
-			if (c != null) {
-				c.close();
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 	}
 
