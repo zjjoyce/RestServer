@@ -8,10 +8,11 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.apache.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.*;
 
 /**
  * Created by Allen on 2017/7/5.
@@ -21,10 +22,22 @@ public class DacpAllResult {
     private static Map info;
     private static Team team;
     private static String result;
+    private static Properties prop;
 
     private static Logger logger = Logger.getLogger(DacpAllResult.class);
 
     public static String getAllResult(String tenantId){
+
+        String classPath = new Property().getClass().getResource("/").getPath();
+        String currentClassesPath = classPath.substring(0, classPath.length() - 8)+ "conf/config.properties";
+        try{
+            InputStream inStream = new FileInputStream(new File(currentClassesPath ));
+            prop = new Properties();
+            prop.load(inStream);
+        }catch(IOException e){
+            logger.error(e.getMessage());
+        }
+
 
         info = new HashMap<>();
         try{
@@ -56,7 +69,7 @@ public class DacpAllResult {
             String reinfoStr = infoStr.replace("\\","").replace("\"[","[").replace("]\"","]");
             System.out.println(reinfoStr);
             info.put("info",reinfoStr);
-            String restResult = restClient.post("http://10.247.33.80:8080/dacp/dps/tenant/all",info);
+            String restResult = restClient.post(prop.getProperty("dacp.url"),info);
             DacpResult dacpResult = gson.fromJson(restResult,DacpResult.class);
             String result = dacpResult.getResult();
             // log the result of sync process
