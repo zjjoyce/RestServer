@@ -50,7 +50,7 @@ public class YarnUtil {
             }
         } catch (MalformedURLException e) {
             logger.error(e.getMessage());
-            memoryquota.setName("queueMemoryQuota");
+            memoryquota.setName("yarnQueueQuota");
             memoryquota.setUsed("-1");
             vcoresquota.setName("queueVcoreQuota");
             vcoresquota.setUsed("-1");
@@ -59,7 +59,7 @@ public class YarnUtil {
             return result;
         } catch (IOException e) {
             e.printStackTrace();
-            memoryquota.setName("queueMemoryQuota");
+            memoryquota.setName("yarnQueueQuota");
             memoryquota.setUsed("-1");
             vcoresquota.setName("queueVcoreQuota");
             vcoresquota.setUsed("-1");
@@ -81,8 +81,8 @@ public class YarnUtil {
             for(int i = 0;i<json5.length();i++){
                 String value = json5.getString(i);
                 JSONObject json6 = new JSONObject(value);
-                String queueName = json6.getString("queueName");
-                if(queuename.equals(queueName)){
+                String tmpQueueName = json6.getString("queueName");
+                if(queuename.equals(tmpQueueName)){
                     String resourcesUsed = json6.getString("resourcesUsed");
                     JSONObject json7 = new JSONObject(resourcesUsed);
                     String memory = json7.getString("memory");
@@ -94,9 +94,13 @@ public class YarnUtil {
                     vcoresquota.setUsed(vCores);
                 }
             }
+            if(memoryquota.getUsed().equals("")){
+                memoryquota.setUsed("-1");
+
+            }
         } catch (JSONException e) {
             logger.error(e.getMessage());
-            memoryquota.setName("queueMemoryQuota");
+            memoryquota.setName("yarnQueueQuota");
             memoryquota.setUsed("-1");
             vcoresquota.setName("queueVcoreQuota");
             vcoresquota.setUsed("-1");
