@@ -526,7 +526,7 @@ public class TenantResource {
 //							}
 						}
 					}
-                    DacpAllResult.getAllResult(tenantId);
+                    
 					return Response.ok().entity(bodyStr).build();
 				} finally {
 					response2.close();

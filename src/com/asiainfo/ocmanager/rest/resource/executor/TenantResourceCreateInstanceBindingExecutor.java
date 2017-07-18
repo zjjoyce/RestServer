@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import com.asiainfo.ocmanager.dacp.DacpAllResult;
 import com.asiainfo.ocmanager.persistence.model.ServiceRolePermission;
 import com.asiainfo.ocmanager.persistence.model.UserRoleView;
 import com.asiainfo.ocmanager.rest.bean.AdapterResponseBean;
@@ -101,6 +102,8 @@ public class TenantResourceCreateInstanceBindingExecutor implements Runnable {
 					}
 				}
 			}
+			
+			DacpAllResult.getAllResult(tenantId);
 
 		} catch (Exception e) {
 			// system out the exception into the console log
