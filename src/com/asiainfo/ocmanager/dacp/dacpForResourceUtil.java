@@ -64,6 +64,7 @@ public class dacpForResourceUtil {
                                 JsonObject credentialJsonObj = bindObj.get("credentials").getAsJsonObject();
                                 assignForDBInfo(credentialJsonObj,backingservice_name);
                             }
+
                         }
                     }else{
                         boolean flag = provisioningJsonObj.get("credentials").isJsonObject();
