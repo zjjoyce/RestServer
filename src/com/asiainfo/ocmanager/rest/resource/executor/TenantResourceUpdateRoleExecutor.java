@@ -13,9 +13,10 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.asiainfo.ocmanager.dacp.DacpAllResult;
 
 /**
- * 
+ *
  * @author zhaoyim
  *
  */
@@ -134,6 +135,9 @@ public class TenantResourceUpdateRoleExecutor implements Runnable {
 										instanceName, userName);
 								if (bindingRes.getResCodel() == 201) {
 									logger.info("updateRoleToUserInTenant -> binding successfully");
+                                    TenantResource.watiInstanceBindingComplete(bindingRes, tenantId,
+                                        instanceName);
+                                    DacpAllResult.getAllResult(tenantId);
 								}
 							}
 						}
