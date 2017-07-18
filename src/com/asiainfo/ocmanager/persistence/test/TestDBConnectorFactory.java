@@ -30,8 +30,7 @@ public class TestDBConnectorFactory {
 			InputStream inputStream = Resources.getResourceAsStream(resource);
 
 			String currentClassPath = new DFPropertiesFoundry().getClass().getResource("/").getPath();
-			String propertiesFilePath = currentClassPath.substring(0, currentClassPath.length() - 4)
-					+ "conf/config.properties";
+			String propertiesFilePath = currentClassPath + "../../WebContent/WEB-INF/conf/config.properties";
 
 			InputStream propInputStream = new FileInputStream(new File(propertiesFilePath));
 			Properties prop = new Properties();
