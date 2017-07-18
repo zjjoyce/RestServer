@@ -23,7 +23,6 @@ public class HbaseUtil {
     private static Admin admin;
     private static int tabnum;
     private static int regnum;
-    private static List<Quota> result = new ArrayList<Quota>();
 
     private static Logger logger = Logger.getLogger(HbaseUtil.class);
 
@@ -52,7 +51,7 @@ public class HbaseUtil {
     }*/
 
     public static List<Quota> getHbaseData(String namespace){
-
+        List<Quota> result = new ArrayList<Quota>();
         String currentClassPath = new HbaseUtil().getClass().getResource("/").getPath();
         String  keytabPath= currentClassPath.substring(0, currentClassPath.length() - 8) + "conf/shixiuru.keytab";
         String  krbPath = currentClassPath.substring(0,currentClassPath.length() - 8) + "conf/krb5.conf";
