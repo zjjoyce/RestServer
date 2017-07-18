@@ -384,7 +384,7 @@ public class TenantResource {
 
 						JsonElement resBodyJson = new JsonParser().parse(bodyStr);
 						JsonObject resBodyJsonObj = resBodyJson.getAsJsonObject();
-//						serviceInstance.setId(resBodyJsonObj.getAsJsonObject("metadata").get("uid").getAsString());
+						serviceInstance.setId(resBodyJsonObj.getAsJsonObject("metadata").get("uid").getAsString());
 						serviceInstance
 								.setInstanceName(resBodyJsonObj.getAsJsonObject("metadata").get("name").getAsString());
 						serviceInstance.setTenantId(tenantId);
@@ -437,8 +437,6 @@ public class TenantResource {
 									.getAsJsonObject("provisioning").get("parameters").toString());
 						}
 						serviceInstance.setStatus(phase);
-						// set instance id, the id generated after Provisioning
-						serviceInstance.setId(serviceInstanceJson.getAsJsonObject().getAsJsonObject("spec").get("instance_id").getAsString());
 
 						// insert the service instance into the adapter DB
 						ServiceInstancePersistenceWrapper.createServiceInstance(serviceInstance);

@@ -3,17 +3,11 @@ package com.asiainfo.ocmanager.rest.resource.quotaUtils;
 import java.io.IOException;
 import java.sql.*;
 import java.util.*;
-
 import com.asiainfo.ocmanager.mail.ParamQuery;
 import com.asiainfo.ocmanager.persistence.model.Quota;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import org.apache.hadoop.fs.Path;
-
 import com.mongodb.MongoClient;
 import com.mongodb.client.*;
+import org.apache.log4j.Logger;
 import org.bson.Document;
 
 /**
@@ -24,7 +18,7 @@ import org.bson.Document;
 public class quotaQuery {
 
 
-    public static Log logger = LogFactory.getLog(quotaQuery.class);
+    private static Logger logger = Logger.getLogger(quotaQuery.class);
 
 
     /**
@@ -36,10 +30,6 @@ public class quotaQuery {
         Map<String,List<Quota>> result = new HashMap<String,List<Quota>>();
         List<Quota> dfsquota = HdfsUtil.getHDFSData(path);
         result.put("items", dfsquota);
-	    /*Quota hdfsQuota = new Quota("hdfsQuota","100","20","180","hive service instance db used space");
-	    List<Quota> items = new ArrayList<Quota>();
-	    items.add(hdfsQuota);
-	    result.put("items",items);*/
         return result;
     }
 
@@ -52,10 +42,6 @@ public class quotaQuery {
         Map<String,List<Quota>> result = new HashMap<String,List<Quota>>();
         List<Quota> mrquota = YarnUtil.getYarnData(queuename);
         result.put("items", mrquota);
-      /*Quota queueQuota= new Quota("queueQuota","100","10","190","mr service instance queue used memory");
-      List<Quota> items = new ArrayList<Quota>();
-      items.add(queueQuota);
-      result.put("items",items);*/
         return result;
     }
 
@@ -86,12 +72,6 @@ public class quotaQuery {
         Map<String,List<Quota>> result = new HashMap<String,List<Quota>>();
         List<Quota> hbasequota = HbaseUtil.getHbaseData(namespace);
         result.put("items", hbasequota);
-	    /*Quota regionQuota= new Quota("regionQuota","100","10","190","hbase region num quota");
-	    Quota tableQuota = new Quota("tableQuota","100","20","180","hbase table num quota");
-	    List<Quota> items = new ArrayList<Quota>();
-	    items.add(regionQuota);
-	    items.add(tableQuota);
-	    result.put("items",items);*/
         return result;
     }
 
@@ -109,8 +89,6 @@ public class quotaQuery {
          */
         String path = "/apps/hive/warehouse/"+dbname+".db";
         List<Quota> hdfsQuota = HdfsUtil.getHDFSData(path);
-//        HdfsUtils hdfsUtils = new HdfsUtils();
-//        List<Quota> hdfsQuota = hdfsUtils.getHdfsQuota(new Path("/apps/hive/warehouse/"+dbname+".db"));
         List<Quota> queueQuota = YarnUtil.getYarnData(queuename);
         //yarn quota
         Iterator<Quota> iterator = queueQuota.iterator();
@@ -156,7 +134,6 @@ public class quotaQuery {
         try {
             Class.forName("org.postgresql.Driver");
             String hostport = ParamQuery.getCFProperties().get(ParamQuery.GREENPLUM_HOST_PORT);
-            //Connection db = DriverManager.getConnection("jdbc:postgresql://10.247.32.84:5432/d778303ea916d266", "u09f42e1eaa08a8b", "pa465990aee497b4");
             Connection db1 = DriverManager.getConnection("jdbc:postgresql://"+hostport+"/" + database, "gpadmin", "asiainfoldp");
             Statement st = db1.createStatement();
             ResultSet rs = st.executeQuery("select  sum((pg_relation_size(relid)))from pg_stat_user_tables");
@@ -169,10 +146,22 @@ public class quotaQuery {
             st.close();
         } catch (ClassNotFoundException e) {
             logger.info("quotaQuery getGpQuota ClassNotFoundException" + e.getMessage());
+            volumeSize= new Quota("volumeSize","","-1","","greenplum database used Size");
+            items.add(volumeSize);
+            result.put("items", items);
+            return result;
         } catch (SQLException e) {
             logger.info("quotaQuery getGpQuota SQLException" + e.getMessage());
+            volumeSize= new Quota("volumeSize","","-1","","greenplum database used Size");
+            items.add(volumeSize);
+            result.put("items", items);
+            return result;
         } catch (IOException e) {
             logger.info("quotaQuery getGpQuota IOException" + e.getMessage());
+            volumeSize= new Quota("volumeSize","","-1","","greenplum database used Size");
+            items.add(volumeSize);
+            result.put("items", items);
+            return result;
         }
         items.add(volumeSize);
         result.put("items", items);
@@ -192,7 +181,6 @@ public class quotaQuery {
         try {
             String host = ParamQuery.getCFProperties().get(ParamQuery.MONGO_HOST);
             String port = ParamQuery.getCFProperties().get(ParamQuery.MONGO_PORT);
-            //MongoClient mongoClient = new MongoClient("10.247.32.97", 27021);
             MongoClient mongoClient = new MongoClient(host, Integer.valueOf(port));
             MongoDatabase database = mongoClient.getDatabase(databasename);
             for(Document colloctio:database.listCollections()){
@@ -202,6 +190,10 @@ public class quotaQuery {
             volumSize= new Quota("volumeSize","",used,"","mongodb database used size");
         }catch (Exception e){
             logger.info("quotaQuery getMongoQuota Exception "+e.getMessage());
+            volumSize= new Quota("volumeSize","","-1","","mongodb database used size");
+            items.add(volumSize);
+            result.put("items",items);
+            return result;
         }
         items.add(volumSize);
         result.put("items",items);

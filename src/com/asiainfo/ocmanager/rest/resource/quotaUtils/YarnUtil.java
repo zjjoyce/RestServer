@@ -9,6 +9,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import com.asiainfo.ocmanager.persistence.model.Quota;
+import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -21,12 +22,16 @@ public class YarnUtil {
     private static HttpURLConnection conn;
     private static BufferedReader reader;
 
+    private static Logger logger = Logger.getLogger(YarnUtil.class);
     public static List<Quota> getYarnData(String queuename){
 
         String yarnurl = AmbariUtil.getUrl("yarn");
 
         String restresult = "";
         String yarnresturl = "http://"+yarnurl+"/ws/v1/cluster/scheduler";
+
+        Quota memoryquota = new Quota("yarnQueueQuota","","","","queue memory quota(GB)");
+        Quota vcoresquota = new Quota("queueVcoreQuota","","","","queue vcore qutoa(GB)");
 
         try {
             conn = (HttpURLConnection)new URL(yarnresturl).openConnection();
@@ -44,12 +49,25 @@ public class YarnUtil {
                 restresult = fsResult;
             }
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
+            memoryquota.setName("yarnQueueQuota");
+            memoryquota.setUsed("-1");
+            vcoresquota.setName("queueVcoreQuota");
+            vcoresquota.setUsed("-1");
+            List<Quota> result = new ArrayList<Quota>();
+            result.add(memoryquota);
+            return result;
         } catch (IOException e) {
             e.printStackTrace();
+            memoryquota.setName("yarnQueueQuota");
+            memoryquota.setUsed("-1");
+            vcoresquota.setName("queueVcoreQuota");
+            vcoresquota.setUsed("-1");
+            List<Quota> result = new ArrayList<Quota>();
+            result.add(memoryquota);
+            return result;
         }
-        Quota memoryquota = new Quota("yarnQueueQuota","","","","queue memory quota(GB)");
-        Quota vcoresquota = new Quota("queueVcoreQuota","","","","queue vcore qutoa(GB)");
+
         try {
             JSONObject json1 = new JSONObject(restresult);
             String scheduler = json1.getString("scheduler");
@@ -63,8 +81,8 @@ public class YarnUtil {
             for(int i = 0;i<json5.length();i++){
                 String value = json5.getString(i);
                 JSONObject json6 = new JSONObject(value);
-                String queueName = json6.getString("queueName");
-                if(queuename.equals(queueName)){
+                String tmpQueueName = json6.getString("queueName");
+                if(queuename.equals(tmpQueueName)){
                     String resourcesUsed = json6.getString("resourcesUsed");
                     JSONObject json7 = new JSONObject(resourcesUsed);
                     String memory = json7.getString("memory");
@@ -76,12 +94,22 @@ public class YarnUtil {
                     vcoresquota.setUsed(vCores);
                 }
             }
+            if(memoryquota.getUsed().equals("")){
+                memoryquota.setUsed("-1");
+
+            }
         } catch (JSONException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
+            memoryquota.setName("yarnQueueQuota");
+            memoryquota.setUsed("-1");
+            vcoresquota.setName("queueVcoreQuota");
+            vcoresquota.setUsed("-1");
+            List<Quota> result = new ArrayList<Quota>();
+            result.add(memoryquota);
+            return result;
         }
         List<Quota> result = new ArrayList<Quota>();
         result.add(memoryquota);
-//        result.add(vcoresquota);
         return result;
     }
 }

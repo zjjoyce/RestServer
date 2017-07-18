@@ -19,7 +19,7 @@ public class TestUser {
 			UserMapper mapper = session.getMapper(UserMapper.class);
 
 			System.out.println("=== Insert user ===");
-			mapper.insertUser(new User("id3", "username", "password", "email", "123", "description", "aaa"));
+			mapper.insertUser(new User("id3", "username", "password", "email", "123", "description"));
 			session.commit();
 			System.out.println("=== Update user ===");
 			mapper.updateUser(new User("id3", "username4", "password4", "email4", "1234", "description4"));
