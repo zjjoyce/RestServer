@@ -5,15 +5,15 @@ package com.asiainfo.ocmanager.dacp.model;
  */
 public class Team {
     private String xmlid;
-    private int team_code;
+    private String team_code;
     private String team_name;
-    private int team_type;
+    private String team_type;
     private String start_date;
     private String state;
     private String icon_path;
     private String remark;
 
-    public Team(String xmlid,int team_code,String team_name,int team_type,String start_date,String state,String icon_path,String remark){
+    public Team(String xmlid,String team_code,String team_name,String team_type,String start_date,String state,String icon_path,String remark){
         this.xmlid = xmlid;
         this.team_name = team_name;
         this.team_code = team_code;
@@ -26,13 +26,13 @@ public class Team {
     public void setxmlid(String xmlid){this.xmlid = xmlid;}
     public String getxmlid(){return this.xmlid;}
 
-    public void setteam_code(int team_code){this.team_code = team_code;}
-    public int getteam_code(){return this.team_code;}
+    public void setteam_code(String team_code){this.team_code = team_code;}
+    public String getteam_code(){return this.team_code;}
     public void setteam_name(String team_name){this.team_name = team_name;}
     public String getteam_name(){return this.team_name;}
 
-    public void setteam_type(int team_type){this.team_type = team_type;}
-    public int getteam_type(){return this.team_type;}
+    public void setteam_type(String team_type){this.team_type = team_type;}
+    public String getteam_type(){return this.team_type;}
 
     public void setstart_date(String start_date){this.start_date = start_date;}
     public String getstart_date(){return this.start_date;}

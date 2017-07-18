@@ -5,6 +5,7 @@ import com.asiainfo.ocmanager.dacp.service.TeamWrapper;
 import com.asiainfo.ocmanager.dacp.service.UserWrapper;
 import com.asiainfo.ocmanager.rest.resource.quotaUtils.restClient;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import org.apache.log4j.Logger;
 
@@ -52,11 +53,17 @@ public class DacpAllResult {
             List<DBRegister> DBRegisters = map.get("database");
             List<DBDistribution> DBDistributions = map.get("transdatabase");
             // add data to info jsonObject
+            GsonBuilder gb =new GsonBuilder();
+            gb.disableHtmlEscaping();
+            String teamStr = gb.create().toJson(teams);
+            String userInfoStr = gb.create().toJson(userInfos);
+            String DBRegisterStr = gb.create().toJson(DBRegisters);
+            String DBDistributionStr = gb.create().toJson(DBDistributions);
             Gson gson = new Gson();
-            String teamStr = gson.toJson(teams);
+            /*String teamStr = gson.toJson(teams);
             String userInfoStr = gson.toJson(userInfos);
             String DBRegisterStr = gson.toJson(DBRegisters);
-            String DBDistributionStr = gson.toJson(DBDistributions);
+            String DBDistributionStr = gson.toJson(DBDistributions);*/
             JsonObject jsonObject = new JsonObject();
             jsonObject.addProperty("userinfo",userInfoStr);
             jsonObject.addProperty("team",teamStr);
@@ -64,7 +71,10 @@ public class DacpAllResult {
             jsonObject.addProperty("transdatabase",DBDistributionStr);
 //            jsonObject.addProperty("hadoopaudit",HadoopRsourceStr);
 
-            String infoStr = gson.toJson(jsonObject);
+
+            String infoStr = gb.create().toJson(jsonObject);
+            System.out.println(infoStr);
+
             String reinfoStr = infoStr.replace("\\","").replace("\"[","[").replace("]\"","]");
             logger.info(reinfoStr);
             info.put("info",reinfoStr);

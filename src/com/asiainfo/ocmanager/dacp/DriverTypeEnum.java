@@ -10,12 +10,12 @@ public enum DriverTypeEnum {
     GREENPLUM("com.pivotal.jdbc.GreenplumDriver","greenplum"),MONGODB("mongodb.jdbc.MongoDriver","mongodb"),
     NEO4J("org.neo4j.jdbc.Driver","neo4j"),GBASE("com.gbase.jdbc.Driver","gbase"),
     TERADATA("com.ncr.teradata.TeraDriver","teradata"),SQLSERVER("com.microsoft.sqlserver.jdbc.SQLServerDriver","sqlserver"),
-    POSTGRE("org.postgresql.Driver","postgresql"),
-    HDFS("","hdfs"),
+    POSTGRE("org.postgresql.Driver","postgresql");
+    /*HDFS("","hdfs"),
     SPARK("","spark"),
     HBASE("","hbase"),
     KAFKA("","kafka"),
-    MAPREDUCE("","mapreduce");
+    MAPREDUCE("","mapreduce");*/
 
     String driveClassname;
 

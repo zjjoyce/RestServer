@@ -22,12 +22,12 @@ public class TeamWrapper {
     public static Team getTeamFromTenant(String tenantId){
         Tenant tenant = TenantPersistenceWrapper.getTenantById(tenantId);
         if(tenant.equals(null)){
-            Team team = new  Team("",0,"",1,"","ON","/dacp-res/dps/img/team1.png","");
+            Team team = new  Team("","","","","","ON","/dacp-res/dps/img/team1.png","");
             return team;
         }
         String xmlId = tenant.getId();
-        int teamCode = tenant.getDacpTeamCode();
-        int teamType = tenant.getLevel();
+        String teamCode = String.valueOf(tenant.getDacpTeamCode());
+        String teamType = String.valueOf(tenant.getLevel());
         Date d = new Date();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String dateNowStr = sdf.format(d);
