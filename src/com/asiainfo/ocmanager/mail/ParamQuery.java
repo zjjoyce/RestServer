@@ -55,7 +55,7 @@ public class ParamQuery {
                                 map.put(DACP_HADOOP_SECURITY_AUTHENTICATION,DACP_HADOOP_SECURITY_AUTHENTICATION+"="+prop.getProperty(DACP_HADOOP_SECURITY_AUTHENTICATION));
                                 map.put(DACP_JAVA_SECURITY_KRB5_KDC,DACP_JAVA_SECURITY_KRB5_KDC+"="+prop.getProperty(DACP_JAVA_SECURITY_KRB5_KDC));
                                 map.put(DACP_JAVA_SECURITY_KRB5_REALM,DACP_JAVA_SECURITY_KRB5_REALM+"="+prop.getProperty(DACP_JAVA_SECURITY_KRB5_REALM));
-                                map.put(DACP_KERBEROS_PRINCIPAL,DACP_KERBEROS_PRINCIPAL+"+"+prop.getProperty(DACP_KERBEROS_PRINCIPAL));
+                                map.put(DACP_KERBEROS_PRINCIPAL,DACP_KERBEROS_PRINCIPAL+"="+prop.getProperty(DACP_KERBEROS_PRINCIPAL));
                                 map.put(DACP_KEYTAB_FILE,DACP_KEYTAB_FILE+"="+prop.getProperty(DACP_KEYTAB_FILE));
                                 prop.load(inputStream);
                                 inputStream.close(); // 关闭流
