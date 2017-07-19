@@ -23,6 +23,7 @@ import com.asiainfo.ocmanager.persistence.model.Tenant;
 import com.asiainfo.ocmanager.persistence.model.User;
 import com.asiainfo.ocmanager.persistence.model.UserRoleView;
 import com.asiainfo.ocmanager.rest.bean.AdapterResponseBean;
+import com.asiainfo.ocmanager.rest.bean.UserWithTURBean;
 import com.asiainfo.ocmanager.rest.constant.Constant;
 import com.asiainfo.ocmanager.rest.resource.utils.TenantPersistenceWrapper;
 import com.asiainfo.ocmanager.rest.resource.utils.UserPersistenceWrapper;
@@ -39,6 +40,63 @@ import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationExceptio
 public class UserResource {
 
 	private static Logger logger = Logger.getLogger(TenantResource.class);
+
+	/**
+	 * Get All OCManager users with tenants
+	 *
+	 * @return user list
+	 */
+	@GET
+	@Path("/with/tenants")
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
+	public Response getUsersWithTenants() {
+		try {
+			List<User> users = UserPersistenceWrapper.getUsers();
+			List<UserWithTURBean> usersWithTenants = new ArrayList<UserWithTURBean>();
+			for (User u : users) {
+				List<UserRoleView> urv = UserRoleViewPersistenceWrapper.getTenantAndRoleBasedOnUserId(u.getId());
+				UserWithTURBean userBean = new UserWithTURBean(u);
+				userBean.setUrv(urv);
+				usersWithTenants.add(userBean);
+			}
+
+			return Response.ok().entity(usersWithTenants).build();
+		} catch (Exception e) {
+			// system out the exception into the console log
+			logger.info("getUsersWithTenants -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
+		}
+	}
+
+	/**
+	 * Get the specific user with tenants by id
+	 *
+	 * @param userId
+	 *            user id
+	 * @return user
+	 */
+	@GET
+	@Path("{id}/with/tenants")
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
+	public Response getUserWithTenantsById(@PathParam("id") String userId) {
+		try {
+			User user = UserPersistenceWrapper.getUserById(userId);
+
+			if (user == null) {
+				return Response.status(Status.NOT_FOUND).entity("The user " + userId + "can not find.")
+						.build();
+			}
+			List<UserRoleView> urv = UserRoleViewPersistenceWrapper.getTenantAndRoleBasedOnUserId(userId);
+			UserWithTURBean userBean = new UserWithTURBean(user);
+			userBean.setUrv(urv);
+			return Response.ok().entity(userBean).build();
+
+		} catch (Exception e) {
+			// system out the exception into the console log
+			logger.info("getUserWithTenantsById -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
+		}
+	}
 
 	/**
 	 * Get All OCManager users
@@ -141,7 +199,8 @@ public class UserResource {
 			User updateUser = UserPersistenceWrapper.getUserById(user.getId());
 
 			if (updateUser == null) {
-				return Response.status(Status.NOT_FOUND).entity("The user " + user + "can not find.").build();
+				return Response.status(Status.NOT_FOUND).entity("The user " + user.getUsername() + "can not find.")
+						.build();
 			}
 
 			if (updateUser.getCreatedUser().equals(loginUser)) {
@@ -177,7 +236,7 @@ public class UserResource {
 			User user = UserPersistenceWrapper.getUserById(userId);
 
 			if (user == null) {
-				return Response.status(Status.NOT_FOUND).entity("The user " + user + "can not find.").build();
+				return Response.status(Status.NOT_FOUND).entity("The user " + userId + "can not find.").build();
 			}
 
 			userName = user.getUsername();
