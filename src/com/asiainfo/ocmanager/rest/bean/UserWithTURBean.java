@@ -7,7 +7,7 @@ import com.asiainfo.ocmanager.persistence.model.UserRoleView;
 
 public class UserWithTURBean extends User {
 
-	private List<UserRoleView> urv;
+	private List<UserRoleViewBean> urv;
 
 	public UserWithTURBean() {
 
@@ -19,11 +19,11 @@ public class UserWithTURBean extends User {
 
 	}
 
-	public List<UserRoleView> getUrv() {
+	public List<UserRoleViewBean> getUrv() {
 		return urv;
 	}
 
-	public void setUrv(List<UserRoleView> urv) {
+	public void setUrv(List<UserRoleViewBean> urv) {
 		this.urv = urv;
 	}
 

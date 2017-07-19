@@ -23,6 +23,7 @@ import com.asiainfo.ocmanager.persistence.model.Tenant;
 import com.asiainfo.ocmanager.persistence.model.User;
 import com.asiainfo.ocmanager.persistence.model.UserRoleView;
 import com.asiainfo.ocmanager.rest.bean.AdapterResponseBean;
+import com.asiainfo.ocmanager.rest.bean.UserRoleViewBean;
 import com.asiainfo.ocmanager.rest.bean.UserWithTURBean;
 import com.asiainfo.ocmanager.rest.constant.Constant;
 import com.asiainfo.ocmanager.rest.resource.utils.TenantPersistenceWrapper;
@@ -54,9 +55,19 @@ public class UserResource {
 			List<User> users = UserPersistenceWrapper.getUsers();
 			List<UserWithTURBean> usersWithTenants = new ArrayList<UserWithTURBean>();
 			for (User u : users) {
-				List<UserRoleView> urv = UserRoleViewPersistenceWrapper.getTenantAndRoleBasedOnUserId(u.getId());
+				
+				List<UserRoleViewBean> urvbs = new ArrayList<UserRoleViewBean>();
+				List<UserRoleView> urvs = UserRoleViewPersistenceWrapper.getTenantAndRoleBasedOnUserId(u.getId());
+				
+				for (UserRoleView urv: urvs){
+					UserRoleViewBean urvb = new UserRoleViewBean(urv);
+					String parentTenantName = UserResource.getParentTenantName(urv.getTenantId());
+					urvb.setParentTenantName(parentTenantName);
+					urvbs.add(urvb);
+				}
+				
 				UserWithTURBean userBean = new UserWithTURBean(u);
-				userBean.setUrv(urv);
+				userBean.setUrv(urvbs);
 				usersWithTenants.add(userBean);
 			}
 
@@ -86,9 +97,18 @@ public class UserResource {
 				return Response.status(Status.NOT_FOUND).entity("The user " + userId + "can not find.")
 						.build();
 			}
-			List<UserRoleView> urv = UserRoleViewPersistenceWrapper.getTenantAndRoleBasedOnUserId(userId);
+			List<UserRoleViewBean> urvbs = new ArrayList<UserRoleViewBean>();
+			List<UserRoleView> urvs = UserRoleViewPersistenceWrapper.getTenantAndRoleBasedOnUserId(userId);
+			
+			for (UserRoleView urv: urvs){
+				UserRoleViewBean urvb = new UserRoleViewBean(urv);
+				String parentTenantName = UserResource.getParentTenantName(urv.getTenantId());
+				urvb.setParentTenantName(parentTenantName);
+				urvbs.add(urvb);
+			}
+			
 			UserWithTURBean userBean = new UserWithTURBean(user);
-			userBean.setUrv(urv);
+			userBean.setUrv(urvbs);
 			return Response.ok().entity(userBean).build();
 
 		} catch (Exception e) {
@@ -98,6 +118,15 @@ public class UserResource {
 		}
 	}
 
+	private static String getParentTenantName(String tenantId) {
+		Tenant ct = TenantPersistenceWrapper.getTenantById(tenantId);
+		if (ct != null) {
+			Tenant pt = TenantPersistenceWrapper.getTenantById(ct.getParentId());
+			return pt == null ? null : pt.getName();
+		}
+		return null;
+	}
+	
 	/**
 	 * Get All OCManager users
 	 *
