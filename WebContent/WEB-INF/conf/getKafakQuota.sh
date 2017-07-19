@@ -12,7 +12,7 @@ quotaSum=0
 huanSuanG=1048576
 for i in $hosts
 do
-	quota=`ssh $i "du -sk /hdfs/data*/kafka-logs/${topic_name}*"|awk -F '\t' '{sum+=$1} END {print sum}'`
+	quota=`ssh $i "du -sk /hdfs/data*/kafka-logs/${topic_name}"|awk -F '\t' '{sum+=$1} END {print sum}'`
 	let quotaSum=quotaSum+quota
 done
 let quotaSum=$quotaSum/$huanSuanG
