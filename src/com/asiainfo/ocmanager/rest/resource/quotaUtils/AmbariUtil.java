@@ -205,7 +205,7 @@ public class AmbariUtil {
 
     public static void getProp(){
         String classPath = new AmbariUtil().getClass().getResource("/").getPath();
-        String currentClassesPath = classPath.substring(0, classPath.length() - 8)+ "ocmanager/WEB-INF/conf/config.properties";
+        String currentClassesPath = classPath.substring(0, classPath.length() - 8)+ "conf/config.properties";
         try{
             InputStream inStream = new FileInputStream(new File(currentClassesPath ));
             prop = new Properties();
