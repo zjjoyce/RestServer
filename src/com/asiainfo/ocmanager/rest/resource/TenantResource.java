@@ -862,13 +862,13 @@ public class TenantResource {
 			JsonElement allServiceInstancesJson = new JsonParser().parse(allServiceInstances);
 
 			JsonArray allServiceInstancesArray = allServiceInstancesJson.getAsJsonObject().getAsJsonArray("items");
-			for (int i = 0; i < allServiceInstancesArray.size(); i++) {
+//			for (int i = 0; i < allServiceInstancesArray.size(); i++) {
 				TenantResourceAssignRoleExecutor runnable = new TenantResourceAssignRoleExecutor(tenantId,
-						allServiceInstancesArray, assignment, i);
+						allServiceInstancesArray, assignment, 0);
 				Thread thread = new Thread(runnable);
 				thread.start();
 
-			}
+//			}
 
 			assignment = TURAssignmentPersistenceWrapper.assignRoleToUserInTenant(assignment);
 
@@ -904,12 +904,12 @@ public class TenantResource {
 			JsonElement allServiceInstancesJson = new JsonParser().parse(allServiceInstances);
 
 			JsonArray allServiceInstancesArray = allServiceInstancesJson.getAsJsonObject().getAsJsonArray("items");
-			for (int i = 0; i < allServiceInstancesArray.size(); i++) {
+//			for (int i = 0; i < allServiceInstancesArray.size(); i++) {
 				TenantResourceUpdateRoleExecutor runnable = new TenantResourceUpdateRoleExecutor(tenantId,
-						allServiceInstancesArray, assignment, i);
+						allServiceInstancesArray, assignment, 0);
 				Thread thread = new Thread(runnable);
 				thread.start();
-			}
+//			}
 
 			assignment = TURAssignmentPersistenceWrapper.updateRoleToUserInTenant(assignment);
 
