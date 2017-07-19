@@ -50,7 +50,6 @@ public class dacpForResourceUtil {
                 if (!"Failure".equals(phase)) {
                     JsonObject provisioningJsonObj = specJsonObj.get("provisioning").getAsJsonObject();
                     String backingservice_name = provisioningJsonObj.get("backingservice_name").getAsString();//dbname
-                    String cnname = provisioningJsonObj.get("backingservice_name").getAsString();//cnname
                     String driveTypeStr = provisioningJsonObj.get("backingservice_name").getAsString().toLowerCase();
                     String driverclassname = DriverTypeEnum.getDriverTypeEnum(driveTypeStr);
 
@@ -73,7 +72,7 @@ public class dacpForResourceUtil {
                             assignForDBInfo(credentialsJsonObj,backingservice_name);
                         }
                     }
-                    DBEntityAssign(tenantId,instance_id,backingservice_name,cnname,driverclassname);
+                    DBEntityAssign(tenantId,instance_id,backingservice_name,driverclassname);
                 }
             }
             mapInfo.put("database", dbRegisterList);
@@ -87,7 +86,7 @@ public class dacpForResourceUtil {
         return mapInfo;
     }
 
-    private static void DBEntityAssign(String tenantId, String instance_id, String backingservice_name, String cnname, String driverclassname) {
+    private static void DBEntityAssign(String tenantId, String instance_id, String backingservice_name, String driverclassname) {
         /*数据库分配*/
         String state = "on";
         String remark = "";//remark
@@ -96,8 +95,8 @@ public class dacpForResourceUtil {
 
         DBRegister dbRegister = new DBRegister();
         dbRegister.setXmlid(instance_id);
-        dbRegister.setDbname(backingservice_name);
-        dbRegister.setCnname(cnname);
+        dbRegister.setDbname(databasename);
+        dbRegister.setCnname(databasename);
         dbRegister.setDriverclassname(driverclassname);
         dbRegister.setUrl(url);
         dbRegister.setUsername(username);
@@ -106,8 +105,8 @@ public class dacpForResourceUtil {
         dbRegister.setAlias(backingservice_name.toLowerCase());
 
         DBDistribution dbDistribution = new DBDistribution();
-        dbDistribution.setDbname(backingservice_name);
-        dbDistribution.setCnname(cnname);
+        dbDistribution.setDbname(databasename);
+        dbDistribution.setCnname(databasename);
         dbDistribution.setDriverclassname(driverclassname);
         dbDistribution.setUrl(url);
         dbDistribution.setUsername(username);

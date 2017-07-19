@@ -73,7 +73,7 @@ public class DacpAllResult {
 
 
             String infoStr = gb.create().toJson(jsonObject);
-            System.out.println(infoStr);
+            //System.out.println(infoStr);
 
             String reinfoStr = infoStr.replace("\\","").replace("\"[","[").replace("]\"","]");
             logger.info(reinfoStr);
