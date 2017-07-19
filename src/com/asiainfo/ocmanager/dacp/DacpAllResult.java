@@ -28,6 +28,7 @@ public class DacpAllResult {
     private static Logger logger = Logger.getLogger(DacpAllResult.class);
 
     public static String getAllResult(String tenantId){
+        logger.info("begin to call dacp interface");
 
         String classPath = new Property().getClass().getResource("/").getPath();
         String currentClassesPath = classPath.substring(0, classPath.length() - 8)+ "conf/config.properties";
@@ -73,11 +74,12 @@ public class DacpAllResult {
 
 
             String infoStr = gb.create().toJson(jsonObject);
-            System.out.println(infoStr);
+            //System.out.println(infoStr);
 
             String reinfoStr = infoStr.replace("\\","").replace("\"[","[").replace("]\"","]");
             logger.info(reinfoStr);
             info.put("info",reinfoStr);
+            logger.info("dacp url :"+prop.getProperty("dacp.url"));
             String restResult = restClient.post(prop.getProperty("dacp.url"),info);
             DacpResult dacpResult = gson.fromJson(restResult,DacpResult.class);
             String result = dacpResult.getResult();
@@ -91,7 +93,8 @@ public class DacpAllResult {
         }catch (Exception e){
             logger.info(e.getMessage());
         }
-
+        logger.info("end to call dacp interface");
         return result;
+
     }
 }
