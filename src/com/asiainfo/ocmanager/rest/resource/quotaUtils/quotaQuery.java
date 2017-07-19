@@ -182,6 +182,21 @@ public class quotaQuery {
             String host = ParamQuery.getCFProperties().get(ParamQuery.MONGO_HOST);
             String port = ParamQuery.getCFProperties().get(ParamQuery.MONGO_PORT);
             MongoClient mongoClient = new MongoClient(host, Integer.valueOf(port));
+
+            MongoIterable<String> mongoIterables= mongoClient.listDatabaseNames();
+            if(mongoIterables!=null && mongoIterables.first()!=null){
+                boolean flag = true;
+
+                for(String dbname:mongoIterables){
+                    if(dbname.equals(databasename)){
+                        flag = false;
+                    }
+                }
+                if(flag){
+                    throw new Exception("this databaseName does not exist!");
+                }
+            }
+
             MongoDatabase database = mongoClient.getDatabase(databasename);
             for(Document colloctio:database.listCollections()){
                 useplace+=colloctio.toJson().getBytes().length;
@@ -192,7 +207,7 @@ public class quotaQuery {
             logger.info("quotaQuery getMongoQuota Exception "+e.getMessage());
             volumSize= new Quota("volumeSize","","-1","","mongodb database used size");
             items.add(volumSize);
-            result.put("items",items);
+            result.put("items", items);
             return result;
         }
         items.add(volumSize);
