@@ -33,5 +33,7 @@ public class Constant {
 	/*****************************************************************/
 	// ocdp service name list
 	public static final List<String> list = Arrays.asList("hdfs", "hbase", "hive", "mapreduce", "spark", "kafka");
-
+	public static final List<String> canCreateUserList = Arrays.asList("system.admin", "subsidiary.admin", "project.admin");
+	
+	
 }

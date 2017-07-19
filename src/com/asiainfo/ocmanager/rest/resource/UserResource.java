@@ -23,6 +23,7 @@ import com.asiainfo.ocmanager.persistence.model.Tenant;
 import com.asiainfo.ocmanager.persistence.model.User;
 import com.asiainfo.ocmanager.persistence.model.UserRoleView;
 import com.asiainfo.ocmanager.rest.bean.AdapterResponseBean;
+import com.asiainfo.ocmanager.rest.constant.Constant;
 import com.asiainfo.ocmanager.rest.resource.utils.TenantPersistenceWrapper;
 import com.asiainfo.ocmanager.rest.resource.utils.UserPersistenceWrapper;
 import com.asiainfo.ocmanager.rest.resource.utils.UserRoleViewPersistenceWrapper;
@@ -91,9 +92,32 @@ public class UserResource {
 	public Response createUser(User user, @Context HttpServletRequest request) {
 		try {
 			String createdUser = request.getHeader("username");
-			user.setCreatedUser(createdUser);
-			user = UserPersistenceWrapper.createUser(user);
-			return Response.ok().entity(user).build();
+			if (createdUser == null) {
+				return Response.status(Status.NOT_FOUND)
+						.entity("Can not get the login user, please make sure the login user is pass to adapter.")
+						.build();
+			}
+
+			List<UserRoleView> urvs = UserRoleViewPersistenceWrapper.getTenantAndRoleBasedOnUserName(createdUser);
+			boolean canCreateUser = false;
+			for (UserRoleView urv : urvs) {
+				if (Constant.canCreateUserList.contains(urv.getRoleName())) {
+					canCreateUser = true;
+					break;
+				}
+			}
+
+			if (canCreateUser) {
+				user.setCreatedUser(createdUser);
+				user = UserPersistenceWrapper.createUser(user);
+				return Response.ok().entity(user).build();
+			} else {
+				return Response.status(Status.BAD_REQUEST)
+						.entity(new AdapterResponseBean("create failed",
+								"The user " + createdUser + " can not add user, because it is team member role.", 4003))
+						.build();
+			}
+
 		} catch (Exception e) {
 			// system out the exception into the console log
 			logger.info("createUser -> " + e.getMessage());
@@ -111,10 +135,25 @@ public class UserResource {
 	@PUT
 	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response updateUser(User user) {
+	public Response updateUser(User user, @Context HttpServletRequest request) {
 		try {
-			user = UserPersistenceWrapper.updateUser(user);
-			return Response.ok().entity(user).build();
+			String loginUser = request.getHeader("username");
+			User updateUser = UserPersistenceWrapper.getUserById(user.getId());
+
+			if (updateUser == null) {
+				return Response.status(Status.NOT_FOUND).entity("The user " + user + "can not find.").build();
+			}
+
+			if (updateUser.getCreatedUser().equals(loginUser)) {
+				user = UserPersistenceWrapper.updateUser(user);
+				return Response.ok().entity(user).build();
+			} else {
+				return Response.status(Status.BAD_REQUEST).entity(new AdapterResponseBean("update failed",
+						"Can not update the user: " + updateUser.getUsername() + ", it is created by user: "
+								+ updateUser.getCreatedUser() + ". please use the created user to update.",
+						4004)).build();
+			}
+
 		} catch (Exception e) {
 			// system out the exception into the console log
 			logger.info("updateUser -> " + e.getMessage());
@@ -134,7 +173,7 @@ public class UserResource {
 	public Response deleteUser(@PathParam("id") String userId, @Context HttpServletRequest request) {
 		String userName = null;
 		try {
-			String createdUser = request.getHeader("username");
+			String loginUser = request.getHeader("username");
 			User user = UserPersistenceWrapper.getUserById(userId);
 
 			if (user == null) {
@@ -143,7 +182,7 @@ public class UserResource {
 
 			userName = user.getUsername();
 
-			if (user.getCreatedUser().equals(createdUser)) {
+			if (user.getCreatedUser().equals(loginUser)) {
 				UserPersistenceWrapper.deleteUser(userId);
 			} else {
 				return Response.status(Status.BAD_REQUEST)
@@ -278,7 +317,8 @@ public class UserResource {
 	@GET
 	@Path("id/{id}/tenant/{tenantId}/children/tenants")
 	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
-	public Response getChildrenTenantsByUserIdTenantId(@PathParam("id") String userId, @PathParam("tenantId") String tenantId) {
+	public Response getChildrenTenantsByUserIdTenantId(@PathParam("id") String userId,
+			@PathParam("tenantId") String tenantId) {
 		try {
 			List<UserRoleView> turs = UserRoleViewPersistenceWrapper.getTenantAndRoleBasedOnUserId(userId);
 
