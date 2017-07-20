@@ -3,7 +3,6 @@ package com.asiainfo.ocmanager.rest.bean;
 import java.util.List;
 
 import com.asiainfo.ocmanager.persistence.model.User;
-import com.asiainfo.ocmanager.persistence.model.UserRoleView;
 
 public class UserWithTURBean extends User {
 
