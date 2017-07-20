@@ -92,7 +92,7 @@ public class DacpAllResult {
 
         }catch (Exception e){
             e.printStackTrace();
-            logger.info("getAllResult exception");
+            logger.info("getAllResult exception"+e.getMessage());
         }
         logger.info("end to call dacp interface");
         return result;
