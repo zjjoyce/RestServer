@@ -62,7 +62,7 @@ public class dacpForResourceUtil {
                     boolean hadoopflag = isHadoopflag(backingservice_name.toLowerCase());
                     if(hadoopflag){
                         if(!backingservice_name.toLowerCase().equals("hive")) continue;
-                        if(specJsonObj.get("binding").isJsonArray()){
+                        if(specJsonObj.get("binding").isJsonArray() && !"Unbound".equals(phase)){
                             JsonArray bindingJsonArray = specJsonObj.get("binding").getAsJsonArray();
                             JsonObject bindObj = bindingJsonArray.get(0).getAsJsonObject();
                             if(bindObj != null){
