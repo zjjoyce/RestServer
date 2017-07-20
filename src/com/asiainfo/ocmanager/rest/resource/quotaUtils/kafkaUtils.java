@@ -3,6 +3,7 @@ package com.asiainfo.ocmanager.rest.resource.quotaUtils;
 import com.asiainfo.ocmanager.mail.ParamQuery;
 import com.asiainfo.ocmanager.persistence.model.Quota;
 import com.jcraft.jsch.*;
+import org.apache.commons.math3.exception.NumberIsTooLargeException;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.PartitionInfo;
 import org.apache.log4j.Logger;
@@ -77,10 +78,11 @@ public class kafkaUtils {
                 for (String pro : processList) {
                     logger.info("kafka topic partiton num"+pro);
                 }
+                if(Integer.valueOf(processList.get(0))>Integer.MAX_VALUE){throw new IOException("num is too large!!");}
                 partitionQuota= new Quota("partitionQuota",String.valueOf(processList.get(0)),"","","kafka topic partition used size");
                 input.close();
             }catch (IOException e){
-                logger.info("KafkaUtils getKafkaSpaceQuota IOException"+e.getStackTrace());
+                logger.info("KafkaUtils getKafkaSpaceQuota IOException"+e.getMessage());
                 Quota partitionQuota2= new Quota("partitionQuota","-1","","","kafka topic partition used size");
                 return partitionQuota2;
             }
