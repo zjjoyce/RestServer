@@ -40,6 +40,7 @@ public class dacpForResourceUtil {
         team_code = team.getteam_code();
         try {
             String resourceJson = DacpQuery.GetData(tenantId);
+            logger.info("call DF tenant instance resource: \r\n"+resourceJson);
             JsonParser parser = new JsonParser();
             JsonObject object = (JsonObject) parser.parse(resourceJson);
             JsonArray array = object.get("items").getAsJsonArray();
