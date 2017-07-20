@@ -60,18 +60,20 @@ public class dacpForResourceUtil {
                     String driverclassname = DriverTypeEnum.getDriverTypeEnum(driveTypeStr);
 
                     boolean hadoopflag = isHadoopflag(backingservice_name.toLowerCase());
-                    if(hadoopflag && (!"Unbound".equals(phase))){
-                        if(!backingservice_name.toLowerCase().equals("hive")) continue;
-                        if(specJsonObj.get("binding").isJsonArray()){
-                            JsonArray bindingJsonArray = specJsonObj.get("binding").getAsJsonArray();
-                            JsonObject bindObj = bindingJsonArray.get(0).getAsJsonObject();
-                            if(bindObj != null){
-                                JsonObject credentialJsonObj = bindObj.get("credentials").getAsJsonObject();
-                                assignForDBInfo(credentialJsonObj,backingservice_name);
-                            }
+                    if(hadoopflag){
+                        if(!"Unbound".equals(phase)){
+                            if(!backingservice_name.toLowerCase().equals("hive")) continue;
+                            if(specJsonObj.get("binding").isJsonArray()){
+                                JsonArray bindingJsonArray = specJsonObj.get("binding").getAsJsonArray();
+                                JsonObject bindObj = bindingJsonArray.get(0).getAsJsonObject();
+                                if(bindObj != null){
+                                    JsonObject credentialJsonObj = bindObj.get("credentials").getAsJsonObject();
+                                    assignForDBInfo(credentialJsonObj,backingservice_name);
+                                }
 
+                            }
+                            DBEntityAssign(instance_id,backingservice_name,driverclassname);
                         }
-                        DBEntityAssign(instance_id,backingservice_name,driverclassname);
                     }else{
                         boolean flag = provisioningJsonObj.get("credentials").isJsonObject();
                         if (flag) {
