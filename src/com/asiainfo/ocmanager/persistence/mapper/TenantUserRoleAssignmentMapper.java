@@ -1,5 +1,7 @@
 package com.asiainfo.ocmanager.persistence.mapper;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Param;
 
 import com.asiainfo.ocmanager.persistence.model.TenantUserRoleAssignment;
@@ -34,4 +36,12 @@ public interface TenantUserRoleAssignmentMapper {
 	 * @param userId
 	 */
 	public void deleteTenantUserRoleAssignment(@Param("tenantId") String tenantId, @Param("userId") String userId);
+
+	/**
+	 * 
+	 * @param tenantId
+	 * @return
+	 */
+	public List<TenantUserRoleAssignment> selectAssignmentByTenant(@Param("tenantId") String tenantId);
+
 }

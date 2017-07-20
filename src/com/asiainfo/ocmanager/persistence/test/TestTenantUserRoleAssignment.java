@@ -1,5 +1,7 @@
 package com.asiainfo.ocmanager.persistence.test;
 
+import java.util.List;
+
 import org.apache.ibatis.session.SqlSession;
 
 import com.asiainfo.ocmanager.persistence.mapper.TenantUserRoleAssignmentMapper;
@@ -22,6 +24,14 @@ public class TestTenantUserRoleAssignment {
 			System.out.println(tura.getUserId());
 			System.out.println(tura.getRoleId());
 			System.out.println("====");
+			
+			List<TenantUserRoleAssignment> turas = mapper.selectAssignmentByTenant("ttt");
+			for(TenantUserRoleAssignment tura1: turas){
+				System.out.println(tura1.getTenantId());
+				System.out.println(tura1.getUserId());
+				System.out.println(tura1.getRoleId());
+				System.out.println("====");
+			}
 
 			mapper.deleteTenantUserRoleAssignment("t2", "u1");
 			session.commit();
