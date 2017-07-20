@@ -60,9 +60,9 @@ public class dacpForResourceUtil {
                     String driverclassname = DriverTypeEnum.getDriverTypeEnum(driveTypeStr);
 
                     boolean hadoopflag = isHadoopflag(backingservice_name.toLowerCase());
-                    if(hadoopflag){
+                    if(hadoopflag && (!"Unbound".equals(phase))){
                         if(!backingservice_name.toLowerCase().equals("hive")) continue;
-                        if(specJsonObj.get("binding").isJsonArray() && !"Unbound".equals(phase)){
+                        if(specJsonObj.get("binding").isJsonArray()){
                             JsonArray bindingJsonArray = specJsonObj.get("binding").getAsJsonArray();
                             JsonObject bindObj = bindingJsonArray.get(0).getAsJsonObject();
                             if(bindObj != null){
