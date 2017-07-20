@@ -35,6 +35,7 @@ public class AmbariUtil {
         String version = getTag();
 //        String url = "http://"+(prop.getProperty("ambari.host"))+"/api/v1/clusters/"+clustername+"/configurations?type="+servicename+"-site&tag="+version;
         String url = "http://"+(prop.getProperty("ambari.host"))+"/api/v1/clusters/"+clustername+"/configurations?type="+servicename+"-site&tag=version1";
+        logger.info("url is :"+url);
         try {
             conn = (HttpURLConnection)new URL(url).openConnection();
             String user = "admin";
@@ -43,6 +44,7 @@ public class AmbariUtil {
             String encoded = base64.encodeToString((user + ":" + passwd).getBytes("UTF-8"));
             conn.setRequestProperty("Authorization", "Basic " + encoded);
             int resultCode = conn.getResponseCode();
+            logger.info("response code is :" + resultCode);
             if (resultCode == 200) {
                 reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                 String line = "";
@@ -55,6 +57,7 @@ public class AmbariUtil {
                 String itemStr = items.toString().replace("[","").replace("]","");
                 JSONObject newItem = new JSONObject(itemStr);
                 JSONObject properties = newItem.getJSONObject("properties");
+                logger.info("servicename is :" +servicename);
                 result = properties.getString(getparametername(servicename));
             }
 

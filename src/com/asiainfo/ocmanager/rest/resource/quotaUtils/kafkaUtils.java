@@ -66,7 +66,7 @@ public class kafkaUtils {
             process = Runtime.getRuntime().exec("sh /home/ai/getKafakQuota.sh  "+topicName+"-*"+"\n");
             input = new BufferedReader(new InputStreamReader(process.getInputStream()));
         } catch (Exception e) {
-            logger.error("KafkaUtils getKafkaSpaceQuota Exception"+e.getStackTrace());
+            logger.error("KafkaUtils getKafkaSpaceQuota Exception"+e.getMessage());
             Quota partitionQuota1= new Quota("partitionQuota","-1","","","kafka topic partition used size");
             return partitionQuota1;
         } finally {
