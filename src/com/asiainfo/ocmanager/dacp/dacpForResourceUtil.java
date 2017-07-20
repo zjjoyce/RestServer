@@ -95,6 +95,8 @@ public class dacpForResourceUtil {
         return mapInfo;
     }
 
+
+    /*初始化数据注册与分配实例，并分别加入队列*/
     private static void DBEntityAssign(String instance_id, String backingservice_name, String driverclassname) {
         /*数据库分配*/
         String state = "on";
@@ -126,6 +128,7 @@ public class dacpForResourceUtil {
         dbDistributionList.add(dbDistribution);
     }
 
+    /*数据注册与分配实例，并分别加入队列*/
     private static void assignForDBInfo(JsonObject credentialsJsonObj,String backingservice_name) {
         if (credentialsJsonObj.get("username") != null) {
             username = credentialsJsonObj.get("username").getAsString();//username
