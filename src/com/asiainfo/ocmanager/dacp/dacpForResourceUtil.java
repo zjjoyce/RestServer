@@ -88,10 +88,9 @@ public class dacpForResourceUtil {
             mapInfo.put("database", dbRegisterList);
             mapInfo.put("transdatabase", dbDistributionList);
 
-        } catch (JsonIOException e) {
-            logger.info("DacpforResourceUtil JsonIOException " + e.getMessage());
-        } catch (JsonSyntaxException e) {
-            logger.info("DacpforResourceUtil JsonSyntaxException " + e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.info("DacpforResourceUtil Exception " + e.getMessage());
         }
         return mapInfo;
     }
