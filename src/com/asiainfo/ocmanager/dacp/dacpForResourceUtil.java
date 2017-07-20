@@ -27,8 +27,8 @@ public class dacpForResourceUtil {
     public static Log logger = LogFactory.getLog(dacpForResourceUtil.class);
 
     private static Map<String, List> mapInfo;
-    private static List dbRegisterList = new ArrayList<>();
-    private static List dbDistributionList = new ArrayList<>();
+    private static List dbRegisterList;
+    private static List dbDistributionList;
     private static String databasename = "";
     private static String username = "";
     private static String password = "";
@@ -45,6 +45,8 @@ public class dacpForResourceUtil {
             JsonObject object = (JsonObject) parser.parse(resourceJson);
             JsonArray array = object.get("items").getAsJsonArray();
             mapInfo = new HashMap<>();
+            dbRegisterList = new ArrayList<>();
+            dbDistributionList = new ArrayList<>();
             for (int i = 0; i < array.size(); i++) {
                 JsonObject subObject = array.get(i).getAsJsonObject();
                 JsonObject specJsonObj = subObject.get("spec").getAsJsonObject();
