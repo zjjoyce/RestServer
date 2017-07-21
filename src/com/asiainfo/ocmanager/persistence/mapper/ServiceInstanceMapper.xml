@@ -5,7 +5,7 @@
 <mapper namespace="com.asiainfo.ocmanager.persistence.mapper.ServiceInstanceMapper">
     <!-- get all service instances in tenant -->
     <select id="selectServiceInstancesByTenant" resultType="com.asiainfo.ocmanager.persistence.model.ServiceInstance">
-        select * from service_instances where tenantId = #{tenantId}
+        select * from service_instances where tenantId = #{tenantId} order by instanceName
     </select>
     <!-- create service instance -->
     <insert id="insertServiceInstance" keyProperty="id"
@@ -19,7 +19,7 @@
 	</delete>
     <!-- get all service instances -->
     <select id="selectAllServiceInstances" resultType="com.asiainfo.ocmanager.persistence.model.ServiceInstance">
-        select * from service_instances
+        select * from service_instances order by instanceName
     </select>
 	<!-- update instance quota -->
 	<update id="updateInstanceQuota" parameterType="java.lang.String">
