@@ -553,7 +553,8 @@ public class UserResource {
 								bindingedUserNames.add(bindingUserName);
 							}
 							if (bindingedUserNames.contains(userName)) {
-								AssignmentInfoBean AIB = new AssignmentInfoBean(instace.getInstanceName(), "Authorization Success");
+								AssignmentInfoBean AIB = new AssignmentInfoBean(instace.getInstanceName(),
+										"Authorization Success");
 								assignmentInfoBeans.add(AIB);
 							} else {
 								if (action == null && patch == null) {
@@ -561,6 +562,37 @@ public class UserResource {
 											"Failure OR Not Begin");
 									assignmentInfoBeans.add(AIB);
 								} else {
+									if (patch != null) {
+										if (patch.getAsString().equals(Constant.FAILURE)) {
+											AssignmentInfoBean AIB = new AssignmentInfoBean(instace.getInstanceName(),
+													"Failure OR Not Begin");
+											assignmentInfoBeans.add(AIB);
+										} else {
+											AssignmentInfoBean AIB = new AssignmentInfoBean(instace.getInstanceName(),
+													"Authorization Running");
+											assignmentInfoBeans.add(AIB);
+										}
+									} else {
+										if (action.getAsString().equals(Constant._TOBIND)
+												|| action.getAsString().equals(Constant._TOUNBIND)) {
+											AssignmentInfoBean AIB = new AssignmentInfoBean(instace.getInstanceName(),
+													"Authorization Running");
+											assignmentInfoBeans.add(AIB);
+										} else {
+											AssignmentInfoBean AIB = new AssignmentInfoBean(instace.getInstanceName(),
+													"Failure OR Not Begin");
+											assignmentInfoBeans.add(AIB);
+										}
+									}
+								}
+							}
+						} else {
+							if (action == null && patch == null) {
+								AssignmentInfoBean AIB = new AssignmentInfoBean(instace.getInstanceName(),
+										"Failure OR Not Begin");
+								assignmentInfoBeans.add(AIB);
+							} else {
+								if (patch != null) {
 									if (patch.getAsString().equals(Constant.FAILURE)) {
 										AssignmentInfoBean AIB = new AssignmentInfoBean(instace.getInstanceName(),
 												"Failure OR Not Begin");
@@ -568,6 +600,17 @@ public class UserResource {
 									} else {
 										AssignmentInfoBean AIB = new AssignmentInfoBean(instace.getInstanceName(),
 												"Authorization Running");
+										assignmentInfoBeans.add(AIB);
+									}
+								} else {
+									if (action.getAsString().equals(Constant._TOBIND)
+											|| action.getAsString().equals(Constant._TOUNBIND)) {
+										AssignmentInfoBean AIB = new AssignmentInfoBean(instace.getInstanceName(),
+												"Authorization Running");
+										assignmentInfoBeans.add(AIB);
+									} else {
+										AssignmentInfoBean AIB = new AssignmentInfoBean(instace.getInstanceName(),
+												"Failure OR Not Begin");
 										assignmentInfoBeans.add(AIB);
 									}
 								}
