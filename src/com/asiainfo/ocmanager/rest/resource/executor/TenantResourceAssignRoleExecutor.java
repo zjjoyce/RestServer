@@ -135,7 +135,9 @@ public class TenantResourceAssignRoleExecutor implements Runnable {
 					}
 				}
 			}
+            logger.info("assign role call dacp before...");
 			DacpAllResult.getAllResult(tenantId);
+            logger.info("assign role call dacp after...");
 		} catch (Exception e) {
 			// system out the exception into the console log
 			logger.info("assignRoleToUserInTenant -> " + e.getMessage());

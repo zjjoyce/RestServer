@@ -652,7 +652,9 @@ public class TenantResource {
 						logger.info("deleteServiceInstanceInTenant -> delete successfully");
 					}
 					String bodyStr = EntityUtils.toString(response1.getEntity());
+                    logger.info("delete instance call dacp before... ");
 					DacpAllResult.getAllResult(tenantId);
+                    logger.info("delete instance call dacp after... ");
 					return Response.ok().entity(bodyStr).build();
 				} finally {
 					response1.close();

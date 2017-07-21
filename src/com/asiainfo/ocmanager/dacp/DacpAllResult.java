@@ -20,9 +20,9 @@ import java.util.*;
  */
 public class DacpAllResult {
 
-    private static Map info;
-    private static Team team;
-    private static String result;
+//    private static Map info;
+//    private static Team team;
+//    private static String result;
     private static Properties prop;
 
     private static Logger logger = Logger.getLogger(DacpAllResult.class);
@@ -41,10 +41,11 @@ public class DacpAllResult {
         }
 
 
-        info = new HashMap<>();
+        Map info = new HashMap<>();
+        String result = null;
         try{
             //get team
-            team = TeamWrapper.getTeamFromTenant(tenantId);
+            Team team = TeamWrapper.getTeamFromTenant(tenantId);
             List<Team> teams = new ArrayList<>() ;
             teams.add(team);
             //get userinfo
@@ -82,7 +83,7 @@ public class DacpAllResult {
             logger.info("dacp url :"+prop.getProperty("dacp.url"));
             String restResult = restClient.post(prop.getProperty("dacp.url"),info);
             DacpResult dacpResult = gson.fromJson(restResult,DacpResult.class);
-            String result = dacpResult.getResult();
+            result = dacpResult.getResult();
             // log the result of sync process
             if(result.equals("true")){
                 logger.info("dacp is ok");
@@ -91,7 +92,8 @@ public class DacpAllResult {
             }
 
         }catch (Exception e){
-            logger.info(e.getMessage());
+            e.printStackTrace();
+            logger.info("getAllResult exception"+e.getMessage());
         }
         logger.info("end to call dacp interface");
         return result;

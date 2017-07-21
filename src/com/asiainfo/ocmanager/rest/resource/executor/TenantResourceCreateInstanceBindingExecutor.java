@@ -101,9 +101,9 @@ public class TenantResourceCreateInstanceBindingExecutor implements Runnable {
 					}
 				}
 			}
-			
+			logger.info("create instance call dacp before... ");
 			DacpAllResult.getAllResult(tenantId);
-
+            logger.info("create instance call dacp after... ");
 		} catch (Exception e) {
 			// system out the exception into the console log
 			logger.info("assignRoleToUserInTenant -> " + e.getMessage());

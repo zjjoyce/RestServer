@@ -19,10 +19,10 @@ import org.apache.log4j.Logger;
 public class HbaseUtil {
 
     public static final Configuration conf = new Configuration();
-    private static Connection hconn;
-    private static Admin admin;
-    private static int tabnum;
-    private static int regnum;
+//    private static Connection hconn;
+//    private static Admin admin;
+//    private static int tabnum;
+//    private static int regnum;
 
     private static Logger logger = Logger.getLogger(HbaseUtil.class);
 
@@ -51,6 +51,11 @@ public class HbaseUtil {
     }*/
 
     public static List<Quota> getHbaseData(String namespace){
+
+        Connection hconn;
+        Admin admin;
+        int tabnum = 0;
+        int regnum = 0;
         List<Quota> result = new ArrayList<Quota>();
         String currentClassPath = new HbaseUtil().getClass().getResource("/").getPath();
         String  keytabPath= currentClassPath.substring(0, currentClassPath.length() - 8) + "conf/shixiuru.keytab";
@@ -81,6 +86,7 @@ public class HbaseUtil {
                     regnum = regnum+regs;
                 }
             }
+            logger.info("tabnum:"+tabnum+"------  regnum:"+regnum);
             Quota tabquota = new Quota();
             Quota regquota = new Quota();
             tabquota.setName("maximumTablesQuota");
