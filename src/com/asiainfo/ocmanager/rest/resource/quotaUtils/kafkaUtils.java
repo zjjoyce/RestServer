@@ -16,7 +16,7 @@ import java.util.*;
  * Created by yujin on 2017/6/29.
  */
 public class kafkaUtils {
-    private static final Properties props = new Properties();
+    private static final Properties propsp = new Properties();
     private static Logger logger = Logger.getLogger(kafkaUtils.class);
 
 
@@ -34,23 +34,23 @@ public class kafkaUtils {
 
         try {
             String bootstrapServers = ParamQuery.getCFProperties().get(ParamQuery.BOOTSTRAP_SERVERS);
-            props.put("security.protocol", "SASL_PLAINTEXT");
+            propsp.put("security.protocol", "SASL_PLAINTEXT");
             //props.put("bootstrap.servers", "zx-dn-10:6667,zx-dn-11:6667,zx-dn-12:6667,zx-dn-13:6667,zx-dn-14:6667,zx-bdi-01:6667,zx-bdi-02:6667,zx-bdi-03:6667");
             //props.put("bootstrap.servers", "zx-dn-10:6667,zx-dn-11:6667,zx-dn-12:6667,zx-dn-13:6667,zx-dn-14:6667");
-            props.put("bootstrap.servers", bootstrapServers);
-            props.put("group.id", "group1");
-            props.put("enable.auto.commit", "true");
-            props.put("auto.commit.interval.ms", "1000");
-            props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
-            props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
-            KafkaConsumer<byte[],byte[]> consumer = new KafkaConsumer<>(props);
+            propsp.put("bootstrap.servers", bootstrapServers);
+            propsp.put("group.id", "group1");
+            propsp.put("enable.auto.commit", "true");
+            propsp.put("auto.commit.interval.ms", "1000");
+            propsp.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+            propsp.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+            KafkaConsumer<byte[],byte[]> consumer = new KafkaConsumer<>(propsp);
             List<PartitionInfo> PartionInfoForTopic = consumer.partitionsFor(topicName);
             int partitionNum = PartionInfoForTopic.size();
             String partitionNumStr = String.valueOf(partitionNum);
             partitionQuota= new Quota("partitionQuota",partitionNumStr,"","","kafka topic partiton num");
             logger.info("partitionQuota is:" + partitionNumStr);
         }catch (Exception e){
-            logger.info("KafkaUtils getKafkaPartitionNumQuota Exception "+e.getStackTrace());
+            logger.info("KafkaUtils getKafkaPartitionNumQuota Exception "+e.getMessage());
             Quota partitionQuota1= new Quota("partitionQuota","-1","","","kafka topic partiton num");
             return partitionQuota1;
         }
