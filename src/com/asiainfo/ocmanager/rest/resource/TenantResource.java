@@ -414,6 +414,7 @@ public class TenantResource {
 							// get the instance info again
 							getInstanceResBody = TenantResource.getTenantServiceInstancesFromDf(tenantId,
 									serviceInstance.getInstanceName());
+							bodyStr = getInstanceResBody;
 							serviceInstanceJson = new JsonParser().parse(getInstanceResBody);
 							serviceName = serviceInstanceJson.getAsJsonObject().getAsJsonObject("spec")
 									.getAsJsonObject("provisioning").get("backingservice_name").getAsString();
