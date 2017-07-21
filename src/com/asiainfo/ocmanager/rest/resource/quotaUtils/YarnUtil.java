@@ -19,8 +19,8 @@ import org.codehaus.jettison.json.JSONObject;
  */
 public class YarnUtil {
 
-    private static HttpURLConnection conn;
-    private static BufferedReader reader;
+//    private static HttpURLConnection conn;
+//    private static BufferedReader reader;
 
     private static Logger logger = Logger.getLogger(YarnUtil.class);
     public static List<Quota> getYarnData(String queuename){
@@ -33,6 +33,8 @@ public class YarnUtil {
         Quota memoryquota = new Quota("yarnQueueQuota","","","","queue memory quota(GB)");
         Quota vcoresquota = new Quota("queueVcoreQuota","","","","queue vcore qutoa(GB)");
 
+        HttpURLConnection conn = null;
+        BufferedReader reader;
         try {
             conn = (HttpURLConnection)new URL(yarnresturl).openConnection();
             conn.setRequestMethod("GET");
@@ -66,6 +68,8 @@ public class YarnUtil {
             List<Quota> result = new ArrayList<Quota>();
             result.add(memoryquota);
             return result;
+        } finally {
+            conn.disconnect();
         }
 
         try {
@@ -94,9 +98,9 @@ public class YarnUtil {
                     vcoresquota.setUsed(vCores);
                 }
             }
+            logger.info("memoryquota.Used:"+memoryquota.getUsed());
             if(memoryquota.getUsed().equals("")){
                 memoryquota.setUsed("-1");
-
             }
         } catch (JSONException e) {
             logger.error(e.getMessage());

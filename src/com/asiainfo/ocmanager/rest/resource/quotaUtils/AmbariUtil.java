@@ -241,9 +241,9 @@ public class AmbariUtil {
             logger.error(e.getMessage());
         }
     }
-    public static void main(String[] args){
+    /*public static void main(String[] args){
         String service = "hdfs";
         String result =new AmbariUtil().getUrl(service);
         System.out.println(result);
-    }
+    }*/
 }
