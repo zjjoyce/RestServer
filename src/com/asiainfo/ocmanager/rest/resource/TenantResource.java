@@ -917,6 +917,9 @@ public class TenantResource {
 		JsonElement patch = updateInstJson.getAsJsonObject().getAsJsonObject("status").get("patch");
 
 		while (patch != null) {
+			if (patch.getAsString().equals(Constant.FAILURE)) {
+				break;
+			}
 			logger.debug("watiInstanceUpdateComplete -> waiting");
 			Thread.sleep(1000);
 			updateInstStr = TenantResource.getTenantServiceInstancesFromDf(tenantId, instanceName);
