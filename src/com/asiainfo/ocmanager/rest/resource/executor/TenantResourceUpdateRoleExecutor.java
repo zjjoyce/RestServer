@@ -144,7 +144,9 @@ public class TenantResourceUpdateRoleExecutor implements Runnable {
 					}
 				}
 			}
+            logger.info("update role call dacp before...");
 			DacpAllResult.getAllResult(tenantId);
+            logger.info("update role call dacp after...");
 
 		} catch (Exception e) {
 			// system out the exception into the console log
