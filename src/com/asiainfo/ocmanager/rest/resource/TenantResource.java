@@ -414,6 +414,7 @@ public class TenantResource {
 							// get the instance info again
 							getInstanceResBody = TenantResource.getTenantServiceInstancesFromDf(tenantId,
 									serviceInstance.getInstanceName());
+							bodyStr = getInstanceResBody;
 							serviceInstanceJson = new JsonParser().parse(getInstanceResBody);
 							serviceName = serviceInstanceJson.getAsJsonObject().getAsJsonObject("spec")
 									.getAsJsonObject("provisioning").get("backingservice_name").getAsString();
@@ -919,6 +920,9 @@ public class TenantResource {
 		JsonElement patch = updateInstJson.getAsJsonObject().getAsJsonObject("status").get("patch");
 
 		while (patch != null) {
+			if (patch.getAsString().equals(Constant.FAILURE)) {
+				break;
+			}
 			logger.debug("watiInstanceUpdateComplete -> waiting");
 			Thread.sleep(1000);
 			updateInstStr = TenantResource.getTenantServiceInstancesFromDf(tenantId, instanceName);

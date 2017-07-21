@@ -92,7 +92,7 @@ public class TenantResourceAssignRoleExecutor implements Runnable {
 						// get the service permission based on the service name
 						// and role
 						ServiceRolePermission permission = ServiceRolePermissionWrapper
-								.getServicePermissionByRoleId(serviceName, assignment.getRoleId());
+								.getServicePermissionByRoleId(serviceName.toLowerCase(), assignment.getRoleId());
 
 						// only the has service permission users
 						// can be assign
@@ -119,15 +119,15 @@ public class TenantResourceAssignRoleExecutor implements Runnable {
 									instanceName, OCDPServiceInstanceJson.toString());
 
 							if (updateRes.getResCodel() == 200) {
-								logger.info(instanceName + "assignRoleToUserInTenant -> wait update complete");
+								logger.info(instanceName + " assignRoleToUserInTenant -> wait update complete");
 								TenantResource.watiInstanceUpdateComplete(updateRes, tenantId, instanceName);
-								logger.info(instanceName + "assignRoleToUserInTenant -> update complete");
+								logger.info(instanceName + " assignRoleToUserInTenant -> update complete");
 
-								logger.info(instanceName + "assignRoleToUserInTenant -> begin to binding");
+								logger.info(instanceName + " assignRoleToUserInTenant -> begin to binding");
 								AdapterResponseBean bindingRes = TenantResource.generateOCDPServiceCredentials(tenantId,
 										instanceName, userName);
 								if (bindingRes.getResCodel() == 201) {
-									logger.info(instanceName + "assignRoleToUserInTenant -> binding successfully");
+									logger.info(instanceName + " assignRoleToUserInTenant -> binding successfully");
 									TenantResource.watiInstanceBindingComplete(bindingRes, tenantId, instanceName);
 								}
 							}
