@@ -23,8 +23,8 @@ public class HdfsUtil {
 
     public static final Configuration conf = new Configuration();
     private static Logger logger = Logger.getLogger(HdfsUtil.class);
-    private static Quota filesquota;
-    private static Quota spacequota;
+//    private static Quota filesquota;
+//    private static Quota spacequota;
     /*static {
         String currentClassPath = new HdfsUtil().getClass().getResource("/").getPath();
         String  keytabPath= currentClassPath.substring(0, currentClassPath.length() - 8) + "conf/shixiuru.keytab";
@@ -58,14 +58,15 @@ public class HdfsUtil {
         System.setProperty("java.security.krb5.conf",krbPath);
         UserGroupInformation.setConfiguration(conf);
 
-        filesquota = new Quota("nameSpaceQuota","","","","hdfs file quota");
-        spacequota = new Quota("storageSpaceQuota","","","","hdfs space quota");
+        Quota filesquota = new Quota("nameSpaceQuota","","","","hdfs file quota");
+        Quota spacequota = new Quota("storageSpaceQuota","","","","hdfs space quota");
         try {
             UserGroupInformation.loginUserFromKeytab("shixiuru@EXAMPLE.COM",keytabPath);
             FileSystem fs = FileSystem.get(conf);
             ContentSummary contentSum = fs.getContentSummary(new Path(path));
             long Quota = contentSum.getQuota();
             long FileCount = contentSum.getFileCount();
+            logger.info("quota:"+Quota+"-------   filecount:"+FileCount);
             if(Quota==-1){
                 filesquota.setSize("");
                 filesquota.setUsed(String.valueOf(FileCount));
@@ -77,6 +78,7 @@ public class HdfsUtil {
             }
             long spaceQuota = contentSum.getSpaceQuota();
             long spaceConsumed = contentSum.getSpaceConsumed();
+            logger.info("spacequota:"+spaceQuota+"---------  spaceconsumed:"+spaceConsumed);
             if(spaceQuota==-1){
                 spacequota.setSize("");
                 spacequota.setUsed(String.valueOf(spaceConsumed/1024/1024/1024));
