@@ -37,7 +37,6 @@ public enum DBUrlEnum {
     static String dacpSecutityKrb5Kdc;
     static String dacpHadoopSecurityAuth;
     static String dacpKeytabFile;
-    static String dacpKerosPrincipal;
     static String HadoopUrl;
 
     String driveUrl;
@@ -57,13 +56,14 @@ public enum DBUrlEnum {
             dacpSecutityKrb5Kdc = ParamQuery.getCFProperties().get(ParamQuery.DACP_JAVA_SECURITY_KRB5_KDC);
             dacpHadoopSecurityAuth = ParamQuery.getCFProperties().get(ParamQuery.DACP_HADOOP_SECURITY_AUTHENTICATION);
             dacpKeytabFile = ParamQuery.getCFProperties().get(ParamQuery.DACP_KEYTAB_FILE);
-            dacpKerosPrincipal = ParamQuery.getCFProperties().get(ParamQuery.DACP_KERBEROS_PRINCIPAL);
+            //dacpKerosPrincipal = ParamQuery.getCFProperties().get(ParamQuery.DACP_KERBEROS_PRINCIPAL);
         } catch (IOException e) {
             System.out.println("DBUrlEnum IOException " + e.getMessage());
         }
         for (DBUrlEnum c : DBUrlEnum.values()) {
             if (c.getDriveType().equals(driveTypeStr)) {
                 if(DbTypeEnum.getDbFlagEnum(driveTypeStr).equals("true")){
+                    String dacpKerosPrincipal = "dacp.kerberos.principal=" + uri.substring(uri.indexOf("=")+1);
                     HadoopUrl = uri + ";"+ dacpSecurityKrb5Realm + dacpSecutityKrb5Kdc + dacpHadoopSecurityAuth + dacpKeytabFile + dacpKerosPrincipal;
                     return HadoopUrl;
                 }else if("postgresql".equals(driveTypeStr)){
