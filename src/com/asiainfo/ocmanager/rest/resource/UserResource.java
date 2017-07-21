@@ -541,6 +541,7 @@ public class UserResource {
 				String serviceName = spec.getAsJsonObject("provisioning").get("backingservice_name").getAsString();
 
 				JsonElement action = instanceJson.getAsJsonObject("status").get("action");
+				JsonElement patch = instanceJson.getAsJsonObject("status").get("patch");
 
 				if (!phase.equals(Constant.FAILURE)) {
 					if (Constant.list.contains(serviceName.toLowerCase())) {
@@ -552,17 +553,23 @@ public class UserResource {
 								bindingedUserNames.add(bindingUserName);
 							}
 							if (bindingedUserNames.contains(userName)) {
-								AssignmentInfoBean AIB = new AssignmentInfoBean(instace.getInstanceName(), "Success");
+								AssignmentInfoBean AIB = new AssignmentInfoBean(instace.getInstanceName(), "Authorization Success");
 								assignmentInfoBeans.add(AIB);
 							} else {
-								if (action == null) {
+								if (action == null && patch == null) {
 									AssignmentInfoBean AIB = new AssignmentInfoBean(instace.getInstanceName(),
-											"Failure");
+											"Failure OR Not Begin");
 									assignmentInfoBeans.add(AIB);
 								} else {
-									AssignmentInfoBean AIB = new AssignmentInfoBean(instace.getInstanceName(),
-											"Binding");
-									assignmentInfoBeans.add(AIB);
+									if (patch.getAsString().equals(Constant.FAILURE)) {
+										AssignmentInfoBean AIB = new AssignmentInfoBean(instace.getInstanceName(),
+												"Failure OR Not Begin");
+										assignmentInfoBeans.add(AIB);
+									} else {
+										AssignmentInfoBean AIB = new AssignmentInfoBean(instace.getInstanceName(),
+												"Authorization Running");
+										assignmentInfoBeans.add(AIB);
+									}
 								}
 							}
 						}
