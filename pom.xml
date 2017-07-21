@@ -343,5 +343,13 @@
         </configuration>
       </plugin>
     </plugins>
+      <sourceDirectory>src</sourceDirectory>
+      <testSourceDirectory>src/test</testSourceDirectory>
+      <testResources>
+          <testResource>
+              <directory>WebContent/WEB-INF/conf</directory>
+              <targetPath>../test-conf</targetPath>
+          </testResource>
+      </testResources>
   </build>
 </project>
