@@ -20,9 +20,9 @@ import java.util.*;
  */
 public class DacpAllResult {
 
-    //private static Map info;
-    //private static Team team;
-    //private static String result;
+//    private static Map info;
+//    private static Team team;
+//    private static String result;
     private static Properties prop;
 
     private static Logger logger = Logger.getLogger(DacpAllResult.class);
@@ -42,7 +42,7 @@ public class DacpAllResult {
 
 
         Map info = new HashMap<>();
-        String result=null;
+        String result = null;
         try{
             //get team
             Team team = TeamWrapper.getTeamFromTenant(tenantId);
