@@ -55,9 +55,16 @@ dataFoundry.url=https://<df rest server IP>:<df rest server api port>
 dataFoundry.token=<df admin token>
 ```
 
-11. Then restart the tomcat server
+11. Congifure the tenantMonitor properties, go to __<TOMCAT_HOME>/webapps/ocmanager/WEB-INF/conf__ , edit the tenantMonitor.properties
+```
+tenant.monitor.enable=true
+tenant.monitor.period=3600
+tenant.monitor.url=http://<中信云rest api IP or 主机名>:<中信云rest api 端口>
+```
 
-12. Then Access __http://<your tomcat server>:<port>/ocmanager/v1/api/tenant__ you can see the data
+12. Then restart the tomcat server
+
+13. Then Access __http://<your tomcat server>:<port>/ocmanager/v1/api/tenant__ you can see the data
 
 
 __NOTE: __ More rest api, please access the link: https://github.com/OCManager/RestServer/tree/master/docs/adaptorRest
