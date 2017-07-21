@@ -19,16 +19,23 @@ import javax.ws.rs.core.Response.Status;
 
 import org.apache.log4j.Logger;
 
+import com.asiainfo.ocmanager.persistence.model.ServiceInstance;
 import com.asiainfo.ocmanager.persistence.model.Tenant;
 import com.asiainfo.ocmanager.persistence.model.User;
 import com.asiainfo.ocmanager.persistence.model.UserRoleView;
 import com.asiainfo.ocmanager.rest.bean.AdapterResponseBean;
+import com.asiainfo.ocmanager.rest.bean.AssignmentInfoBean;
 import com.asiainfo.ocmanager.rest.bean.UserRoleViewBean;
 import com.asiainfo.ocmanager.rest.bean.UserWithTURBean;
 import com.asiainfo.ocmanager.rest.constant.Constant;
+import com.asiainfo.ocmanager.rest.resource.utils.ServiceInstancePersistenceWrapper;
 import com.asiainfo.ocmanager.rest.resource.utils.TenantPersistenceWrapper;
 import com.asiainfo.ocmanager.rest.resource.utils.UserPersistenceWrapper;
 import com.asiainfo.ocmanager.rest.resource.utils.UserRoleViewPersistenceWrapper;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 
 /**
@@ -55,17 +62,17 @@ public class UserResource {
 			List<User> users = UserPersistenceWrapper.getUsers();
 			List<UserWithTURBean> usersWithTenants = new ArrayList<UserWithTURBean>();
 			for (User u : users) {
-				
+
 				List<UserRoleViewBean> urvbs = new ArrayList<UserRoleViewBean>();
 				List<UserRoleView> urvs = UserRoleViewPersistenceWrapper.getTenantAndRoleBasedOnUserId(u.getId());
-				
-				for (UserRoleView urv: urvs){
+
+				for (UserRoleView urv : urvs) {
 					UserRoleViewBean urvb = new UserRoleViewBean(urv);
 					String parentTenantName = UserResource.getParentTenantName(urv.getTenantId());
 					urvb.setParentTenantName(parentTenantName);
 					urvbs.add(urvb);
 				}
-				
+
 				UserWithTURBean userBean = new UserWithTURBean(u);
 				userBean.setUrv(urvbs);
 				usersWithTenants.add(userBean);
@@ -94,19 +101,18 @@ public class UserResource {
 			User user = UserPersistenceWrapper.getUserById(userId);
 
 			if (user == null) {
-				return Response.status(Status.NOT_FOUND).entity("The user " + userId + "can not find.")
-						.build();
+				return Response.status(Status.NOT_FOUND).entity("The user " + userId + "can not find.").build();
 			}
 			List<UserRoleViewBean> urvbs = new ArrayList<UserRoleViewBean>();
 			List<UserRoleView> urvs = UserRoleViewPersistenceWrapper.getTenantAndRoleBasedOnUserId(userId);
-			
-			for (UserRoleView urv: urvs){
+
+			for (UserRoleView urv : urvs) {
 				UserRoleViewBean urvb = new UserRoleViewBean(urv);
 				String parentTenantName = UserResource.getParentTenantName(urv.getTenantId());
 				urvb.setParentTenantName(parentTenantName);
 				urvbs.add(urvb);
 			}
-			
+
 			UserWithTURBean userBean = new UserWithTURBean(user);
 			userBean.setUrv(urvbs);
 			return Response.ok().entity(userBean).build();
@@ -126,7 +132,7 @@ public class UserResource {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Get All OCManager users
 	 *
@@ -513,6 +519,73 @@ public class UserResource {
 			}
 		}
 		return tenantList;
+	}
+
+	@GET
+	@Path("name/{userName}/tenant/{tenantId}/assignments/info")
+	@Produces((MediaType.APPLICATION_JSON + ";charset=utf-8"))
+	public Response getAssignmentsInfoForUser(@PathParam("userName") String userName,
+			@PathParam("tenantId") String tenantId) {
+		try {
+			List<AssignmentInfoBean> assignmentInfoBeans = new ArrayList<AssignmentInfoBean>();
+			List<ServiceInstance> instaces = ServiceInstancePersistenceWrapper.getServiceInstancesInTenant(tenantId);
+
+			for (ServiceInstance instace : instaces) {
+				String instanceStr = TenantResource.getTenantServiceInstancesFromDf(tenantId,
+						instace.getInstanceName());
+				JsonElement instanceJE = new JsonParser().parse(instanceStr);
+				JsonObject instanceJson = instanceJE.getAsJsonObject();
+				JsonObject spec = instanceJson.getAsJsonObject("spec");
+				String phase = instanceJson.getAsJsonObject("status").get("phase").getAsString();
+				JsonElement binding = spec.get("binding");
+				String serviceName = spec.getAsJsonObject("provisioning").get("backingservice_name").getAsString();
+
+				JsonElement action = instanceJson.getAsJsonObject("status").get("action");
+				JsonElement patch = instanceJson.getAsJsonObject("status").get("patch");
+
+				if (!phase.equals(Constant.FAILURE)) {
+					if (Constant.list.contains(serviceName.toLowerCase())) {
+						if (!binding.isJsonNull()) {
+							JsonArray bindingArray = spec.getAsJsonArray("binding");
+							List<String> bindingedUserNames = new ArrayList<String>();
+							for (JsonElement je : bindingArray) {
+								String bindingUserName = je.getAsJsonObject().get("bind_hadoop_user").getAsString();
+								bindingedUserNames.add(bindingUserName);
+							}
+							if (bindingedUserNames.contains(userName)) {
+								AssignmentInfoBean AIB = new AssignmentInfoBean(instace.getInstanceName(), "Authorization Success");
+								assignmentInfoBeans.add(AIB);
+							} else {
+								if (action == null && patch == null) {
+									AssignmentInfoBean AIB = new AssignmentInfoBean(instace.getInstanceName(),
+											"Failure OR Not Begin");
+									assignmentInfoBeans.add(AIB);
+								} else {
+									if (patch.getAsString().equals(Constant.FAILURE)) {
+										AssignmentInfoBean AIB = new AssignmentInfoBean(instace.getInstanceName(),
+												"Failure OR Not Begin");
+										assignmentInfoBeans.add(AIB);
+									} else {
+										AssignmentInfoBean AIB = new AssignmentInfoBean(instace.getInstanceName(),
+												"Authorization Running");
+										assignmentInfoBeans.add(AIB);
+									}
+								}
+							}
+						}
+					} else {
+						AssignmentInfoBean AIB = new AssignmentInfoBean(instace.getInstanceName(), "Success");
+						assignmentInfoBeans.add(AIB);
+					}
+				}
+			}
+
+			return Response.ok().entity(assignmentInfoBeans).build();
+		} catch (Exception e) {
+			// system out the exception into the console log
+			logger.info("getAssignmentsInfoForUser -> " + e.getMessage());
+			return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
+		}
 	}
 
 }
