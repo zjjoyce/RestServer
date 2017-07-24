@@ -51,10 +51,8 @@ public class AmbariUtil {
         HttpURLConnection conn = null ;
         try {
             conn = (HttpURLConnection)new URL(url).openConnection();
-            String user = "admin";
-            String passwd = "admin";
             Base64 base64 = new Base64();
-            String encoded = base64.encodeToString((user + ":" + passwd).getBytes("UTF-8"));
+            String encoded = base64.encodeToString((prop.getProperty("ambari.username") + ":" + prop.getProperty("ambari.password")).getBytes("UTF-8"));
             conn.setRequestProperty("Authorization", "Basic " + encoded);
             int resultCode = conn.getResponseCode();
             logger.info("response code is :" + resultCode);
