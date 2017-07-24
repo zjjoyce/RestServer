@@ -18,6 +18,7 @@ import java.util.*;
 public class kafkaUtils {
     private static final Properties propsp = new Properties();
     private static Logger logger = Logger.getLogger(kafkaUtils.class);
+    private static Properties prop = new Properties();
 
 
     public  static Quota  getKafkaPartitionNumQuota(String topicName){
@@ -25,8 +26,8 @@ public class kafkaUtils {
         Quota partitionQuota;
         String currentClassPath = new kafkaUtils().getClass().getResource("/").getPath();
 
-        String  jaasPath= currentClassPath.substring(0, currentClassPath.length() - 8) + "conf/kafka-jaas.conf";
-        String  krbPath = currentClassPath.substring(0,currentClassPath.length() - 8) + "conf/krb5.conf";
+        String  jaasPath= currentClassPath.substring(0, currentClassPath.length() - 8) + "conf/"+prop.getProperty("kerberos.jass.name");
+        String  krbPath = currentClassPath.substring(0,currentClassPath.length() - 8) + "conf/"+prop.getProperty("kerberos.krb.name");
 
         logger.info("getKafkaPartitionNumQuota jaasPath: " + jaasPath);
         System.setProperty("java.security.auth.login.config", jaasPath);
@@ -63,7 +64,7 @@ public class kafkaUtils {
         List<String> processList = new ArrayList<String>();
         BufferedReader input = null;
         try {
-            process = Runtime.getRuntime().exec("sh /home/ai/getKafakQuota.sh  "+topicName+"-*"+"\n");
+            process = Runtime.getRuntime().exec("sh /home/ai/"+prop.getProperty("getKafakQuota.sh.name")+topicName+"-*"+"\n");
             input = new BufferedReader(new InputStreamReader(process.getInputStream()));
         } catch (Exception e) {
             logger.error("KafkaUtils getKafkaSpaceQuota Exception"+e.getMessage());

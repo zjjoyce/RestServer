@@ -6,6 +6,8 @@ package com.asiainfo.ocmanager.rest.resource.quotaUtils;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
+
 import com.asiainfo.ocmanager.persistence.model.Quota;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HRegionInfo;
@@ -19,6 +21,7 @@ import org.apache.log4j.Logger;
 public class HbaseUtil {
 
     public static final Configuration conf = new Configuration();
+    private static Properties prop = new Properties();
 //    private static Connection hconn;
 //    private static Admin admin;
 //    private static int tabnum;
@@ -58,8 +61,8 @@ public class HbaseUtil {
         int regnum = 0;
         List<Quota> result = new ArrayList<Quota>();
         String currentClassPath = new HbaseUtil().getClass().getResource("/").getPath();
-        String  keytabPath= currentClassPath.substring(0, currentClassPath.length() - 8) + "conf/shixiuru.keytab";
-        String  krbPath = currentClassPath.substring(0,currentClassPath.length() - 8) + "conf/krb5.conf";
+        String  keytabPath= currentClassPath.substring(0, currentClassPath.length() - 8) +"conf/"+prop.getProperty("kerberos.keytab.name");
+        String  krbPath = currentClassPath.substring(0,currentClassPath.length() - 8) + "conf/"+prop.getProperty("kerberos.krb.name");
         String hbaseurl = AmbariUtil.getUrl("hbase");
 
         conf.set("hbase.zookeeper.quorum", hbaseurl);
@@ -74,7 +77,7 @@ public class HbaseUtil {
         UserGroupInformation.setConfiguration(conf);
 
         try {
-            UserGroupInformation.loginUserFromKeytab("shixiuru@EXAMPLE.COM", keytabPath);
+            UserGroupInformation.loginUserFromKeytab(prop.getProperty("kerberos.username"), keytabPath);
             hconn = ConnectionFactory.createConnection(conf);
             admin = hconn.getAdmin();
             TableName[] tables = admin.listTableNamesByNamespace(namespace);

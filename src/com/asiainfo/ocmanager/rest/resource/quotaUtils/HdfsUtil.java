@@ -3,6 +3,8 @@ package com.asiainfo.ocmanager.rest.resource.quotaUtils;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
+
 import com.asiainfo.ocmanager.persistence.model.Quota;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.ContentSummary;
@@ -20,8 +22,8 @@ public class HdfsUtil {
     public static final String USER_NAME_KEY = "hdfs.kerberos.principal";
     public static final String DEFAULT_FS = "fs.defaultFS";
     public static final String AUTHENTICATION = "hadoop.security.authentication";
-
     public static final Configuration conf = new Configuration();
+    private static Properties prop = new Properties();
     private static Logger logger = Logger.getLogger(HdfsUtil.class);
 //    private static Quota filesquota;
 //    private static Quota spacequota;
@@ -48,8 +50,8 @@ public class HdfsUtil {
     public static List<Quota> getHDFSData(String path){
 
         String currentClassPath = new HdfsUtil().getClass().getResource("/").getPath();
-        String  keytabPath= currentClassPath.substring(0, currentClassPath.length() - 8) + "conf/shixiuru.keytab";
-        String  krbPath = currentClassPath.substring(0,currentClassPath.length() - 8) + "conf/krb5.conf";
+        String  keytabPath= currentClassPath.substring(0, currentClassPath.length() - 8) + "conf/"+prop.getProperty("kerberos.keytab.name");
+        String  krbPath = currentClassPath.substring(0,currentClassPath.length() - 8) + "conf/"+prop.getProperty("kerberos.krb.name");
         String dfsurl = AmbariUtil.getUrl("hdfs");
 
         conf.set(KEYTAB_FILE_KEY, keytabPath);
@@ -61,7 +63,7 @@ public class HdfsUtil {
         Quota filesquota = new Quota("nameSpaceQuota","","","","hdfs file quota");
         Quota spacequota = new Quota("storageSpaceQuota","","","","hdfs space quota");
         try {
-            UserGroupInformation.loginUserFromKeytab("shixiuru@EXAMPLE.COM",keytabPath);
+            UserGroupInformation.loginUserFromKeytab(prop.getProperty("kerberos.username"),keytabPath);
             FileSystem fs = FileSystem.get(conf);
             ContentSummary contentSum = fs.getContentSummary(new Path(path));
             long Quota = contentSum.getQuota();
