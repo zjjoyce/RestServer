@@ -18,6 +18,8 @@ public class Constant {
 
 	public final static String UPDATE = "Update";
 	public final static String _TODELETE = "_ToDelete";
+	public final static String _TOBIND = "_ToBind";
+	public final static String _TOUNBIND = "_ToUnbind";
 	public final static String PROJECTMANAGERROLE = "a12a84d0-524a-11e7-9dbb-fa163ed7d0ae";
 
 	/*****************************************************************/
