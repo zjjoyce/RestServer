@@ -153,7 +153,7 @@ public class dacpForResourceUtil {
                 databasename = credentialsJsonObj.get("name").getAsString();
             }
         }
-        url = DBUrlEnum.getDBUrlEnum(backingservice_name.toLowerCase(), uri, host, port, databasename);//url
+        url = DBUrlEnum.getDBUrlEnum(backingservice_name.toLowerCase(), uri, host, port, databasename,username);//url
     }
 
     private static boolean isHadoopflag(String backingservice_name) {

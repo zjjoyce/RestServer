@@ -49,7 +49,7 @@ public enum DBUrlEnum {
     }
 
 
-    public static String getDBUrlEnum(String driveTypeStr,String uri,String ip,String port,String dbname){
+    public static String getDBUrlEnum(String driveTypeStr,String uri,String ip,String port,String dbname,String usename){
         Logger logger = Logger.getLogger(DBUrlEnum.class);
         try {
             dacpSecurityKrb5Realm = ParamQuery.getCFProperties().get(ParamQuery.DACP_JAVA_SECURITY_KRB5_REALM);
@@ -63,7 +63,7 @@ public enum DBUrlEnum {
         for (DBUrlEnum c : DBUrlEnum.values()) {
             if (c.getDriveType().equals(driveTypeStr)) {
                 if(DbTypeEnum.getDbFlagEnum(driveTypeStr).equals("true")){
-                    String dacpKerosPrincipal = "dacp.kerberos.principal=" + uri.substring(uri.indexOf("=")+1);
+                    String dacpKerosPrincipal = "dacp.kerberos.principal=" + usename;
                     HadoopUrl = uri + ";"+ dacpSecurityKrb5Realm + dacpSecutityKrb5Kdc + dacpHadoopSecurityAuth + dacpKeytabFile + dacpKerosPrincipal;
                     return HadoopUrl;
                 }else if("postgresql".equals(driveTypeStr)){
