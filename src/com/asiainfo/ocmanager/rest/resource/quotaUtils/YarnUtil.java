@@ -30,8 +30,8 @@ public class YarnUtil {
         String restresult = "";
         String yarnresturl = "http://"+yarnurl+"/ws/v1/cluster/scheduler";
 
-        Quota memoryquota = new Quota("yarnQueueQuota","","","","queue memory quota(GB)");
-        Quota vcoresquota = new Quota("queueVcoreQuota","","","","queue vcore qutoa(GB)");
+        Quota memoryquota = new Quota("yarnQueueQuota","","","","queue memory quota(MB)");
+        Quota vcoresquota = new Quota("queueVcoreQuota","","","","queue vcore qutoa(MB)");
 
         HttpURLConnection conn = null;
         BufferedReader reader;

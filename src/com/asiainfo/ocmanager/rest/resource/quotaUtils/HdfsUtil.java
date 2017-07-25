@@ -62,21 +62,18 @@ public class HdfsUtil {
         String currentClassPath = new HdfsUtil().getClass().getResource("/").getPath();
         String  keytabPath= currentClassPath.substring(0, currentClassPath.length() - 8) + "conf/"+prop.getProperty("hdfs.kerberos.keytab.name");
         String  krbPath = currentClassPath.substring(0,currentClassPath.length() - 8) + "conf/"+prop.getProperty("kerberos.krb.name");
-//        String dfsurl = AmbariUtil.getUrl("hdfs");
         String dfsurl =AmbariUtil.getUrl("hdfs");
 
         conf.set("hdfs.keytab.file", keytabPath);
         conf.set("fs.defaultFS",dfsurl);
         conf.set("hadoop.security.authentication","kerberos");
-        conf.set("hadoop.master.kerberos.principal", prop.getProperty("hadoop.master.kerberos.principal"));
-        conf.set("hadoop.regionserver.kerberos.principal", prop.getProperty("hadoop.regionserver.kerberos.principal"));
         System.setProperty("java.security.krb5.conf",krbPath);
         UserGroupInformation.setConfiguration(conf);
 
         Quota filesquota = new Quota("nameSpaceQuota","","","","hdfs file quota");
         Quota spacequota = new Quota("storageSpaceQuota","","","","hdfs space quota");
         try {
-            UserGroupInformation.loginUserFromKeytab(prop.getProperty("hadoop.master.kerberos.principal"),keytabPath);
+            UserGroupInformation.loginUserFromKeytab(prop.getProperty("hadoop.kerberos.principal"),keytabPath);
             FileSystem fs = FileSystem.get(conf);
             ContentSummary contentSum = fs.getContentSummary(new Path(path));
             long Quota = contentSum.getQuota();
