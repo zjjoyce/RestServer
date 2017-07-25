@@ -71,12 +71,17 @@ public class kafkaUtils {
         return partitionQuota;
     }
     public static Quota getKafkaSpaceQuota(String topicName){
+        String shellClassPath = new kafkaUtils().getClass().getResource("/").getPath();
+        String shellPath = shellClassPath.substring(0,shellClassPath.length() - 8) + "conf/";
+
         Quota partitionQuota;
         Process process = null;
         List<String> processList = new ArrayList<String>();
         BufferedReader input = null;
         try {
-            process = Runtime.getRuntime().exec("sh /home/ai/"+prop.getProperty("getKafakQuota.sh.name")+topicName+"-*"+"\n");
+            String execStr = "sh " + shellPath + prop.getProperty("getKafakQuota.sh.name")+" "+topicName+"-*"+"\n";
+            logger.info("getKafkaSpaceQuota execStr: " + execStr);
+            process = Runtime.getRuntime().exec(execStr);
             input = new BufferedReader(new InputStreamReader(process.getInputStream()));
         } catch (Exception e) {
             logger.error("KafkaUtils getKafkaSpaceQuota Exception"+e.getMessage());
@@ -94,7 +99,7 @@ public class kafkaUtils {
                 if(Integer.valueOf(processList.get(0))>Integer.MAX_VALUE){throw new IOException("num is too large!!");}
                 partitionQuota= new Quota("partitionQuota",String.valueOf(processList.get(0)),"","","kafka topic partition used size");
                 input.close();
-            }catch (IOException e){
+            }catch (Exception e){
                 logger.info("KafkaUtils getKafkaSpaceQuota IOException"+e.getMessage());
                 Quota partitionQuota2= new Quota("partitionQuota","-1","","","kafka topic partition used size");
                 return partitionQuota2;
