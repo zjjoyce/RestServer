@@ -35,6 +35,8 @@ public class dacpForResourceUtil {
     private static String uri = "";
     private static String url = "";
     private static String team_code = "";
+    private static String thriftUri = "";
+    private static String thriftUrl = "";
     public static Map<String, List> getResult(String tenantId) {
         Team team = TeamWrapper.getTeamFromTenant(tenantId);
         team_code = team.getteam_code();
@@ -128,6 +130,33 @@ public class dacpForResourceUtil {
 
         dbRegisterList.add(dbRegister);
         dbDistributionList.add(dbDistribution);
+        if(backingservice_name.toLowerCase().equals("hive")){
+            DBRegister dbRegister_sparksql = new DBRegister();
+            dbRegister_sparksql.setXmlid(instance_id);
+            dbRegister_sparksql.setDbname(databasename);
+            dbRegister_sparksql.setCnname(databasename);
+            dbRegister_sparksql.setDriverclassname(driverclassname);
+            dbRegister_sparksql.setUrl(thriftUrl);
+            dbRegister_sparksql.setUsername(username);
+            dbRegister_sparksql.setPassword(password);
+            dbRegister_sparksql.setRemark(remark);
+            dbRegister_sparksql.setAlias(backingservice_name.toLowerCase());
+
+            DBDistribution dbDistribution_sparksql = new DBDistribution();
+            dbDistribution_sparksql.setDbname(databasename);
+            dbDistribution_sparksql.setCnname(databasename);
+            dbDistribution_sparksql.setDriverclassname(driverclassname);
+            dbDistribution_sparksql.setUrl(thriftUrl);
+            dbDistribution_sparksql.setUsername(username);
+            dbDistribution_sparksql.setPassword(password);
+            dbDistribution_sparksql.setState(state);
+            dbDistribution_sparksql.setTeam_code(team_code);
+            dbDistribution_sparksql.setDbtype(backingservice_name.toLowerCase());
+
+
+            dbRegisterList.add(dbRegister_sparksql);
+            dbDistributionList.add(dbDistribution_sparksql);
+        }
     }
 
     /*数据注册与分配实例，并分别加入队列*/
@@ -153,7 +182,11 @@ public class dacpForResourceUtil {
                 databasename = credentialsJsonObj.get("name").getAsString();
             }
         }
-        url = DBUrlEnum.getDBUrlEnum(backingservice_name.toLowerCase(), uri, host, port, databasename);//url
+        if(credentialsJsonObj.has("thriftUri")){
+            thriftUri = credentialsJsonObj.get("thriftUri").getAsString();
+        }
+        thriftUrl = DBUrlEnum.getDBUrlEnum(backingservice_name.toLowerCase(), thriftUri, host, port, databasename,username);//thriftUrl
+        url = DBUrlEnum.getDBUrlEnum(backingservice_name.toLowerCase(), uri, host, port, databasename,username);//url
     }
 
     private static boolean isHadoopflag(String backingservice_name) {

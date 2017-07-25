@@ -16,8 +16,21 @@ import java.util.*;
  * Created by yujin on 2017/6/29.
  */
 public class kafkaUtils {
-    private static final Properties propsp = new Properties();
+    private static Properties propsp = new Properties();
     private static Logger logger = Logger.getLogger(kafkaUtils.class);
+    private static Properties prop = new Properties();
+
+    static {
+        String classPath = new AmbariUtil().getClass().getResource("/").getPath();
+        String currentClassesPath = classPath.substring(0, classPath.length() - 8)+ "conf/config.properties";
+        try{
+            InputStream inStream = new FileInputStream(new File(currentClassesPath ));
+            //            prop = new Properties();
+            prop.load(inStream);
+        }catch(IOException e){
+            logger.error(e.getMessage());
+        }
+    }
 
 
     public  static Quota  getKafkaPartitionNumQuota(String topicName){
@@ -25,8 +38,8 @@ public class kafkaUtils {
         Quota partitionQuota;
         String currentClassPath = new kafkaUtils().getClass().getResource("/").getPath();
 
-        String  jaasPath= currentClassPath.substring(0, currentClassPath.length() - 8) + "conf/kafka-jaas.conf";
-        String  krbPath = currentClassPath.substring(0,currentClassPath.length() - 8) + "conf/krb5.conf";
+        String  jaasPath= currentClassPath.substring(0, currentClassPath.length() - 8) + "conf/"+prop.getProperty("kerberos.jass.name");
+        String  krbPath = currentClassPath.substring(0,currentClassPath.length() - 8) + "conf/"+prop.getProperty("kerberos.krb.name");
 
         logger.info("getKafkaPartitionNumQuota jaasPath: " + jaasPath);
         System.setProperty("java.security.auth.login.config", jaasPath);
@@ -58,12 +71,17 @@ public class kafkaUtils {
         return partitionQuota;
     }
     public static Quota getKafkaSpaceQuota(String topicName){
+        String shellClassPath = new kafkaUtils().getClass().getResource("/").getPath();
+        String shellPath = shellClassPath.substring(0,shellClassPath.length() - 8) + "conf/";
+
         Quota partitionQuota;
         Process process = null;
         List<String> processList = new ArrayList<String>();
         BufferedReader input = null;
         try {
-            process = Runtime.getRuntime().exec("sh /home/ai/getKafakQuota.sh  "+topicName+"-*"+"\n");
+            String execStr = "sh " + shellPath + prop.getProperty("getKafakQuota.sh.name")+" "+topicName+"-*"+"\n";
+            logger.info("getKafkaSpaceQuota execStr: " + execStr);
+            process = Runtime.getRuntime().exec(execStr);
             input = new BufferedReader(new InputStreamReader(process.getInputStream()));
         } catch (Exception e) {
             logger.error("KafkaUtils getKafkaSpaceQuota Exception"+e.getMessage());
@@ -81,7 +99,7 @@ public class kafkaUtils {
                 if(Integer.valueOf(processList.get(0))>Integer.MAX_VALUE){throw new IOException("num is too large!!");}
                 partitionQuota= new Quota("partitionQuota",String.valueOf(processList.get(0)),"","","kafka topic partition used size");
                 input.close();
-            }catch (IOException e){
+            }catch (Exception e){
                 logger.info("KafkaUtils getKafkaSpaceQuota IOException"+e.getMessage());
                 Quota partitionQuota2= new Quota("partitionQuota","-1","","","kafka topic partition used size");
                 return partitionQuota2;

@@ -30,8 +30,8 @@ public class YarnUtil {
         String restresult = "";
         String yarnresturl = "http://"+yarnurl+"/ws/v1/cluster/scheduler";
 
-        Quota memoryquota = new Quota("yarnQueueQuota","","","","queue memory quota(GB)");
-        Quota vcoresquota = new Quota("queueVcoreQuota","","","","queue vcore qutoa(GB)");
+        Quota memoryquota = new Quota("yarnQueueQuota","","","","queue memory quota(MB)");
+        Quota vcoresquota = new Quota("queueVcoreQuota","","","","queue vcore qutoa(MB)");
 
         HttpURLConnection conn = null;
         BufferedReader reader;
@@ -90,9 +90,9 @@ public class YarnUtil {
                     String resourcesUsed = json6.getString("resourcesUsed");
                     JSONObject json7 = new JSONObject(resourcesUsed);
                     String memory = json7.getString("memory");
-                    int memoryGb = Integer.valueOf(memory) / 1024;
+                    int memoryGb = Integer.valueOf(memory);
                     memoryquota.setName("queueMemoryQuota");
-                    memoryquota.setUsed(String.valueOf(memoryGb));
+                    memoryquota.setUsed(String.valueOf(memoryGb)+"(MB)");
                     String vCores = json7.getString("vCores");
                     vcoresquota.setName("queueVcoreQuota");
                     vcoresquota.setUsed(vCores);

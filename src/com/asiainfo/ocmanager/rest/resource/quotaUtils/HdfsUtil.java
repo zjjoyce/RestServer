@@ -1,8 +1,13 @@
 package com.asiainfo.ocmanager.rest.resource.quotaUtils;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
+
 import com.asiainfo.ocmanager.persistence.model.Quota;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.ContentSummary;
@@ -16,12 +21,8 @@ import org.apache.log4j.Logger;
  */
 public class HdfsUtil {
 
-    public static final String KEYTAB_FILE_KEY = "hdfs.keytab.file";
-    public static final String USER_NAME_KEY = "hdfs.kerberos.principal";
-    public static final String DEFAULT_FS = "fs.defaultFS";
-    public static final String AUTHENTICATION = "hadoop.security.authentication";
-
     public static final Configuration conf = new Configuration();
+    private static Properties prop = new Properties();
     private static Logger logger = Logger.getLogger(HdfsUtil.class);
 //    private static Quota filesquota;
 //    private static Quota spacequota;
@@ -44,24 +45,35 @@ public class HdfsUtil {
         }
 
     }*/
+    static {
+        String classPath = new AmbariUtil().getClass().getResource("/").getPath();
+        String currentClassesPath = classPath.substring(0, classPath.length() - 8)+ "conf/config.properties";
+        try{
+            InputStream inStream = new FileInputStream(new File(currentClassesPath ));
+    //            prop = new Properties();
+            prop.load(inStream);
+        }catch(IOException e){
+            logger.error(e.getMessage());
+        }
+    }
 
     public static List<Quota> getHDFSData(String path){
 
         String currentClassPath = new HdfsUtil().getClass().getResource("/").getPath();
-        String  keytabPath= currentClassPath.substring(0, currentClassPath.length() - 8) + "conf/shixiuru.keytab";
-        String  krbPath = currentClassPath.substring(0,currentClassPath.length() - 8) + "conf/krb5.conf";
-        String dfsurl = AmbariUtil.getUrl("hdfs");
+        String  keytabPath= currentClassPath.substring(0, currentClassPath.length() - 8) + "conf/"+prop.getProperty("hdfs.kerberos.keytab.name");
+        String  krbPath = currentClassPath.substring(0,currentClassPath.length() - 8) + "conf/"+prop.getProperty("kerberos.krb.name");
+        String dfsurl =AmbariUtil.getUrl("hdfs");
 
-        conf.set(KEYTAB_FILE_KEY, keytabPath);
-        conf.set(DEFAULT_FS,dfsurl);
-        conf.set(AUTHENTICATION,"kerberos");
+        conf.set("hdfs.keytab.file", keytabPath);
+        conf.set("fs.defaultFS",dfsurl);
+        conf.set("hadoop.security.authentication","kerberos");
         System.setProperty("java.security.krb5.conf",krbPath);
         UserGroupInformation.setConfiguration(conf);
 
         Quota filesquota = new Quota("nameSpaceQuota","","","","hdfs file quota");
         Quota spacequota = new Quota("storageSpaceQuota","","","","hdfs space quota");
         try {
-            UserGroupInformation.loginUserFromKeytab("shixiuru@EXAMPLE.COM",keytabPath);
+            UserGroupInformation.loginUserFromKeytab(prop.getProperty("hadoop.kerberos.principal"),keytabPath);
             FileSystem fs = FileSystem.get(conf);
             ContentSummary contentSum = fs.getContentSummary(new Path(path));
             long Quota = contentSum.getQuota();
@@ -81,12 +93,12 @@ public class HdfsUtil {
             logger.info("spacequota:"+spaceQuota+"---------  spaceconsumed:"+spaceConsumed);
             if(spaceQuota==-1){
                 spacequota.setSize("");
-                spacequota.setUsed(String.valueOf(spaceConsumed/1024/1024/1024));
+                spacequota.setUsed(String.valueOf(spaceConsumed)+"(B)");
                 spacequota.setAvailable("");
             }else {
-                spacequota.setSize(String.valueOf(spaceQuota/1024/1024/1024));
-                spacequota.setUsed(String.valueOf(spaceConsumed/1024/1024/1024));
-                spacequota.setAvailable(String.valueOf((spaceQuota-spaceConsumed)/1024/1024/1024));
+                spacequota.setSize(String.valueOf(spaceQuota)+"(B)");
+                spacequota.setUsed(String.valueOf(spaceConsumed)+"(B)");
+                spacequota.setAvailable(String.valueOf(spaceQuota-spaceConsumed)+"(B)");
             }
         } catch (IOException e) {
             logger.error("IOException :" +e);
