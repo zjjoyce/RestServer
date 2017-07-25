@@ -35,6 +35,8 @@ public class dacpForResourceUtil {
     private static String uri = "";
     private static String url = "";
     private static String team_code = "";
+    private static String thriftUri = "";
+    private static String thriftUrl = "";
     public static Map<String, List> getResult(String tenantId) {
         Team team = TeamWrapper.getTeamFromTenant(tenantId);
         team_code = team.getteam_code();
@@ -128,6 +130,12 @@ public class dacpForResourceUtil {
 
         dbRegisterList.add(dbRegister);
         dbDistributionList.add(dbDistribution);
+        if(backingservice_name.toLowerCase().equals("hive")){
+            dbRegister.setUrl(thriftUrl);
+            dbDistribution.setUrl(thriftUrl);
+            dbRegisterList.add(dbRegister);
+            dbDistributionList.add(dbDistribution);
+        }
     }
 
     /*数据注册与分配实例，并分别加入队列*/
@@ -153,7 +161,11 @@ public class dacpForResourceUtil {
                 databasename = credentialsJsonObj.get("name").getAsString();
             }
         }
-        url = DBUrlEnum.getDBUrlEnum(backingservice_name.toLowerCase(), uri, host, port, databasename);//url
+        if(credentialsJsonObj.has("thriftUri")){
+            thriftUri = credentialsJsonObj.get("thriftUri").getAsString();
+        }
+        thriftUrl = DBUrlEnum.getDBUrlEnum(backingservice_name.toLowerCase(), thriftUri, host, port, databasename,username);//thriftUrl
+        url = DBUrlEnum.getDBUrlEnum(backingservice_name.toLowerCase(), uri, host, port, databasename,username);//url
     }
 
     private static boolean isHadoopflag(String backingservice_name) {
