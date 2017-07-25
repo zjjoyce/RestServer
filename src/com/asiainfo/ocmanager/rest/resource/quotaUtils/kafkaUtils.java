@@ -16,7 +16,7 @@ import java.util.*;
  * Created by yujin on 2017/6/29.
  */
 public class kafkaUtils {
-    private static final Properties propsp = new Properties();
+    private static Properties propsp = new Properties();
     private static Logger logger = Logger.getLogger(kafkaUtils.class);
     private static Properties prop = new Properties();
 
