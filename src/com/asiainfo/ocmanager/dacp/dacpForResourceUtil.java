@@ -131,10 +131,31 @@ public class dacpForResourceUtil {
         dbRegisterList.add(dbRegister);
         dbDistributionList.add(dbDistribution);
         if(backingservice_name.toLowerCase().equals("hive")){
-            dbRegister.setUrl(thriftUrl);
-            dbDistribution.setUrl(thriftUrl);
-            dbRegisterList.add(dbRegister);
-            dbDistributionList.add(dbDistribution);
+            DBRegister dbRegister_sparksql = new DBRegister();
+            dbRegister_sparksql.setXmlid(instance_id);
+            dbRegister_sparksql.setDbname(databasename);
+            dbRegister_sparksql.setCnname(databasename);
+            dbRegister_sparksql.setDriverclassname(driverclassname);
+            dbRegister_sparksql.setUrl(thriftUrl);
+            dbRegister_sparksql.setUsername(username);
+            dbRegister_sparksql.setPassword(password);
+            dbRegister_sparksql.setRemark(remark);
+            dbRegister_sparksql.setAlias(backingservice_name.toLowerCase());
+
+            DBDistribution dbDistribution_sparksql = new DBDistribution();
+            dbDistribution_sparksql.setDbname(databasename);
+            dbDistribution_sparksql.setCnname(databasename);
+            dbDistribution_sparksql.setDriverclassname(driverclassname);
+            dbDistribution_sparksql.setUrl(thriftUrl);
+            dbDistribution_sparksql.setUsername(username);
+            dbDistribution_sparksql.setPassword(password);
+            dbDistribution_sparksql.setState(state);
+            dbDistribution_sparksql.setTeam_code(team_code);
+            dbDistribution_sparksql.setDbtype(backingservice_name.toLowerCase());
+
+
+            dbRegisterList.add(dbRegister_sparksql);
+            dbDistributionList.add(dbDistribution_sparksql);
         }
     }
 
