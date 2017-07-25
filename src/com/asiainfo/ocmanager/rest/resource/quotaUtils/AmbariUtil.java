@@ -39,16 +39,69 @@ public class AmbariUtil {
         }
     }
 
+
     public static String getUrl(String servicename){
 
-//        getProp();
         String result = "";
+        if(servicename.equals("hdfs")){
+            result = getHdfsUrl();
+        }else{
+            String clustername = getClustername();
+            String url = "";
+
+            if(servicename.equals("yarn")){
+                url = "http://"+(prop.getProperty("ambari.host"))+"/api/v1/clusters/"+clustername+"/configurations?type="
+                    +servicename+"-"+prop.getProperty("ambari.type")+"&tag="+getTags("yarn");
+            }
+            if(servicename.equals("hbase")){
+                url = "http://"+(prop.getProperty("ambari.host"))+"/api/v1/clusters/"+clustername+"/configurations?type="
+                    +servicename+"-"+prop.getProperty("ambari.type")+"&tag="+getTags("hbase");
+            }
+
+            logger.info("url is :"+url);
+            HttpURLConnection conn = null ;
+            try {
+                conn = (HttpURLConnection)new URL(url).openConnection();
+                Base64 base64 = new Base64();
+                String encoded = base64.encodeToString((prop.getProperty("ambari.username") + ":" + prop.getProperty("ambari.password")).getBytes("UTF-8"));
+                conn.setRequestProperty("Authorization", "Basic " + encoded);
+                int resultCode = conn.getResponseCode();
+                logger.info("response code is :" + resultCode);
+                if (resultCode == 200) {
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                    String line = "";
+                    String fsResult = "";
+                    while ((line = reader.readLine()) != null) {
+                        fsResult += line;
+                    }
+//                    System.out.println(fsResult);
+                    JSONObject json = new JSONObject(fsResult);
+                    JSONArray items = json.getJSONArray("items");
+                    String itemStr = items.toString().replace("[","").replace("]","");
+                    JSONObject newItem = new JSONObject(itemStr);
+                    JSONObject properties = newItem.getJSONObject("properties");
+                    logger.info("servicename is :" +servicename);
+                    result = properties.getString(getparametername(servicename));
+                }
+
+            } catch (Exception e) {
+                logger.error(e.getMessage());
+            } finally {
+                conn.disconnect();
+            }
+        }
+
+        return result;
+
+    }
+
+    public static String getHdfsUrl(){
+
         String clustername = getClustername();
-//        String version = getTag();
-//        String url = "http://"+(prop.getProperty("ambari.host"))+"/api/v1/clusters/"+clustername+"/configurations?type="+servicename+"-site&tag="+version;
-        String url = "http://"+(prop.getProperty("ambari.host"))+"/api/v1/clusters/"+clustername+"/configurations?type="+servicename+"-site&tag=version1";
+        String url = "http://"+(prop.getProperty("ambari.host"))+"/api/v1/clusters/"+clustername+"/host_components?HostRoles/component_name=NAMENODE&metrics/dfs/FSNamesystem/HAState=active";
         logger.info("url is :"+url);
         HttpURLConnection conn = null ;
+        String result = "";
         try {
             conn = (HttpURLConnection)new URL(url).openConnection();
             Base64 base64 = new Base64();
@@ -63,23 +116,26 @@ public class AmbariUtil {
                 while ((line = reader.readLine()) != null) {
                     fsResult += line;
                 }
+//                System.out.println(fsResult);
                 JSONObject json = new JSONObject(fsResult);
                 JSONArray items = json.getJSONArray("items");
                 String itemStr = items.toString().replace("[","").replace("]","");
                 JSONObject newItem = new JSONObject(itemStr);
-                JSONObject properties = newItem.getJSONObject("properties");
-                logger.info("servicename is :" +servicename);
-                result = properties.getString(getparametername(servicename));
+                JSONObject hostRoles = newItem.getJSONObject("HostRoles");
+                String hostname = hostRoles.getString("host_name");
+                result = hostname;
+//                System.out.println(hostname);
+                logger.info("hostname is:"+result);
+                logger.info("servicename is :hdfs");
             }
-
         } catch (Exception e) {
             logger.error(e.getMessage());
         } finally {
             conn.disconnect();
         }
         return result;
-
     }
+
     public static String getparametername(String servicename){
 
         String parametername = null;
@@ -95,23 +151,21 @@ public class AmbariUtil {
     }
 
 
-    public static String getTag(){
+    public static String getTags(String servicename){
 
-//        getProp();
-        String result="";
+        String result = "";
         String clustername = getClustername();
-        String rmHost = getrmHost();
-        String url = "http://"+(prop.getProperty("ambari.host"))+"/api/v1/clusters/"+clustername+"/hosts/"+rmHost+"/host_components/RESOURCEMANAGER?fields=HostRoles/actual_configs/capacity-scheduler";
+        String url = "http://10.247.33.57:8080/api/v1/clusters/hip/configurations?type=";
+        String assurl = url+servicename+"-"+prop.getProperty("ambari.type");
+        logger.info("url is :"+assurl);
         HttpURLConnection conn = null ;
-
         try {
-            conn = (HttpURLConnection)new URL(url).openConnection();
-            String user = "admin";
-            String passwd = "admin";
+            conn = (HttpURLConnection)new URL(assurl).openConnection();
             Base64 base64 = new Base64();
-            String encoded = base64.encodeToString((user + ":" + passwd).getBytes("UTF-8"));
+            String encoded = base64.encodeToString((prop.getProperty("ambari.username") + ":" + prop.getProperty("ambari.password")).getBytes("UTF-8"));
             conn.setRequestProperty("Authorization", "Basic " + encoded);
             int resultCode = conn.getResponseCode();
+            logger.info("response code is :" + resultCode);
             if (resultCode == 200) {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                 String line = "";
@@ -119,14 +173,15 @@ public class AmbariUtil {
                 while ((line = reader.readLine()) != null) {
                     fsResult += line;
                 }
+//                System.out.println(fsResult);
+                List list = new ArrayList<>();
                 JSONObject json = new JSONObject(fsResult);
-                JSONObject json1 = new JSONObject(json.getString("HostRoles"));
-                JSONObject json2 = new JSONObject(json1.getString("actual_configs"));
-                JSONObject json3 = new JSONObject(json2.getString("capacity-scheduler"));
-                String version = json3.getString("default");
-                result = version;
+                JSONArray items = json.getJSONArray("items");
+                String lastObject = items.getString(items.length()-1);
+                JSONObject lastversion = new JSONObject(lastObject);
+                result = lastversion.getString("tag");
+                logger.info("servicename is :hdfs");
             }
-
         } catch (Exception e) {
             logger.error(e.getMessage());
         } finally {
@@ -135,51 +190,6 @@ public class AmbariUtil {
         return result;
     }
 
-    public static String getrmHost(){
-
-//        getProp();
-        String result="";
-        String clustername = getClustername();
-        String url = "http://"+(prop.getProperty("ambari.host"))+"/api/v1/clusters/"+clustername+"/services/YARN/components/RESOURCEMANAGER";
-        HttpURLConnection conn = null ;
-
-        try {
-            conn = (HttpURLConnection)new URL(url).openConnection();
-            String user = "admin";
-            String passwd = "admin";
-            Base64 base64 = new Base64();
-            String encoded = base64.encodeToString((user + ":" + passwd).getBytes("UTF-8"));
-            conn.setRequestProperty("Authorization", "Basic " + encoded);
-            int resultCode = conn.getResponseCode();
-            List<String> list = new ArrayList<>();
-            if (resultCode == 200) {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                String line = "";
-                String fsResult = "";
-                while ((line = reader.readLine()) != null) {
-                    fsResult += line;
-                }
-                logger.info("result of getRmHost result is:"+fsResult);
-                JSONObject json = new JSONObject(fsResult);
-                JSONArray items = json.getJSONArray("host_components");
-                for(int i = 0;i<items.length();i++){
-                    String str = items.getString(i);
-                    JSONObject json1 = new JSONObject(str);
-                    String hostroles = json1.getString("HostRoles");
-                    JSONObject json2 = new JSONObject(hostroles);
-                    String rmhost = json2.getString("host_name");
-                    list.add(rmhost);
-                }
-            }
-            result = list.get(1);
-
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-        } finally {
-            conn.disconnect();
-        }
-        return result;
-    }
 
     public static String getClustername(){
 
@@ -227,21 +237,4 @@ public class AmbariUtil {
         return result;
     }
 
-
-    public static void getProp(){
-        String classPath = new AmbariUtil().getClass().getResource("/").getPath();
-        String currentClassesPath = classPath.substring(0, classPath.length() - 8)+ "conf/config.properties";
-        try{
-            InputStream inStream = new FileInputStream(new File(currentClassesPath ));
-            prop = new Properties();
-            prop.load(inStream);
-        }catch(IOException e){
-            logger.error(e.getMessage());
-        }
-    }
-    /*public static void main(String[] args){
-        String service = "hdfs";
-        String result =new AmbariUtil().getUrl(service);
-        System.out.println(result);
-    }*/
 }

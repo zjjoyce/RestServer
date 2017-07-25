@@ -90,9 +90,9 @@ public class YarnUtil {
                     String resourcesUsed = json6.getString("resourcesUsed");
                     JSONObject json7 = new JSONObject(resourcesUsed);
                     String memory = json7.getString("memory");
-                    int memoryGb = Integer.valueOf(memory) / 1024;
+                    int memoryGb = Integer.valueOf(memory);
                     memoryquota.setName("queueMemoryQuota");
-                    memoryquota.setUsed(String.valueOf(memoryGb));
+                    memoryquota.setUsed(String.valueOf(memoryGb)+"(MB)");
                     String vCores = json7.getString("vCores");
                     vcoresquota.setName("queueVcoreQuota");
                     vcoresquota.setUsed(vCores);

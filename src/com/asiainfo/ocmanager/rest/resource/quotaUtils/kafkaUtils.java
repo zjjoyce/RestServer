@@ -20,6 +20,18 @@ public class kafkaUtils {
     private static Logger logger = Logger.getLogger(kafkaUtils.class);
     private static Properties prop = new Properties();
 
+    static {
+        String classPath = new AmbariUtil().getClass().getResource("/").getPath();
+        String currentClassesPath = classPath.substring(0, classPath.length() - 8)+ "conf/config.properties";
+        try{
+            InputStream inStream = new FileInputStream(new File(currentClassesPath ));
+            //            prop = new Properties();
+            prop.load(inStream);
+        }catch(IOException e){
+            logger.error(e.getMessage());
+        }
+    }
+
 
     public  static Quota  getKafkaPartitionNumQuota(String topicName){
 
