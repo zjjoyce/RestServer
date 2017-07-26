@@ -69,11 +69,10 @@ public class HbaseUtil {
 
     public static List<Quota> getHbaseData(String namespace){
 
-        Connection hconn;
-        Admin admin;
         int tabnum = 0;
         int regnum = 0;
         List<Quota> result = new ArrayList<Quota>();
+        //testing environment
         String currentClassPath = new HbaseUtil().getClass().getResource("/").getPath();
         String  keytabPath= currentClassPath.substring(0, currentClassPath.length() - 8) +"conf/"+prop.getProperty("hbase.kerberos.keytab.name");
         String  krbPath = currentClassPath.substring(0,currentClassPath.length() - 8) + "conf/"+prop.getProperty("kerberos.krb.name");
@@ -90,9 +89,10 @@ public class HbaseUtil {
         UserGroupInformation.setConfiguration(conf);
 
         try {
-            UserGroupInformation.loginUserFromKeytab(prop.getProperty("kerberhbase.master.kerberos.principal"), keytabPath);
-            hconn = ConnectionFactory.createConnection(conf);
-            admin = hconn.getAdmin();
+            UserGroupInformation.loginUserFromKeytab(prop.getProperty("hbase.kerberos.principal"), keytabPath);
+            Connection hconn = ConnectionFactory.createConnection(conf);
+            Admin admin = hconn.getAdmin();
+
             TableName[] tables = admin.listTableNamesByNamespace(namespace);
             tabnum = tables.length;
             for(TableName tab:tables){

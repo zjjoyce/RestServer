@@ -21,7 +21,7 @@ public class kafkaUtils {
     private static Properties prop = new Properties();
 
     static {
-        String classPath = new AmbariUtil().getClass().getResource("/").getPath();
+        String classPath = new kafkaUtils().getClass().getResource("/").getPath();
         String currentClassesPath = classPath.substring(0, classPath.length() - 8)+ "conf/config.properties";
         try{
             InputStream inStream = new FileInputStream(new File(currentClassesPath ));
