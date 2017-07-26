@@ -12,11 +12,11 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by YANLSH
@@ -66,8 +66,14 @@ public class dacpForResourceUtil {
                         if(!"Unbound".equals(phase)){
                             if(!backingservice_name.toLowerCase().equals("hive")) continue;
                             if(specJsonObj.get("binding").isJsonArray()){
+                                /*JsonArray bindingJsonArray = specJsonObj.get("binding").getAsJsonArray();
+                                JsonObject bindObj = bindingJsonArray.get(0).getAsJsonObject();*///no sort
                                 JsonArray bindingJsonArray = specJsonObj.get("binding").getAsJsonArray();
-                                JsonObject bindObj = bindingJsonArray.get(0).getAsJsonObject();
+
+                                String sortByUserBindingStr = sortByUsername(bindingJsonArray.toString());
+
+                                JsonObject bindObj = (JsonObject) parser.parse(sortByUserBindingStr);//have sort
+
                                 if(bindObj != null){
                                     JsonObject credentialJsonObj = bindObj.get("credentials").getAsJsonObject();
                                     assignForDBInfo(credentialJsonObj,backingservice_name);
@@ -196,5 +202,40 @@ public class dacpForResourceUtil {
         }else{
             return false;
         }
+    }
+
+    private static String sortByUsername (String bindingJsonArray){
+        JSONArray jsonArr = null;
+        JSONArray sortedJsonArray = new JSONArray();
+        List<JSONObject> jsonValues = new ArrayList<JSONObject>();
+        String bindObjStr="";
+        try {
+            jsonArr = new JSONArray(bindingJsonArray);
+            for (int i = 0; i < jsonArr.length(); i++) {
+                jsonValues.add(jsonArr.getJSONObject(i));
+            }
+            Collections.sort(jsonValues, new Comparator<JSONObject>() {
+                private static final String KEY_NAME = "bind_hadoop_user";
+
+                public int compare(JSONObject a, JSONObject b) {
+                    String valA = new String();
+                    String valB = new String();
+                    try {
+                        valA = (String) a.get(KEY_NAME);
+                        valB = (String) b.get(KEY_NAME);
+                    } catch (JSONException e) {
+                        logger.info("DacpforResourceUtil Collections sort compare" + e.getMessage());
+                    }
+                    return valA.compareTo(valB);
+                }
+            });
+            for (int i = 0; i < jsonArr.length(); i++) {
+                sortedJsonArray.put(jsonValues.get(i));
+            }
+            bindObjStr = sortedJsonArray.get(0).toString();
+        } catch (JSONException e) {
+            logger.info("DacpforResourceUtil sortByUsername" + e.getMessage());
+        }
+        return bindObjStr;
     }
 }
