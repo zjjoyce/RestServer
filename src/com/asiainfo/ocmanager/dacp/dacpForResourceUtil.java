@@ -107,9 +107,9 @@ public class dacpForResourceUtil {
         String remark = "";//remark
 
         DBRegister dbRegister = new DBRegister();
-        dbRegister.setXmlid(instance_id);
-        dbRegister.setDbname(databasename);
-        dbRegister.setCnname(databasename);
+        dbRegister.setXmlid("hive_"+instance_id);
+        dbRegister.setDbname("hive_"+databasename);
+        dbRegister.setCnname("hive_"+databasename);
         dbRegister.setDriverclassname(driverclassname);
         dbRegister.setUrl(url);
         dbRegister.setUsername(username);
@@ -118,8 +118,8 @@ public class dacpForResourceUtil {
         dbRegister.setAlias(backingservice_name.toLowerCase());
 
         DBDistribution dbDistribution = new DBDistribution();
-        dbDistribution.setDbname(databasename);
-        dbDistribution.setCnname(databasename);
+        dbDistribution.setDbname("hive_"+databasename);
+        dbDistribution.setCnname("hive_"+databasename);
         dbDistribution.setDriverclassname(driverclassname);
         dbDistribution.setUrl(url);
         dbDistribution.setUsername(username);
@@ -132,9 +132,9 @@ public class dacpForResourceUtil {
         dbDistributionList.add(dbDistribution);
         if(backingservice_name.toLowerCase().equals("hive")){
             DBRegister dbRegister_sparksql = new DBRegister();
-            dbRegister_sparksql.setXmlid(instance_id);
-            dbRegister_sparksql.setDbname(databasename);
-            dbRegister_sparksql.setCnname(databasename);
+            dbRegister_sparksql.setXmlid("spark_"+instance_id);
+            dbRegister_sparksql.setDbname("spark_"+databasename);
+            dbRegister_sparksql.setCnname("spark_"+databasename);
             dbRegister_sparksql.setDriverclassname(driverclassname);
             dbRegister_sparksql.setUrl(thriftUrl);
             dbRegister_sparksql.setUsername(username);
@@ -143,8 +143,8 @@ public class dacpForResourceUtil {
             dbRegister_sparksql.setAlias(backingservice_name.toLowerCase());
 
             DBDistribution dbDistribution_sparksql = new DBDistribution();
-            dbDistribution_sparksql.setDbname(databasename);
-            dbDistribution_sparksql.setCnname(databasename);
+            dbDistribution_sparksql.setDbname("spark_"+databasename);
+            dbDistribution_sparksql.setCnname("spark_"+databasename);
             dbDistribution_sparksql.setDriverclassname(driverclassname);
             dbDistribution_sparksql.setUrl(thriftUrl);
             dbDistribution_sparksql.setUsername(username);

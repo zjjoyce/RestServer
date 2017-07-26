@@ -55,7 +55,7 @@ public enum DBUrlEnum {
             dacpSecurityKrb5Realm = ParamQuery.getCFProperties().get(ParamQuery.DACP_JAVA_SECURITY_KRB5_REALM);
             dacpSecutityKrb5Kdc = ParamQuery.getCFProperties().get(ParamQuery.DACP_JAVA_SECURITY_KRB5_KDC);
             dacpHadoopSecurityAuth = ParamQuery.getCFProperties().get(ParamQuery.DACP_HADOOP_SECURITY_AUTHENTICATION);
-            dacpKeytabFile = ParamQuery.getCFProperties().get(ParamQuery.DACP_KEYTAB_FILE);
+            dacpKeytabFile = ParamQuery.getCFProperties().get(ParamQuery.DACP_KEYTAB_FILE) + usename + ".keytab;";
             //dacpKerosPrincipal = ParamQuery.getCFProperties().get(ParamQuery.DACP_KERBEROS_PRINCIPAL);
         } catch (IOException e) {
             System.out.println("DBUrlEnum IOException " + e.getMessage());
