@@ -155,7 +155,7 @@ public class AmbariUtil {
 
         String result = "";
         String clustername = getClustername();
-        String url = "http://10.247.33.57:8080/api/v1/clusters/hip/configurations?type=";
+        String url = "http://"+prop.getProperty("ambari.host")+"/api/v1/clusters/"+clustername+"/configurations?type=";
         String assurl = url+servicename+"-"+prop.getProperty("ambari.type");
         logger.info("url is :"+assurl);
         HttpURLConnection conn = null ;
