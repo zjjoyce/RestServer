@@ -69,11 +69,10 @@ public class HbaseUtil {
 
     public static List<Quota> getHbaseData(String namespace){
 
-        Connection hconn;
-        Admin admin;
         int tabnum = 0;
         int regnum = 0;
         List<Quota> result = new ArrayList<Quota>();
+        //testing environment
         String currentClassPath = new HbaseUtil().getClass().getResource("/").getPath();
         String  keytabPath= currentClassPath.substring(0, currentClassPath.length() - 8) +"conf/"+prop.getProperty("hbase.kerberos.keytab.name");
         String  krbPath = currentClassPath.substring(0,currentClassPath.length() - 8) + "conf/"+prop.getProperty("kerberos.krb.name");
@@ -89,10 +88,29 @@ public class HbaseUtil {
         System.setProperty("java.security.krb5.conf",krbPath);
         UserGroupInformation.setConfiguration(conf);
 
+        //production environment
+//        String currentClassPath = new HbaseUtil().getClass().getResource("/").getPath();
+//        String  keytabPath= currentClassPath.substring(0, currentClassPath.length() - 8) + "conf/"+prop.getProperty("kerberos.keytab.name");
+//        String  krbPath = currentClassPath.substring(0,currentClassPath.length() - 8) +"conf/"+prop.getProperty("kerberos.krb51.name");
+//        String hbaseurl = AmbariUtil.getUrl("hbase");
+//
+//        conf.set("hbase.zookeeper.quorum", hbaseurl);
+//        conf.set("hbase.zookeeper.property.clientPort", prop.getProperty("hbase.clientport"));
+//        conf.set("zookeeper.znode.parent", prop.getProperty("zookeeper.znode.parent"));
+//
+//        conf.set("hadoop.security.authentication", "kerberos");
+//        conf.set("hbase.security.authentication", "kerberos");
+//        conf.set("hbase.master.kerberos.principal", prop.getProperty("hbase.master.kerberos.principal"));
+//        conf.set("hbase.regionserver.kerberos.principal", prop.getProperty("hbase.regionserver.kerberos.principal"));
+//        //System.setProperty("sun.security.krb5.debug", "true");
+//        System.setProperty("java.security.krb5.conf",krbPath);
+//        UserGroupInformation.setConfiguration(conf);
         try {
-            UserGroupInformation.loginUserFromKeytab(prop.getProperty("kerberhbase.master.kerberos.principal"), keytabPath);
-            hconn = ConnectionFactory.createConnection(conf);
-            admin = hconn.getAdmin();
+            UserGroupInformation.loginUserFromKeytab(prop.getProperty("hbase.master.kerberos.principal"), keytabPath);
+//            UserGroupInformation.loginUserFromKeytab(prop.getProperty("kerberos.username"), keytabPath);
+            Connection hconn = ConnectionFactory.createConnection(conf);
+            Admin admin = hconn.getAdmin();
+
             TableName[] tables = admin.listTableNamesByNamespace(namespace);
             tabnum = tables.length;
             for(TableName tab:tables){
