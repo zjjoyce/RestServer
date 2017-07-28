@@ -111,32 +111,31 @@ public class dacpForResourceUtil {
         /*数据库分配*/
         String state = "on";
         String remark = "";//remark
-
-        DBRegister dbRegister = new DBRegister();
-        dbRegister.setXmlid("hive_"+instance_id);
-        dbRegister.setDbname("hive_"+databasename);
-        dbRegister.setCnname("hive_"+databasename);
-        dbRegister.setDriverclassname(driverclassname);
-        dbRegister.setUrl(url);
-        dbRegister.setUsername(username);
-        dbRegister.setPassword(password);
-        dbRegister.setRemark(remark);
-        dbRegister.setAlias(backingservice_name.toLowerCase());
-
-        DBDistribution dbDistribution = new DBDistribution();
-        dbDistribution.setDbname("hive_"+databasename);
-        dbDistribution.setCnname("hive_"+databasename);
-        dbDistribution.setDriverclassname(driverclassname);
-        dbDistribution.setUrl(url);
-        dbDistribution.setUsername(username);
-        dbDistribution.setPassword(password);
-        dbDistribution.setState(state);
-        dbDistribution.setTeam_code(team_code);
-        dbDistribution.setDbtype(backingservice_name.toLowerCase());
-
-        dbRegisterList.add(dbRegister);
-        dbDistributionList.add(dbDistribution);
         if(backingservice_name.toLowerCase().equals("hive")){
+            //hive_
+            DBRegister dbRegister_hive = new DBRegister();
+            dbRegister_hive.setXmlid("hive_"+instance_id);
+            dbRegister_hive.setDbname("hive_"+databasename);
+            dbRegister_hive.setCnname("hive_"+databasename);
+            dbRegister_hive.setDriverclassname(driverclassname);
+            dbRegister_hive.setUrl(url);
+            dbRegister_hive.setUsername(username);
+            dbRegister_hive.setPassword(password);
+            dbRegister_hive.setRemark(remark);
+            dbRegister_hive.setAlias(backingservice_name.toLowerCase());
+            DBDistribution dbDistribution_hive = new DBDistribution();
+            dbDistribution_hive.setDbname("hive_"+databasename);
+            dbDistribution_hive.setCnname("hive_"+databasename);
+            dbDistribution_hive.setDriverclassname(driverclassname);
+            dbDistribution_hive.setUrl(url);
+            dbDistribution_hive.setUsername(username);
+            dbDistribution_hive.setPassword(password);
+            dbDistribution_hive.setState(state);
+            dbDistribution_hive.setTeam_code(team_code);
+            dbDistribution_hive.setDbtype(backingservice_name.toLowerCase());
+            dbRegisterList.add(dbRegister_hive);
+            dbDistributionList.add(dbDistribution_hive);
+            //spark_
             DBRegister dbRegister_sparksql = new DBRegister();
             dbRegister_sparksql.setXmlid("spark_"+instance_id);
             dbRegister_sparksql.setDbname("spark_"+databasename);
@@ -159,10 +158,35 @@ public class dacpForResourceUtil {
             dbDistribution_sparksql.setTeam_code(team_code);
             dbDistribution_sparksql.setDbtype(backingservice_name.toLowerCase());
 
-
             dbRegisterList.add(dbRegister_sparksql);
             dbDistributionList.add(dbDistribution_sparksql);
+        }else{
+            DBRegister dbRegister = new DBRegister();
+            dbRegister.setXmlid(instance_id);
+            dbRegister.setDbname(databasename);
+            dbRegister.setCnname(databasename);
+            dbRegister.setDriverclassname(driverclassname);
+            dbRegister.setUrl(url);
+            dbRegister.setUsername(username);
+            dbRegister.setPassword(password);
+            dbRegister.setRemark(remark);
+            dbRegister.setAlias(backingservice_name.toLowerCase());
+
+            DBDistribution dbDistribution = new DBDistribution();
+            dbDistribution.setDbname(databasename);
+            dbDistribution.setCnname(databasename);
+            dbDistribution.setDriverclassname(driverclassname);
+            dbDistribution.setUrl(url);
+            dbDistribution.setUsername(username);
+            dbDistribution.setPassword(password);
+            dbDistribution.setState(state);
+            dbDistribution.setTeam_code(team_code);
+            dbDistribution.setDbtype(backingservice_name.toLowerCase());
+
+            dbRegisterList.add(dbRegister);
+            dbDistributionList.add(dbDistribution);
         }
+
     }
 
     /*数据注册与分配实例，并分别加入队列*/

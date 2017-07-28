@@ -202,7 +202,7 @@ public class quotaQuery {
                 useplace+=colloctio.toJson().getBytes().length;
             }
             String used = String.valueOf(useplace);
-            volumSize= new Quota("volumeSize","",used,"","mongodb database used size");
+            volumSize= new Quota("volumeSize","",used+"(B)","","mongodb database used size");
         }catch (Exception e){
             logger.info("quotaQuery getMongoQuota Exception "+e.getMessage());
             volumSize= new Quota("volumeSize","","-1","","mongodb database used size");

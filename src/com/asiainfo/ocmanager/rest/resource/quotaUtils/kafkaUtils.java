@@ -60,11 +60,12 @@ public class kafkaUtils {
             List<PartitionInfo> PartionInfoForTopic = consumer.partitionsFor(topicName);
             int partitionNum = PartionInfoForTopic.size();
             String partitionNumStr = String.valueOf(partitionNum);
-            partitionQuota= new Quota("partitionQuota",partitionNumStr,"","","kafka topic partiton num");
-            logger.info("partitionQuota is:" + partitionNumStr);
+            partitionQuota= new Quota("topicQuota","",partitionNumStr,"","kafka topic partiton num");
+            logger.info("topicQuota is:" + partitionNumStr);
         }catch (Exception e){
-            logger.info("KafkaUtils getKafkaPartitionNumQuota Exception "+e.getMessage());
-            Quota partitionQuota1= new Quota("partitionQuota","-1","","","kafka topic partiton num");
+            logger.info("KafkaUtils getKafkaPartitionNumQuota Exception: "+e.getMessage());
+            logger.info("KafkaUtils getKafkaPartitionNumQuota Exception,cause is : "+e.getCause());
+            Quota partitionQuota1= new Quota("topicQuota","","-1","","kafka topic partiton num");
             return partitionQuota1;
         }
 
@@ -84,8 +85,8 @@ public class kafkaUtils {
             process = Runtime.getRuntime().exec(execStr);
             input = new BufferedReader(new InputStreamReader(process.getInputStream()));
         } catch (Exception e) {
-            logger.error("KafkaUtils getKafkaSpaceQuota Exception"+e.getMessage());
-            Quota partitionQuota1= new Quota("partitionQuota","-1","","","kafka topic partition used size");
+            logger.error("KafkaUtils getKafkaSpaceQuota Exception:"+e.getMessage());
+            Quota partitionQuota1= new Quota("partitionQuota","","-1","","kafka topic partition used size");
             return partitionQuota1;
         } finally {
             try {
@@ -97,11 +98,11 @@ public class kafkaUtils {
                     logger.info("kafka topic partiton num"+pro);
                 }
                 if(Integer.valueOf(processList.get(0))>Integer.MAX_VALUE){throw new IOException("num is too large!!");}
-                partitionQuota= new Quota("partitionQuota",String.valueOf(processList.get(0)),"","","kafka topic partition used size");
+                partitionQuota= new Quota("partitionQuota","",String.valueOf(processList.get(0))+"(B)","","kafka topic partition used size");
                 input.close();
             }catch (Exception e){
-                logger.info("KafkaUtils getKafkaSpaceQuota IOException"+e.getMessage());
-                Quota partitionQuota2= new Quota("partitionQuota","-1","","","kafka topic partition used size");
+                logger.info("KafkaUtils getKafkaSpaceQuota IOException:"+e.getMessage());
+                Quota partitionQuota2= new Quota("partitionQuota","","-1","","kafka topic partition used size");
                 return partitionQuota2;
             }
 
