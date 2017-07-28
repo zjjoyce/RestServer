@@ -60,7 +60,7 @@ public class kafkaUtils {
             List<PartitionInfo> PartionInfoForTopic = consumer.partitionsFor(topicName);
             int partitionNum = PartionInfoForTopic.size();
             String partitionNumStr = String.valueOf(partitionNum);
-            partitionQuota= new Quota("topicQuota","",partitionNumStr+"(B)","","kafka topic partiton num");
+            partitionQuota= new Quota("topicQuota","",partitionNumStr,"","kafka topic partiton num");
             logger.info("topicQuota is:" + partitionNumStr);
         }catch (Exception e){
             logger.info("KafkaUtils getKafkaPartitionNumQuota Exception: "+e.getMessage());
