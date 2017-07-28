@@ -16,6 +16,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import com.asiainfo.ocmanager.dacp.DacpAllResult;
 import com.asiainfo.ocmanager.persistence.model.*;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
@@ -39,6 +40,10 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import com.asiainfo.ocmanager.rest.resource.quotaUtils.quotaQuery;
+import org.apache.log4j.Logger;
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 
 
 /**
@@ -159,4 +164,24 @@ public class QuotaResource {
     return Response.ok().entity(quota).build();
   }
 
+    @GET
+    @Path("dacp")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response syncToDacp(@Context HttpServletRequest request) {
+
+        Logger logger = Logger.getLogger(QuotaResource.class);
+        Map result = new HashMap<>();
+        String req = request.getParameter("tanantIds");
+        String[] tanantIds = req.split(",");
+        for(int i = 0;i<tanantIds.length;i++){
+            String tanantId = tanantIds[i];
+            String res = DacpAllResult.getAllResult(tanantId);
+            if(res.equals("true")){
+                result.put(tanantId,"dacp is 0k");
+            }else{
+                result.put(tanantId,"sync dacp is failed");
+            }
+        }
+        return Response.ok().entity(result).build();
+    }
 }
