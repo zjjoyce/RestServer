@@ -55,6 +55,7 @@ import com.asiainfo.ocmanager.rest.resource.utils.TenantPersistenceWrapper;
 import com.asiainfo.ocmanager.rest.resource.utils.UserRoleViewPersistenceWrapper;
 import com.asiainfo.ocmanager.rest.utils.DFPropertiesFoundry;
 import com.asiainfo.ocmanager.rest.utils.SSLSocketIgnoreCA;
+import com.asiainfo.ocmanager.rest.utils.UUIDFactory;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -435,8 +436,17 @@ public class TenantResource {
 						}
 						serviceInstance.setStatus(phase);
 						// set instance id, the id generated after Provisioning
-						serviceInstance.setId(serviceInstanceJson.getAsJsonObject().getAsJsonObject("spec")
-								.get("instance_id").getAsString());
+						JsonElement instanceId = serviceInstanceJson.getAsJsonObject().getAsJsonObject("spec")
+								.get("instance_id");
+						if (instanceId == null || instanceId.isJsonNull() || instanceId.getAsString().isEmpty()) {
+							// just make sure if the create failed and not
+							// return id in df, generate the uid by
+							// adapter self, in this way the data will
+							// be sync with df
+							serviceInstance.setId(UUIDFactory.getUUID());
+						} else {
+							serviceInstance.setId(instanceId.getAsString());
+						}
 
 						// insert the service instance into the adapter DB
 						ServiceInstancePersistenceWrapper.createServiceInstance(serviceInstance);
@@ -652,9 +662,9 @@ public class TenantResource {
 						logger.info("deleteServiceInstanceInTenant -> delete successfully");
 					}
 					String bodyStr = EntityUtils.toString(response1.getEntity());
-                    logger.info("delete instance call dacp before... ");
+					logger.info("delete instance call dacp before... ");
 					DacpAllResult.getAllResult(tenantId);
-                    logger.info("delete instance call dacp after... ");
+					logger.info("delete instance call dacp after... ");
 					return Response.ok().entity(bodyStr).build();
 				} finally {
 					response1.close();
