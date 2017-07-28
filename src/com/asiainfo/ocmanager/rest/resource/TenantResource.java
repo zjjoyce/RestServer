@@ -887,12 +887,19 @@ public class TenantResource {
 
 		int currentBound = instJson.getAsJsonObject().getAsJsonObject("spec").get("bound").getAsInt();
 
+		int count = 0;
 		while (currentBound == bound) {
+			// if the wait 3600s, think it is dead loop, break
+			if (count > 3600) {
+				logger.info("watiInstanceUnBindingComplete -> hit dead loop, break");
+				break;
+			}
 			logger.debug("watiInstanceUnBindingComplete -> waiting");
 			Thread.sleep(1000);
 			instStr = TenantResource.getTenantServiceInstancesFromDf(tenantId, instanceName);
 			instJson = new JsonParser().parse(instStr);
 			currentBound = instJson.getAsJsonObject().getAsJsonObject("spec").get("bound").getAsInt();
+			count++;
 		}
 
 	}
@@ -910,12 +917,19 @@ public class TenantResource {
 
 		int currentBound = instJson.getAsJsonObject().getAsJsonObject("spec").get("bound").getAsInt();
 
+		int count = 0;
 		while (currentBound == bound) {
+			// if the wait 3600s, think it is dead loop, break
+			if (count > 3600) {
+				logger.info("watiInstanceBindingComplete -> hit dead loop, break");
+				break;
+			}
 			logger.debug("watiInstanceBindingComplete -> waiting");
 			Thread.sleep(1000);
 			instStr = TenantResource.getTenantServiceInstancesFromDf(tenantId, instanceName);
 			instJson = new JsonParser().parse(instStr);
 			currentBound = instJson.getAsJsonObject().getAsJsonObject("spec").get("bound").getAsInt();
+			count++;
 		}
 
 	}
