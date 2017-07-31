@@ -51,7 +51,7 @@ public class DacpAllResult {
             //get userinfo
             List<UserInfo> userInfos = UserWrapper.getUserInfoFromUserRoleView(tenantId);
             //getDBRegister,DbDistribution,HadoopResource
-            Map<String,List> map = dacpForResourceUtil.getResult(tenantId);
+            Map<String,List> map = DacpForResourceUtil.getResult(tenantId);
             List<DBRegister> DBRegisters = map.get("database");
             List<DBDistribution> DBDistributions = map.get("transdatabase");
             // add data to info jsonObject
