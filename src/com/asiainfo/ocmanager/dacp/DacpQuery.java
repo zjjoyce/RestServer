@@ -1,13 +1,11 @@
 package com.asiainfo.ocmanager.dacp;
 
+import com.asiainfo.ocmanager.dacp.utils.Property;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLSession;
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 /**

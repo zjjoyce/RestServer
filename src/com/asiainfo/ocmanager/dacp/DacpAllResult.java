@@ -3,6 +3,7 @@ package com.asiainfo.ocmanager.dacp;
 import com.asiainfo.ocmanager.dacp.model.*;
 import com.asiainfo.ocmanager.dacp.service.TeamWrapper;
 import com.asiainfo.ocmanager.dacp.service.UserWrapper;
+import com.asiainfo.ocmanager.dacp.utils.Property;
 import com.asiainfo.ocmanager.rest.resource.quotaUtils.restClient;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

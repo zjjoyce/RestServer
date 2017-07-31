@@ -1,4 +1,4 @@
-package com.asiainfo.ocmanager.dacp;
+package com.asiainfo.ocmanager.dacp.utils;
 
 /**
  * Created by YANLSH
