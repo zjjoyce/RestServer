@@ -17,13 +17,13 @@ public class DacpQuery {
     private static HttpsURLConnection conn;
     private static BufferedReader reader;
 
-    public static String GetData(String name){
+    public static String GetTenantData(String tenantId){
 
         String restresult = "";
         try{
             String url = Property.getDFProperties().get(Property.DATAFOUNDRY_URL_DACP);
             String token = Property.getDFProperties().get(Property.DATAFOUNDRY_TOKEN_DACP);
-            String dfRestUrl = url + "/oapi/v1/namespaces/"+name+"/backingserviceinstances";
+            String dfRestUrl = url + "/oapi/v1/namespaces/"+tenantId+"/backingserviceinstances";
             Authentication.trustAllHttpsCertificates();
             conn = (HttpsURLConnection) new URL(dfRestUrl).openConnection();
             conn.setDefaultHostnameVerifier(Authentication.hv);
