@@ -12,8 +12,8 @@ import java.net.URL;
  * Created by Allen on 2017/7/3.
  * 调用DataFoundry API获取数据
  */
-public class DacpQuery {
-    private static Log logger = LogFactory.getLog(DacpQuery.class);
+public class DFDataQuery {
+    private static Log logger = LogFactory.getLog(DFDataQuery.class);
     private static HttpsURLConnection conn;
     private static BufferedReader reader;
 

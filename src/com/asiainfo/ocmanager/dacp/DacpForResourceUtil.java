@@ -27,7 +27,7 @@ public class DacpForResourceUtil {
 
     public static Log logger = LogFactory.getLog(DacpForResourceUtil.class);
 
-    private static Map<String, List> mapInfo;
+    private static Map<String, List> userInfoMap;
     private static List dbRegisterList;
     private static List dbDistributionList;
     private static String databasename = "";
@@ -38,17 +38,22 @@ public class DacpForResourceUtil {
     private static String team_code = "";
     private static String thriftUri = "";
     private static String thriftUrl = "";
-    public static Map<String, List> getResult(String tenantId) {
+
+    /**
+     * get database and database trans data from df using tenant id
+     */
+    public static Map<String, List> getDatabaseData(String tenantId) {
         Team team = TeamWrapper.getTeamFromTenant(tenantId);
         team_code = team.getteam_code();
         try {
-            String resourceJson = DacpQuery.GetTenantData(tenantId);
+            // get df backing service data using tenant id
+            String resourceJson = DFDataQuery.GetTenantData(tenantId);
             logger.info("call DF tenant instance resource: \r\n"+resourceJson);
             JsonParser parser = new JsonParser();
             JsonObject object = (JsonObject) parser.parse(resourceJson);
             // get items
             JsonArray itemsArray = object.get("items").getAsJsonArray();
-            mapInfo = new HashMap<>();
+            userInfoMap = new HashMap<>();
             dbRegisterList = new ArrayList<>();
             dbDistributionList = new ArrayList<>();
             for (int i = 0; i < itemsArray.size(); i++) {
@@ -92,8 +97,10 @@ public class DacpForResourceUtil {
                         boolean flag = provisioningJsonObj.get("credentials").isJsonObject();
                         if (flag) {
                             if(backingservice_name.toLowerCase().equals("neo4j")||
-                                    backingservice_name.toLowerCase().equals("mongodb")||
-                                    backingservice_name.toLowerCase().equals("rabbitmq")||backingservice_name.toLowerCase().equals("redis")) continue;
+                                backingservice_name.toLowerCase().equals("mongodb")||
+                                backingservice_name.toLowerCase().equals("rabbitmq")||
+                                backingservice_name.toLowerCase().equals("redis"))
+                                continue;
                             JsonObject credentialsJsonObj = provisioningJsonObj.get("credentials").getAsJsonObject();
                             assignForDBInfo(credentialsJsonObj,backingservice_name);
                         }
@@ -101,14 +108,14 @@ public class DacpForResourceUtil {
                     }
                 }
             }
-            mapInfo.put("database", dbRegisterList);
-            mapInfo.put("transdatabase", dbDistributionList);
+            userInfoMap.put("database", dbRegisterList);
+            userInfoMap.put("transdatabase", dbDistributionList);
 
         } catch (Exception e) {
             e.printStackTrace();
             logger.info("DacpforResourceUtil Exception " + e.getMessage());
         }
-        return mapInfo;
+        return userInfoMap;
     }
 
 
