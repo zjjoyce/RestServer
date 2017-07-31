@@ -6,10 +6,8 @@ import com.asiainfo.ocmanager.dacp.model.DBRegister;
 import com.asiainfo.ocmanager.dacp.model.Team;
 import com.asiainfo.ocmanager.dacp.service.TeamWrapper;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonIOException;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.jettison.json.JSONArray;
@@ -22,9 +20,9 @@ import java.util.*;
  * Created by YANLSH
  * Created on 2017/7/3
  */
-public class dacpForResourceUtil {
+public class DacpForResourceUtil {
 
-    public static Log logger = LogFactory.getLog(dacpForResourceUtil.class);
+    public static Log logger = LogFactory.getLog(DacpForResourceUtil.class);
 
     private static Map<String, List> mapInfo;
     private static List dbRegisterList;
