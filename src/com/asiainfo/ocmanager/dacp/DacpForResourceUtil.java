@@ -42,20 +42,22 @@ public class DacpForResourceUtil {
         Team team = TeamWrapper.getTeamFromTenant(tenantId);
         team_code = team.getteam_code();
         try {
-            String resourceJson = DacpQuery.GetData(tenantId);
+            String resourceJson = DacpQuery.GetTenantData(tenantId);
             logger.info("call DF tenant instance resource: \r\n"+resourceJson);
             JsonParser parser = new JsonParser();
             JsonObject object = (JsonObject) parser.parse(resourceJson);
-            JsonArray array = object.get("items").getAsJsonArray();
+            // get items
+            JsonArray itemsArray = object.get("items").getAsJsonArray();
             mapInfo = new HashMap<>();
             dbRegisterList = new ArrayList<>();
             dbDistributionList = new ArrayList<>();
-            for (int i = 0; i < array.size(); i++) {
-                JsonObject subObject = array.get(i).getAsJsonObject();
+            for (int i = 0; i < itemsArray.size(); i++) {
+                JsonObject subObject = itemsArray.get(i).getAsJsonObject();
                 JsonObject specJsonObj = subObject.get("spec").getAsJsonObject();
                 JsonObject statusJsonObj = subObject.get("status").getAsJsonObject();
                 String phase = statusJsonObj.get("phase").getAsString();
                 String instance_id = specJsonObj.get("instance_id").getAsString();
+                // if Failure do nothing
                 if (!"Failure".equals(phase)) {
                     JsonObject provisioningJsonObj = specJsonObj.get("provisioning").getAsJsonObject();
                     String backingservice_name = provisioningJsonObj.get("backingservice_name").getAsString();//dbname
@@ -63,8 +65,11 @@ public class DacpForResourceUtil {
                     String driverclassname = DriverTypeEnum.getDriverTypeEnum(driveTypeStr);
 
                     boolean hadoopflag = isHadoopflag(backingservice_name.toLowerCase());
-                    if(hadoopflag){
+                    // check if item is hadoop ecosystem,if not ,do nothing
+                    if(hadoopflag){//is hadoop ecosystem,get binding
+                        // if unbound ,do nothing
                         if(!"Unbound".equals(phase)){
+                            // only backing_service is hive ,then send to dacp ,or do nothing
                             if(!backingservice_name.toLowerCase().equals("hive")) continue;
                             if(specJsonObj.get("binding").isJsonArray()){
                                 /*JsonArray bindingJsonArray = specJsonObj.get("binding").getAsJsonArray();
@@ -83,12 +88,12 @@ public class DacpForResourceUtil {
                             }
                             DBEntityAssign(instance_id,backingservice_name,driverclassname);
                         }
-                    }else{
+                    }else{// is not hadoop ecosytem,get credentials
                         boolean flag = provisioningJsonObj.get("credentials").isJsonObject();
                         if (flag) {
                             if(backingservice_name.toLowerCase().equals("neo4j")||
                                     backingservice_name.toLowerCase().equals("mongodb")||
-                                    backingservice_name.toLowerCase().equals("rabbitmq")) continue;
+                                    backingservice_name.toLowerCase().equals("rabbitmq")||backingservice_name.toLowerCase().equals("redis")) continue;
                             JsonObject credentialsJsonObj = provisioningJsonObj.get("credentials").getAsJsonObject();
                             assignForDBInfo(credentialsJsonObj,backingservice_name);
                         }
