@@ -88,7 +88,7 @@ public class DacpForResourceUtil {
                             }
                             DBEntityAssign(instance_id,backingservice_name,driverclassname);
                         }
-                    }else{// is not hadoop ecosytem,get credentials
+                    }else{// if backing service is not hadoop ecosytem,get credentials;including gp
                         boolean flag = provisioningJsonObj.get("credentials").isJsonObject();
                         if (flag) {
                             if(backingservice_name.toLowerCase().equals("neo4j")||
