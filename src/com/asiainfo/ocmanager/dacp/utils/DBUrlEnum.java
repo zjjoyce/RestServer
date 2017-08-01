@@ -1,4 +1,4 @@
-package com.asiainfo.ocmanager.dacp;
+package com.asiainfo.ocmanager.dacp.utils;
 
 import com.asiainfo.ocmanager.mail.ParamQuery;
 import org.apache.log4j.Logger;

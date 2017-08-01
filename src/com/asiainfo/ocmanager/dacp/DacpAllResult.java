@@ -3,6 +3,7 @@ package com.asiainfo.ocmanager.dacp;
 import com.asiainfo.ocmanager.dacp.model.*;
 import com.asiainfo.ocmanager.dacp.service.TeamWrapper;
 import com.asiainfo.ocmanager.dacp.service.UserWrapper;
+import com.asiainfo.ocmanager.dacp.utils.Property;
 import com.asiainfo.ocmanager.rest.resource.quotaUtils.restClient;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -42,7 +43,7 @@ public class DacpAllResult {
 
 
         Map info = new HashMap<>();
-        String result = null;
+        String userInfo = null;
         try{
             //get team
             Team team = TeamWrapper.getTeamFromTenant(tenantId);
@@ -51,7 +52,7 @@ public class DacpAllResult {
             //get userinfo
             List<UserInfo> userInfos = UserWrapper.getUserInfoFromUserRoleView(tenantId);
             //getDBRegister,DbDistribution,HadoopResource
-            Map<String,List> map = dacpForResourceUtil.getResult(tenantId);
+            Map<String,List> map = DacpForResourceUtil.getDatabaseData(tenantId);
             List<DBRegister> DBRegisters = map.get("database");
             List<DBDistribution> DBDistributions = map.get("transdatabase");
             // add data to info jsonObject
@@ -77,15 +78,15 @@ public class DacpAllResult {
             String infoStr = gb.create().toJson(jsonObject);
             //System.out.println(infoStr);
 
-            String reinfoStr = infoStr.replace("\\","").replace("\"[","[").replace("]\"","]");
-            logger.info(reinfoStr);
-            info.put("info",reinfoStr);
+            String returnInfo = infoStr.replace("\\","").replace("\"[","[").replace("]\"","]");
+            logger.info(returnInfo);
+            info.put("info",returnInfo);
             logger.info("dacp url :"+prop.getProperty("dacp.url"));
             String restResult = restClient.post(prop.getProperty("dacp.url"),info);
             DacpResult dacpResult = gson.fromJson(restResult,DacpResult.class);
-            result = dacpResult.getResult();
+            userInfo = dacpResult.getResult();
             // log the result of sync process
-            if(result.equals("true")){
+            if(userInfo.equals("true")){
                 logger.info("dacp is ok");
             }else{
                 logger.error("sync dacp is failed,error message is:" + dacpResult.getMessage());
@@ -96,7 +97,7 @@ public class DacpAllResult {
             logger.info("getAllResult exception"+e.getMessage());
         }
         logger.info("end to call dacp interface");
-        return result;
+        return userInfo;
 
     }
 }

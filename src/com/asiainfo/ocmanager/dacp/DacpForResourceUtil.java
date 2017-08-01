@@ -5,11 +5,12 @@ import com.asiainfo.ocmanager.dacp.model.DBRegister;
 
 import com.asiainfo.ocmanager.dacp.model.Team;
 import com.asiainfo.ocmanager.dacp.service.TeamWrapper;
+import com.asiainfo.ocmanager.dacp.utils.DBUrlEnum;
+import com.asiainfo.ocmanager.dacp.utils.DbTypeEnum;
+import com.asiainfo.ocmanager.dacp.utils.DriverTypeEnum;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonIOException;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.jettison.json.JSONArray;
@@ -22,11 +23,11 @@ import java.util.*;
  * Created by YANLSH
  * Created on 2017/7/3
  */
-public class dacpForResourceUtil {
+public class DacpForResourceUtil {
 
-    public static Log logger = LogFactory.getLog(dacpForResourceUtil.class);
+    public static Log logger = LogFactory.getLog(DacpForResourceUtil.class);
 
-    private static Map<String, List> mapInfo;
+    private static Map<String, List> userInfoMap;
     private static List dbRegisterList;
     private static List dbDistributionList;
     private static String databasename = "";
@@ -37,24 +38,31 @@ public class dacpForResourceUtil {
     private static String team_code = "";
     private static String thriftUri = "";
     private static String thriftUrl = "";
-    public static Map<String, List> getResult(String tenantId) {
+
+    /**
+     * get database and database trans data from df using tenant id
+     */
+    public static Map<String, List> getDatabaseData(String tenantId) {
         Team team = TeamWrapper.getTeamFromTenant(tenantId);
         team_code = team.getteam_code();
         try {
-            String resourceJson = DacpQuery.GetData(tenantId);
+            // get df backing service data using tenant id
+            String resourceJson = DFDataQuery.GetTenantData(tenantId);
             logger.info("call DF tenant instance resource: \r\n"+resourceJson);
             JsonParser parser = new JsonParser();
             JsonObject object = (JsonObject) parser.parse(resourceJson);
-            JsonArray array = object.get("items").getAsJsonArray();
-            mapInfo = new HashMap<>();
+            // get items
+            JsonArray itemsArray = object.get("items").getAsJsonArray();
+            userInfoMap = new HashMap<>();
             dbRegisterList = new ArrayList<>();
             dbDistributionList = new ArrayList<>();
-            for (int i = 0; i < array.size(); i++) {
-                JsonObject subObject = array.get(i).getAsJsonObject();
+            for (int i = 0; i < itemsArray.size(); i++) {
+                JsonObject subObject = itemsArray.get(i).getAsJsonObject();
                 JsonObject specJsonObj = subObject.get("spec").getAsJsonObject();
                 JsonObject statusJsonObj = subObject.get("status").getAsJsonObject();
                 String phase = statusJsonObj.get("phase").getAsString();
                 String instance_id = specJsonObj.get("instance_id").getAsString();
+                // if Failure do nothing
                 if (!"Failure".equals(phase)) {
                     JsonObject provisioningJsonObj = specJsonObj.get("provisioning").getAsJsonObject();
                     String backingservice_name = provisioningJsonObj.get("backingservice_name").getAsString();//dbname
@@ -62,8 +70,11 @@ public class dacpForResourceUtil {
                     String driverclassname = DriverTypeEnum.getDriverTypeEnum(driveTypeStr);
 
                     boolean hadoopflag = isHadoopflag(backingservice_name.toLowerCase());
-                    if(hadoopflag){
+                    // check if item is hadoop ecosystem,if not ,do nothing
+                    if(hadoopflag){//is hadoop ecosystem,get binding
+                        // if unbound ,do nothing
                         if(!"Unbound".equals(phase)){
+                            // only backing_service is hive ,then send to dacp ,or do nothing
                             if(!backingservice_name.toLowerCase().equals("hive")) continue;
                             if(specJsonObj.get("binding").isJsonArray()){
                                 /*JsonArray bindingJsonArray = specJsonObj.get("binding").getAsJsonArray();
@@ -82,12 +93,14 @@ public class dacpForResourceUtil {
                             }
                             DBEntityAssign(instance_id,backingservice_name,driverclassname);
                         }
-                    }else{
+                    }else{// if backing service is not hadoop ecosytem,get credentials;including gp
                         boolean flag = provisioningJsonObj.get("credentials").isJsonObject();
                         if (flag) {
                             if(backingservice_name.toLowerCase().equals("neo4j")||
-                                    backingservice_name.toLowerCase().equals("mongodb")||
-                                    backingservice_name.toLowerCase().equals("rabbitmq")) continue;
+                                backingservice_name.toLowerCase().equals("mongodb")||
+                                backingservice_name.toLowerCase().equals("rabbitmq")||
+                                backingservice_name.toLowerCase().equals("redis"))
+                                continue;
                             JsonObject credentialsJsonObj = provisioningJsonObj.get("credentials").getAsJsonObject();
                             assignForDBInfo(credentialsJsonObj,backingservice_name);
                         }
@@ -95,14 +108,14 @@ public class dacpForResourceUtil {
                     }
                 }
             }
-            mapInfo.put("database", dbRegisterList);
-            mapInfo.put("transdatabase", dbDistributionList);
+            userInfoMap.put("database", dbRegisterList);
+            userInfoMap.put("transdatabase", dbDistributionList);
 
         } catch (Exception e) {
             e.printStackTrace();
             logger.info("DacpforResourceUtil Exception " + e.getMessage());
         }
-        return mapInfo;
+        return userInfoMap;
     }
 
 
