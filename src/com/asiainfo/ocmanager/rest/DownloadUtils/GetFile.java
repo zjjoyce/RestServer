@@ -26,7 +26,6 @@ public class GetFile {
         String currentClassesPath = classPath.substring(0, classPath.length() - 8)+ "conf/config.properties";
         try{
             InputStream inStream = new FileInputStream(new File(currentClassesPath ));
-            //            prop = new Properties();
             prop.load(inStream);
         }catch(IOException e){
             logger.error(e.getMessage());
@@ -61,7 +60,7 @@ public class GetFile {
         File dir = new File(prop.getProperty("keytab.path"));
         File file = new File(filepaths);
         try {
-            dirRecursion(dir);
+            dir.mkdirs();
             file.createNewFile();
         } catch (IOException e) {
             logger.error(e.getMessage());
@@ -80,20 +79,9 @@ public class GetFile {
         return file;
     }
 
-
-    public static void dirRecursion(File file) throws IOException {
-        if (file.getParentFile().exists()) {
-            file.mkdir();
-        } else {
-            dirRecursion(file.getParentFile());
-            file.mkdir();
-        }
-    }
-
     public static String getKeytabData(String tenantId,String username){
         String resource = DFDataQuery.GetTenantData(tenantId);
         logger.info("call DF tenant instance resource: \r\n"+resource);
-        List usernamelist = new ArrayList<>();
         String result = "";
         try {
             JSONObject resourceJson = new JSONObject(resource);
@@ -120,13 +108,10 @@ public class GetFile {
                         String principal = credentialsJson.getString("username");
                         String[] usernames = principal.split("@");
                         String splitusername = usernames[0];
-                        if(usernamelist.contains(splitusername)){
-                            continue;
-                        }
-                        usernamelist.add(splitusername);
                         if(username.equals(splitusername)){
                             String keytab = credentialsJson.getString("keytab");
                             result = keytab;
+                            return result;
                         }
                     }
                 }
@@ -142,10 +127,10 @@ public class GetFile {
 
         File file = new File(prop.getProperty("keytab.path") + username + prop.getProperty("keytab.type"));
         if (file.exists()) {
-            logger.info("User non first download ");
+            logger.info("The user is not download for the first time");
             return true;
         } else{
-            logger.info("Users download for the first time");
+            logger.info("The user download for the first time");
             return false;
         }
     }
