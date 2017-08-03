@@ -95,23 +95,36 @@ public class GetFile {
                 String spec = json.getString("spec");
                 JSONObject specJson = new JSONObject(spec);
                 String binding = specJson.getString("binding");
+                if(binding==null||binding.equals("")||binding.equals("null")){
+                    logger.info("Failed to obtain binding information for this user,The information is empty");
+                    continue;
+                }
                 if(phase.equals("Bound")){
                     JSONArray bindingJson = new JSONArray(binding);
                     for(int j = 0;j<bindingJson.length();j++){
                         JSONObject jsonn = new JSONObject(bindingJson.getString(j));
                         String credentials = jsonn.getString("credentials");
-                        if(credentials==null||credentials.equals("")){
-                            logger.info("Failed to obtain binding information for this user,The information is empty");
+                        if(credentials==null||credentials.equals("")||credentials.equals("null")){
+                            logger.info("Failed to obtain credentials information for this user,The information is empty");
                             continue;
                         }
                         JSONObject credentialsJson = new JSONObject(credentials);
-                        String principal = credentialsJson.getString("username");
-                        String[] usernames = principal.split("@");
-                        String splitusername = usernames[0];
-                        if(username.equals(splitusername)){
-                            String keytab = credentialsJson.getString("keytab");
-                            result = keytab;
-                            return result;
+                        Iterator keys = credentialsJson.keys();
+                        while (keys.hasNext()){
+                            if(keys.next().equals("keytab")){
+                                String principal = credentialsJson.getString("username");
+                                String[] usernames = principal.split("@");
+                                String splitusername = usernames[0];
+                                if(username.equals(splitusername)){
+                                    String keytab = credentialsJson.getString("keytab");
+                                    if(keytab==null||keytab.equals("")||keytab.equals("null")){
+                                        logger.info("Failed to obtain keytab information for this user,The information is empty");
+                                        continue;
+                                    }
+                                    result = keytab;
+                                    return result;
+                                }
+                            }
                         }
                     }
                 }

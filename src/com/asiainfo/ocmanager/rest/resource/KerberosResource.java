@@ -23,10 +23,10 @@ import java.util.Map;
 public class KerberosResource {
 
     @GET
-    @Path("getkeytab/{tanantId}/{username}")
+    @Path("getkeytab/{tenantId}/{username}")
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
-    public Response getFiles(@PathParam("tanantId")String tanantid,@PathParam("username")String username){
-        Map map = GetFile.getFile(tanantid,username);
+    public Response getFiles(@PathParam("tenantId")String tenantId,@PathParam("username")String username){
+        Map map = GetFile.getFile(tenantId,username);
         Response.ResponseBuilder responseBuilder = Response.ok(map.get("file"));
         responseBuilder.type("applicatoin/octet-stream");
         responseBuilder.header("Content-Disposition", "attachment; filename="+((File)map.get("file")).getName());
