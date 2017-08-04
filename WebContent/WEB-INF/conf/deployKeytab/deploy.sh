@@ -9,7 +9,7 @@ tag=$3
 
 dir=`dirname $0`
 current=`cd $dir;pwd`
-servers=`cat $current/server.properties |grep -v "#"|grep "server"|awk -F ',' '{print $1}'`
+servers=`cat $current/server.properties |grep -v "#"|grep $tag|awk -F ',' '{print $1}'`
 code=0
 for i in $servers
 do
