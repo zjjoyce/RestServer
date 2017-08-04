@@ -8,6 +8,7 @@ import com.asiainfo.ocmanager.dacp.service.TeamWrapper;
 import com.asiainfo.ocmanager.dacp.utils.DBUrlEnum;
 import com.asiainfo.ocmanager.dacp.utils.DbTypeEnum;
 import com.asiainfo.ocmanager.dacp.utils.DriverTypeEnum;
+import com.asiainfo.ocmanager.dacp.utils.KeyTabClient;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -17,6 +18,7 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
+import java.io.*;
 import java.util.*;
 
 /**
@@ -26,6 +28,20 @@ import java.util.*;
 public class DacpForResourceUtil {
 
     public static Log logger = LogFactory.getLog(DacpForResourceUtil.class);
+
+    private static Properties propdacp = new Properties();
+
+    static {
+        String classPath = new dacpForResourceUtil_test().getClass().getResource("/").getPath();
+        String currentClassesPath = classPath.substring(0, classPath.length() - 8)+ "conf/config.properties";
+        try{
+            InputStream inStream = new FileInputStream(new File(currentClassesPath ));
+            //            prop = new Properties();
+            propdacp.load(inStream);
+        }catch(IOException e){
+            logger.error(e.getMessage());
+        }
+    }
 
     private static Map<String, List> userInfoMap;
     private static List dbRegisterList;
@@ -76,21 +92,7 @@ public class DacpForResourceUtil {
                         if(!"Unbound".equals(phase)){
                             // only backing_service is hive ,then send to dacp ,or do nothing
                             if(!backingservice_name.toLowerCase().equals("hive")) continue;
-                            if(specJsonObj.get("binding").isJsonArray()){
-                                /*JsonArray bindingJsonArray = specJsonObj.get("binding").getAsJsonArray();
-                                JsonObject bindObj = bindingJsonArray.get(0).getAsJsonObject();*///no sort
-                                JsonArray bindingJsonArray = specJsonObj.get("binding").getAsJsonArray();
-
-                                String sortByUserBindingStr = sortByUsername(bindingJsonArray.toString());
-
-                                JsonObject bindObj = (JsonObject) parser.parse(sortByUserBindingStr);//have sort
-
-                                if(bindObj != null){
-                                    JsonObject credentialJsonObj = bindObj.get("credentials").getAsJsonObject();
-                                    assignForDBInfo(credentialJsonObj,backingservice_name);
-                                }
-
-                            }
+                            hadoopDBEntityAssign(backingservice_name,specJsonObj);
                             DBEntityAssign(instance_id,backingservice_name,driverclassname);
                         }
                     }else{// if backing service is not hadoop ecosytem,get credentials;including gp
@@ -118,6 +120,25 @@ public class DacpForResourceUtil {
         return userInfoMap;
     }
 
+    //1.sort users of resource   2.get DBInfo
+    private static void hadoopDBEntityAssign(String backingservice_name, JsonObject specJsonObj) {
+        JsonParser parser = new JsonParser();
+        if(specJsonObj.get("binding").isJsonArray()){
+            JsonArray bindingJsonArray = specJsonObj.get("binding").getAsJsonArray();
+
+            String sortByUserBindingStr = sortByUsername(bindingJsonArray.toString());
+
+            JsonObject bindObj = (JsonObject) parser.parse(sortByUserBindingStr);//have sort
+
+            //JsonObject bindObj = bindingJsonArray.get(0).getAsJsonObject();//no sort
+
+            if(bindObj != null){
+                JsonObject credentialJsonObj = bindObj.get("credentials").getAsJsonObject();
+                assignForDBInfo(credentialJsonObj,backingservice_name);
+            }
+
+        }
+    }
 
     /*初始化数据注册与分配实例，并分别加入队列*/
     private static void DBEntityAssign(String instance_id, String backingservice_name, String driverclassname) {
@@ -220,6 +241,8 @@ public class DacpForResourceUtil {
                 String hiveDatabase = credentialsJsonObj.get("Hive database").getAsString();
                 databasename=hiveDatabase.substring(0,hiveDatabase.indexOf(":"));
             }
+            //now only hive do this operation
+            keyTabFileCreateAndDeploy(credentialsJsonObj);
         }else{
             if (credentialsJsonObj.get("name") != null) {
                 databasename = credentialsJsonObj.get("name").getAsString();
@@ -230,6 +253,59 @@ public class DacpForResourceUtil {
         }
         thriftUrl = DBUrlEnum.getDBUrlEnum(backingservice_name.toLowerCase(), thriftUri, host, port, databasename,username);//thriftUrl
         url = DBUrlEnum.getDBUrlEnum(backingservice_name.toLowerCase(), uri, host, port, databasename,username);//url
+    }
+
+    //hive of hadoop resource keyTab file create and deploy
+    private static void keyTabFileCreateAndDeploy(JsonObject credentialsJsonObj) {
+        Process process = null;
+        List<String> processList = new ArrayList<String>();
+        BufferedReader input = null;
+        Boolean flag = true;
+        try {
+            //begin to create Keytab file
+            String keyTabStr = credentialsJsonObj.get("keytab").getAsString();
+            String keyTabFilePath = propdacp.getProperty("keytab.srcpath");
+            String keyTabFileType = propdacp.getProperty("keytab.type");
+            String keyTabFileName = username + keyTabFileType;
+            String src_file = keyTabFilePath + keyTabFileName;
+            String dest_file = propdacp.getProperty("keytab.destpath");
+            String tag = "dacp";
+            if(credentialsJsonObj.get("keytab") != null){
+                logger.info("keyTabStr: "+keyTabStr+"\nkeyTabFilePath: "+keyTabFilePath);
+                flag = KeyTabClient.CreatKeyTab(keyTabStr, keyTabFilePath, keyTabFileName);
+            }
+            if(flag){
+                //begin to deploy Keytab file
+                String shellClassPath = new dacpForResourceUtil_test().getClass().getResource("/").getPath();
+                String shellPath = shellClassPath.substring(0,shellClassPath.length() - 8) + "conf/deployKeytab/";
+                String execStr = "sh " + shellPath + propdacp.getProperty("deploy.sh.name")+" "+src_file+" "+dest_file+" "+tag +"\n";
+                logger.info("keyTabFileCreateAndDeploy execStr: " + execStr);
+                process = Runtime.getRuntime().exec(execStr);
+                input = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            }else{
+                throw new Exception("Create KeyTab File Failed!");
+            }
+        } catch (Exception e) {
+            logger.error("dacpForResourceUtil keyTabFileCreateAndDeploy Exception:"+e.getMessage());
+        } finally {
+            try {
+                String line = "";
+                while ((line = input.readLine()) != null) {
+                    processList.add(line);
+                }
+                for (String pro : processList) {
+                    if("success".equals(pro)){
+                        logger.info("keyTabFileCreateAndDeploy success: "+pro);
+                    }else if("failed".equals(pro)){
+                        logger.info("keyTabFileCreateAndDeploy failed: "+pro);
+                    }
+                }
+                input.close();
+            }catch (Exception e){
+                logger.info("KafkaUtils getKafkaSpaceQuota Exception:"+e.getMessage());
+            }
+
+        }
     }
 
     private static boolean isHadoopflag(String backingservice_name) {
