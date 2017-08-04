@@ -32,7 +32,7 @@ public class DacpForResourceUtil {
     private static Properties propdacp = new Properties();
 
     static {
-        String classPath = new dacpForResourceUtil_test().getClass().getResource("/").getPath();
+        String classPath = new DacpForResourceUtil().getClass().getResource("/").getPath();
         String currentClassesPath = classPath.substring(0, classPath.length() - 8)+ "conf/config.properties";
         try{
             InputStream inStream = new FileInputStream(new File(currentClassesPath ));
@@ -276,7 +276,7 @@ public class DacpForResourceUtil {
             }
             if(flag){
                 //begin to deploy Keytab file
-                String shellClassPath = new dacpForResourceUtil_test().getClass().getResource("/").getPath();
+                String shellClassPath = new DacpForResourceUtil().getClass().getResource("/").getPath();
                 String shellPath = shellClassPath.substring(0,shellClassPath.length() - 8) + "conf/deployKeytab/";
                 String execStr = "sh " + shellPath + propdacp.getProperty("deploy.sh.name")+" "+src_file+" "+dest_file+" "+tag +"\n";
                 logger.info("keyTabFileCreateAndDeploy execStr: " + execStr);
