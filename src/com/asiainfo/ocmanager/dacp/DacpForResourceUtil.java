@@ -8,6 +8,7 @@ import com.asiainfo.ocmanager.dacp.service.TeamWrapper;
 import com.asiainfo.ocmanager.dacp.utils.DBUrlEnum;
 import com.asiainfo.ocmanager.dacp.utils.DbTypeEnum;
 import com.asiainfo.ocmanager.dacp.utils.DriverTypeEnum;
+import com.asiainfo.ocmanager.dacp.utils.KeyTabClient;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -17,6 +18,7 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
+import java.io.*;
 import java.util.*;
 
 /**
@@ -26,6 +28,20 @@ import java.util.*;
 public class DacpForResourceUtil {
 
     public static Log logger = LogFactory.getLog(DacpForResourceUtil.class);
+
+    private static Properties propdacp = new Properties();
+
+    static {
+        String classPath = new DacpForResourceUtil().getClass().getResource("/").getPath();
+        String currentClassesPath = classPath.substring(0, classPath.length() - 8) + "conf/config.properties";
+        try {
+            InputStream inStream = new FileInputStream(new File(currentClassesPath));
+            //            prop = new Properties();
+            propdacp.load(inStream);
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
+    }
 
     private static Map<String, List> userInfoMap;
     private static List dbRegisterList;
@@ -48,7 +64,7 @@ public class DacpForResourceUtil {
         try {
             // get df backing service data using tenant id
             String resourceJson = DFDataQuery.GetTenantData(tenantId);
-            logger.info("call DF tenant instance resource: \r\n"+resourceJson);
+            logger.info("call DF tenant instance resource: \r\n" + resourceJson);
             JsonParser parser = new JsonParser();
             JsonObject object = (JsonObject) parser.parse(resourceJson);
             // get items
@@ -71,40 +87,26 @@ public class DacpForResourceUtil {
 
                     boolean hadoopflag = isHadoopflag(backingservice_name.toLowerCase());
                     // check if item is hadoop ecosystem,if not ,do nothing
-                    if(hadoopflag){//is hadoop ecosystem,get binding
+                    if (hadoopflag) {//is hadoop ecosystem,get binding
                         // if unbound ,do nothing
-                        if(!"Unbound".equals(phase)){
+                        if (!"Unbound".equals(phase)) {
                             // only backing_service is hive ,then send to dacp ,or do nothing
-                            if(!backingservice_name.toLowerCase().equals("hive")) continue;
-                            if(specJsonObj.get("binding").isJsonArray()){
-                                /*JsonArray bindingJsonArray = specJsonObj.get("binding").getAsJsonArray();
-                                JsonObject bindObj = bindingJsonArray.get(0).getAsJsonObject();*///no sort
-                                JsonArray bindingJsonArray = specJsonObj.get("binding").getAsJsonArray();
-
-                                String sortByUserBindingStr = sortByUsername(bindingJsonArray.toString());
-
-                                JsonObject bindObj = (JsonObject) parser.parse(sortByUserBindingStr);//have sort
-
-                                if(bindObj != null){
-                                    JsonObject credentialJsonObj = bindObj.get("credentials").getAsJsonObject();
-                                    assignForDBInfo(credentialJsonObj,backingservice_name);
-                                }
-
-                            }
-                            DBEntityAssign(instance_id,backingservice_name,driverclassname);
+                            if (!backingservice_name.toLowerCase().equals("hive")) continue;
+                            hadoopDBEntityAssign(backingservice_name, specJsonObj);
+                            DBEntityAssign(instance_id, backingservice_name, driverclassname);
                         }
-                    }else{// if backing service is not hadoop ecosytem,get credentials;including gp
+                    } else {// if backing service is not hadoop ecosytem,get credentials;including gp
                         boolean flag = provisioningJsonObj.get("credentials").isJsonObject();
                         if (flag) {
-                            if(backingservice_name.toLowerCase().equals("neo4j")||
-                                backingservice_name.toLowerCase().equals("mongodb")||
-                                backingservice_name.toLowerCase().equals("rabbitmq")||
+                            if (backingservice_name.toLowerCase().equals("neo4j") ||
+                                backingservice_name.toLowerCase().equals("mongodb") ||
+                                backingservice_name.toLowerCase().equals("rabbitmq") ||
                                 backingservice_name.toLowerCase().equals("redis"))
                                 continue;
                             JsonObject credentialsJsonObj = provisioningJsonObj.get("credentials").getAsJsonObject();
-                            assignForDBInfo(credentialsJsonObj,backingservice_name);
+                            assignForDBInfo(credentialsJsonObj, backingservice_name);
                         }
-                        DBEntityAssign(instance_id,backingservice_name,driverclassname);
+                        DBEntityAssign(instance_id, backingservice_name, driverclassname);
                     }
                 }
             }
@@ -118,18 +120,37 @@ public class DacpForResourceUtil {
         return userInfoMap;
     }
 
+    //1.sort users of resource   2.get DBInfo
+    private static void hadoopDBEntityAssign(String backingservice_name, JsonObject specJsonObj) {
+        JsonParser parser = new JsonParser();
+        if (specJsonObj.get("binding").isJsonArray()) {
+            JsonArray bindingJsonArray = specJsonObj.get("binding").getAsJsonArray();
+
+            String sortByUserBindingStr = sortByUsername(bindingJsonArray.toString());
+
+            JsonObject bindObj = (JsonObject) parser.parse(sortByUserBindingStr);//have sort
+
+            //JsonObject bindObj = bindingJsonArray.get(0).getAsJsonObject();//no sort
+
+            if (bindObj != null) {
+                JsonObject credentialJsonObj = bindObj.get("credentials").getAsJsonObject();
+                assignForDBInfo(credentialJsonObj, backingservice_name);
+            }
+
+        }
+    }
 
     /*初始化数据注册与分配实例，并分别加入队列*/
     private static void DBEntityAssign(String instance_id, String backingservice_name, String driverclassname) {
         /*数据库分配*/
         String state = "on";
         String remark = "";//remark
-        if(backingservice_name.toLowerCase().equals("hive")){
+        if (backingservice_name.toLowerCase().equals("hive")) {
             //hive_
             DBRegister dbRegister_hive = new DBRegister();
-            dbRegister_hive.setXmlid("hive_"+instance_id);
-            dbRegister_hive.setDbname("hive_"+databasename);
-            dbRegister_hive.setCnname("hive_"+databasename);
+            dbRegister_hive.setXmlid("hive_" + instance_id);
+            dbRegister_hive.setDbname("hive_" + databasename);
+            dbRegister_hive.setCnname("hive_" + databasename);
             dbRegister_hive.setDriverclassname(driverclassname);
             dbRegister_hive.setUrl(url);
             dbRegister_hive.setUsername(username);
@@ -137,8 +158,8 @@ public class DacpForResourceUtil {
             dbRegister_hive.setRemark(remark);
             dbRegister_hive.setAlias(backingservice_name.toLowerCase());
             DBDistribution dbDistribution_hive = new DBDistribution();
-            dbDistribution_hive.setDbname("hive_"+databasename);
-            dbDistribution_hive.setCnname("hive_"+databasename);
+            dbDistribution_hive.setDbname("hive_" + databasename);
+            dbDistribution_hive.setCnname("hive_" + databasename);
             dbDistribution_hive.setDriverclassname(driverclassname);
             dbDistribution_hive.setUrl(url);
             dbDistribution_hive.setUsername(username);
@@ -150,9 +171,9 @@ public class DacpForResourceUtil {
             dbDistributionList.add(dbDistribution_hive);
             //spark_
             DBRegister dbRegister_sparksql = new DBRegister();
-            dbRegister_sparksql.setXmlid("spark_"+instance_id);
-            dbRegister_sparksql.setDbname("spark_"+databasename);
-            dbRegister_sparksql.setCnname("spark_"+databasename);
+            dbRegister_sparksql.setXmlid("spark_" + instance_id);
+            dbRegister_sparksql.setDbname("spark_" + databasename);
+            dbRegister_sparksql.setCnname("spark_" + databasename);
             dbRegister_sparksql.setDriverclassname(driverclassname);
             dbRegister_sparksql.setUrl(thriftUrl);
             dbRegister_sparksql.setUsername(username);
@@ -161,8 +182,8 @@ public class DacpForResourceUtil {
             dbRegister_sparksql.setAlias(backingservice_name.toLowerCase());
 
             DBDistribution dbDistribution_sparksql = new DBDistribution();
-            dbDistribution_sparksql.setDbname("spark_"+databasename);
-            dbDistribution_sparksql.setCnname("spark_"+databasename);
+            dbDistribution_sparksql.setDbname("spark_" + databasename);
+            dbDistribution_sparksql.setCnname("spark_" + databasename);
             dbDistribution_sparksql.setDriverclassname(driverclassname);
             dbDistribution_sparksql.setUrl(thriftUrl);
             dbDistribution_sparksql.setUsername(username);
@@ -173,7 +194,7 @@ public class DacpForResourceUtil {
 
             dbRegisterList.add(dbRegister_sparksql);
             dbDistributionList.add(dbDistribution_sparksql);
-        }else{
+        } else {
             DBRegister dbRegister = new DBRegister();
             dbRegister.setXmlid(instance_id);
             dbRegister.setDbname(databasename);
@@ -203,7 +224,7 @@ public class DacpForResourceUtil {
     }
 
     /*数据注册与分配实例，并分别加入队列*/
-    private static void assignForDBInfo(JsonObject credentialsJsonObj,String backingservice_name) {
+    private static void assignForDBInfo(JsonObject credentialsJsonObj, String backingservice_name) {
         if (credentialsJsonObj.get("username") != null) {
             username = credentialsJsonObj.get("username").getAsString();//username
         }
@@ -215,37 +236,92 @@ public class DacpForResourceUtil {
         }
         String host = credentialsJsonObj.get("host").getAsString();//host
         String port = credentialsJsonObj.get("port").getAsString();//port
-        if(DbTypeEnum.getDbFlagEnum(backingservice_name.toLowerCase()).equals("true")){
+        if (DbTypeEnum.getDbFlagEnum(backingservice_name.toLowerCase()).equals("true")) {
             if (credentialsJsonObj.get("Hive database") != null) {
                 String hiveDatabase = credentialsJsonObj.get("Hive database").getAsString();
-                databasename=hiveDatabase.substring(0,hiveDatabase.indexOf(":"));
+                databasename = hiveDatabase.substring(0, hiveDatabase.indexOf(":"));
             }
-        }else{
+            //now only hive do this operation
+            keyTabFileCreateAndDeploy(credentialsJsonObj);
+        } else {
             if (credentialsJsonObj.get("name") != null) {
                 databasename = credentialsJsonObj.get("name").getAsString();
             }
         }
-        if(credentialsJsonObj.has("thriftUri")){
+        if (credentialsJsonObj.has("thriftUri")) {
             thriftUri = credentialsJsonObj.get("thriftUri").getAsString();
         }
-        thriftUrl = DBUrlEnum.getDBUrlEnum(backingservice_name.toLowerCase(), thriftUri, host, port, databasename,username);//thriftUrl
-        url = DBUrlEnum.getDBUrlEnum(backingservice_name.toLowerCase(), uri, host, port, databasename,username);//url
+        thriftUrl = DBUrlEnum.getDBUrlEnum(backingservice_name.toLowerCase(), thriftUri, host, port, databasename, username);//thriftUrl
+        url = DBUrlEnum.getDBUrlEnum(backingservice_name.toLowerCase(), uri, host, port, databasename, username);//url
+    }
+
+    //hive of hadoop resource keyTab file create and deploy
+    private static void keyTabFileCreateAndDeploy(JsonObject credentialsJsonObj) {
+        Process process = null;
+        List<String> processList = new ArrayList<String>();
+        BufferedReader input = null;
+        Boolean flag = true;
+        try {
+            //begin to create Keytab file
+            String keyTabStr = credentialsJsonObj.get("keytab").getAsString();
+            String keyTabFilePath = propdacp.getProperty("keytab.srcpath");
+            String keyTabFileType = propdacp.getProperty("keytab.type");
+            String keyTabFileName = username + keyTabFileType;
+            String src_file = keyTabFilePath + keyTabFileName;
+            String dest_file = propdacp.getProperty("keytab.destpath");
+            String tag = "dacp";
+            if (credentialsJsonObj.get("keytab") != null) {
+                logger.info("keyTabStr: " + keyTabStr + "\nkeyTabFilePath: " + keyTabFilePath);
+                flag = KeyTabClient.CreatKeyTab(keyTabStr, keyTabFilePath, keyTabFileName);
+            }
+            if (flag) {
+                //begin to deploy Keytab file
+                String shellClassPath = new DacpForResourceUtil().getClass().getResource("/").getPath();
+                String shellPath = shellClassPath.substring(0, shellClassPath.length() - 8) + "conf/deployKeytab/";
+                String execStr = "sh " + shellPath + propdacp.getProperty("deploy.sh.name") + " " + src_file + " " + dest_file + " " + tag + "\n";
+                logger.info("keyTabFileCreateAndDeploy execStr: " + execStr);
+                process = Runtime.getRuntime().exec(execStr);
+                input = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            } else {
+                throw new Exception("Create KeyTab File Failed!");
+            }
+        } catch (Exception e) {
+            logger.error("dacpForResourceUtil keyTabFileCreateAndDeploy Exception:" + e.getMessage());
+        } finally {
+            try {
+                String line = "";
+                while ((line = input.readLine()) != null) {
+                    processList.add(line);
+                }
+                for (String pro : processList) {
+                    if ("success".equals(pro)) {
+                        logger.info("keyTabFileCreateAndDeploy success: " + pro);
+                    } else if ("failed".equals(pro)) {
+                        logger.info("keyTabFileCreateAndDeploy failed: " + pro);
+                    }
+                }
+                input.close();
+            } catch (Exception e) {
+                logger.info("KafkaUtils getKafkaSpaceQuota Exception:" + e.getMessage());
+            }
+
+        }
     }
 
     private static boolean isHadoopflag(String backingservice_name) {
         String dbflag = DbTypeEnum.getDbFlagEnum(backingservice_name);
-        if(dbflag.equals("true")){
+        if (dbflag.equals("true")) {
             return true;
-        }else{
+        } else {
             return false;
         }
     }
 
-    private static String sortByUsername (String bindingJsonArray){
+    private static String sortByUsername(String bindingJsonArray) {
         JSONArray jsonArr = null;
         JSONArray sortedJsonArray = new JSONArray();
         List<JSONObject> jsonValues = new ArrayList<JSONObject>();
-        String bindObjStr="";
+        String bindObjStr = "";
         try {
             jsonArr = new JSONArray(bindingJsonArray);
             for (int i = 0; i < jsonArr.length(); i++) {
