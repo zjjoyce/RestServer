@@ -37,6 +37,9 @@ public class GetFile {
         String filepaths = prop.getProperty("keytab.path") + username + prop.getProperty("keytab.type");
         Map result = new HashMap<>();
         result.put("filepaths",filepaths);
+        result.put("file","");
+        result.put("status","");
+        result.put("errormsg","");
         if(isexists==true){
             File file = new File(filepaths);
             result.put("file",file);
@@ -45,7 +48,13 @@ public class GetFile {
         File file = null;
         try {
             file = createFile(tanantid,username);
-            result.put("file",file);
+            if(file==null){
+                result.put("status",false);
+                result.put("errormsg","the user is not exist or the keytab is empty..");
+            }else{
+                result.put("file",file);
+                result.put("status",true);
+            }
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
@@ -55,6 +64,9 @@ public class GetFile {
     public static File createFile(String tanantid,String username) throws IOException {
         String filepaths = prop.getProperty("keytab.path") + username + prop.getProperty("keytab.type");
         String keytab = getKeytabData(tanantid,username);
+        if(keytab.equals("")){
+            return null;
+        }
         Base64 base64 = new Base64();
         String decodekeytab = new String(base64.decode(keytab));
         File dir = new File(prop.getProperty("keytab.path"));
@@ -86,6 +98,9 @@ public class GetFile {
         try {
             JSONObject resourceJson = new JSONObject(resource);
             String items = resourceJson.getString("items");
+            if(items.equals("[]")){
+                return result;
+            }
             JSONArray itemsJson = new JSONArray(items);
             for(int i = 0;i<itemsJson.length();i++){
                 JSONObject json = new JSONObject(itemsJson.getString(i));
@@ -129,7 +144,6 @@ public class GetFile {
                     }
                 }
             }
-
         } catch (JSONException e) {
             logger.error(e.getMessage());
         }

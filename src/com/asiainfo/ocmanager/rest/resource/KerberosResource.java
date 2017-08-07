@@ -24,14 +24,22 @@ public class KerberosResource {
 
     @GET
     @Path("getkeytab/{tenantId}/{username}")
-    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    @Produces({MediaType.APPLICATION_JSON,MediaType.APPLICATION_OCTET_STREAM})
     public Response getFiles(@PathParam("tenantId")String tenantId,@PathParam("username")String username){
         Map map = GetFile.getFile(tenantId,username);
-        Response.ResponseBuilder responseBuilder = Response.ok(map.get("file"));
-        responseBuilder.type("applicatoin/octet-stream");
-        responseBuilder.header("Content-Disposition", "attachment; filename="+((File)map.get("file")).getName());
-        responseBuilder.header("Content-Length", Long.toString(((File)map.get("file")).length()));
-        Response response = responseBuilder.build();
-        return response;
+        boolean status = (boolean) map.get("status");
+        if(!status){
+            Response.ResponseBuilder responseBuilder = Response.ok(map.get("errormsg"));
+            responseBuilder.type("application/json");
+            Response response = responseBuilder.build();
+            return response;
+        }else{
+            Response.ResponseBuilder responseBuilder = Response.ok(map.get("file"));
+            responseBuilder.type("applicatoin/octet-stream");
+            responseBuilder.header("Content-Disposition", "attachment; filename="+((File)map.get("file")).getName());
+            responseBuilder.header("Content-Length", Long.toString(((File)map.get("file")).length()));
+            Response response = responseBuilder.build();
+            return response;
+        }
     }
 }
