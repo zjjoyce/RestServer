@@ -17,7 +17,7 @@ do
 	let code=$code+$?
 done
 ## if return code is 0 meaning success,else is failed
-if[ $code -eq 0 ];then
+if [ $code -eq 0 ];then
     echo "success"
 else
     echo "failed"
