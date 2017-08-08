@@ -293,12 +293,13 @@ public class DacpForResourceUtil {
                 while ((line = input.readLine()) != null) {
                     processList.add(line);
                 }
-                for (String pro : processList) {
-                    if ("success".equals(pro)) {
-                        logger.info("keyTabFileCreateAndDeploy success: " + pro);
-                    } else if ("failed".equals(pro)) {
-                        logger.info("keyTabFileCreateAndDeploy failed: " + pro);
-                    }
+                if ("success".equals(processList.get(processList.size()-1))) {
+                    logger.info("keyTabFileCreateAndDeploy success");
+                } else if ("failed".equals(processList.get(processList.size()-1))) {
+                    logger.info("keyTabFileCreateAndDeploy failed");
+                }
+                for(String pro:processList){
+                    logger.info(pro+"\r\n");
                 }
                 input.close();
             } catch (Exception e) {
