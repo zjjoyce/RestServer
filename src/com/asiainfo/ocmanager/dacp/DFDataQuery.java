@@ -9,7 +9,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
 /**
- * Created by Allen on 2017/7/3.
+ * Created by zhangfq on 2017/7/3.
  * 调用DataFoundry API获取数据
  */
 public class DFDataQuery {
