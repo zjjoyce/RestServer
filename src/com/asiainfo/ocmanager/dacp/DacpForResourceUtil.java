@@ -24,6 +24,9 @@ import java.util.*;
 /**
  * Created by YANLSH
  * Created on 2017/7/3
+ * Get the tenant's resources and synchronize to DACP
+ * Sync succeeds and returns userInfoMap,else return false information
+ * Parameter:tenantId
  */
 public class DacpForResourceUtil {
 
@@ -120,7 +123,11 @@ public class DacpForResourceUtil {
         return userInfoMap;
     }
 
-    //1.sort users of resource   2.get DBInfo
+    /**
+     * sort users of resource and get DBInfo
+     * @Parameter backingservice_name is resource name ;  specJsonObj is resource link info
+     * @returns void
+     */
     private static void hadoopDBEntityAssign(String backingservice_name, JsonObject specJsonObj) {
         JsonParser parser = new JsonParser();
         if (specJsonObj.get("binding").isJsonArray()) {
@@ -140,7 +147,11 @@ public class DacpForResourceUtil {
         }
     }
 
-    /*初始化数据注册与分配实例，并分别加入队列*/
+    /**
+     * Initializes data registration and allocation instances, and joins queues separately
+     * @Parameter instance_id is instance_id  ;  backingservice_name is resource name ; driverclassname is driver class name
+     * @returns void
+     */
     private static void DBEntityAssign(String instance_id, String backingservice_name, String driverclassname) {
         /*数据库分配*/
         String state = "on";
@@ -223,7 +234,11 @@ public class DacpForResourceUtil {
 
     }
 
-    /*数据注册与分配实例，并分别加入队列*/
+    /**
+     * Data is registered and assigned instances, and queues are added
+     * @Parameter credentialsJsonObj is resource credential JsonObject  ;  backingservice_name is resource name ;
+     * @returns void
+     */
     private static void assignForDBInfo(JsonObject credentialsJsonObj, String backingservice_name) {
         if (credentialsJsonObj.get("username") != null) {
             username = credentialsJsonObj.get("username").getAsString();//username
@@ -255,7 +270,12 @@ public class DacpForResourceUtil {
         url = DBUrlEnum.getDBUrlEnum(backingservice_name.toLowerCase(), uri, host, port, databasename, username);//url
     }
 
-    //hive of hadoop resource keyTab file create and deploy
+
+    /**
+     * hive of hadoop resource keyTab file create and deploy
+     * @Parameter credentialsJsonObj is resource credential JsonObject
+     * @returns void
+     */
     private static void keyTabFileCreateAndDeploy(JsonObject credentialsJsonObj) {
         Process process = null;
         List<String> processList = new ArrayList<String>();
@@ -265,14 +285,15 @@ public class DacpForResourceUtil {
             //begin to create Keytab file
             String keyTabStr = credentialsJsonObj.get("keytab").getAsString();
             String keyTabFilePath = propdacp.getProperty("keytab.srcpath");
+            String keyTabFileDesPath = propdacp.getProperty("keytab.destpath");
             String keyTabFileType = propdacp.getProperty("keytab.type");
             String keyTabFileName = username + keyTabFileType;
             String src_file = keyTabFilePath + keyTabFileName;
-            String dest_file = propdacp.getProperty("keytab.destpath");
+            String dest_file = keyTabFileDesPath + keyTabFileName;
             String tag = "dacp";
             if (credentialsJsonObj.get("keytab") != null) {
-                logger.info("keyTabStr: " + keyTabStr + "\nkeyTabFilePath: " + keyTabFilePath);
                 flag = KeyTabClient.CreatKeyTab(keyTabStr, keyTabFilePath, keyTabFileName);
+                logger.info("keyTabStr: " + keyTabStr + "\nkeyTabFilePath: " + keyTabFilePath + " \ncreateKeyTabFlag:"+flag);
             }
             if (flag) {
                 //begin to deploy Keytab file
@@ -309,6 +330,13 @@ public class DacpForResourceUtil {
         }
     }
 
+
+
+    /**
+     * Determines whether the component is of the Hadoop type
+     * @Parameter backingservice_name is resource name
+     * @returns true is hadoop; else is not
+     */
     private static boolean isHadoopflag(String backingservice_name) {
         String dbflag = DbTypeEnum.getDbFlagEnum(backingservice_name);
         if (dbflag.equals("true")) {
@@ -318,6 +346,13 @@ public class DacpForResourceUtil {
         }
     }
 
+
+
+    /**
+     * The user list is sorted under the resource component
+     * @Parameter bindingJsonArray is bingding resource contents
+     * @returns Sorted list
+     */
     private static String sortByUsername(String bindingJsonArray) {
         JSONArray jsonArr = null;
         JSONArray sortedJsonArray = new JSONArray();
