@@ -27,9 +27,9 @@ public class KerberosResource {
     @Produces({MediaType.APPLICATION_JSON,MediaType.APPLICATION_OCTET_STREAM})
     public Response getFiles(@PathParam("tenantId")String tenantId,@PathParam("username")String username){
         Map map = GetFile.getFile(tenantId,username);
-        boolean status = (boolean) map.get("status");
-        if(!status){
-            Response.ResponseBuilder responseBuilder = Response.ok(map.get("errormsg"));
+        String status = (String)map.get("status");
+        if(status.equals("false")){
+            Response.ResponseBuilder responseBuilder = Response.ok(map.get("msg"));
             responseBuilder.type("application/json");
             Response response = responseBuilder.build();
             return response;
