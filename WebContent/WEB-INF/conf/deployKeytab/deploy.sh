@@ -9,15 +9,17 @@ tag=$3
 
 dir=`dirname $0`
 current=`cd $dir;pwd`
-servers=`cat $current/server.properties |grep -v "#"|grep "server"|awk -F ',' '{print $1}'`
+dest_dir=`dirname $dest_file`
+servers=`cat $current/server.properties |grep -v "#"|grep $tag|awk -F ',' '{print $1}'`
 code=0
 for i in $servers
 do
-	scp $src_file $i:$dest_file
+    ssh $tag@$i "mkdir -p $dest_dir"
+	scp $src_file $tag@$i:$dest_file
 	let code=$code+$?
 done
 ## if return code is 0 meaning success,else is failed
-if[ $code -eq 0 ];then
+if [ $code -eq 0 ];then
     echo "success"
 else
     echo "failed"
